@@ -1,0 +1,31 @@
+{
+  "format": "kocum.book-template",
+  "schemaVersion": 1,
+  "author": "ornek_kullanici",
+  "book": {
+    "title": "345 TYT Matematik Soru Bankası",
+    "publisher": "3-4-5 Yayınları",
+    "examType": "TYT",
+    "subject": "Matematik",
+    "pageCount": 120,
+    "avgQuestionsPerPage": 8
+  },
+  "units": [
+    { "title": "1. ÜNİTE: TEMEL KAVRAMLAR", "pageStart": 1, "pageEnd": 24, "meb": "tyt.mat.temel", "children": [
+      { "title": "Sayı Kümeleri", "pageStart": 1, "pageEnd": 8 },
+      { "title": "Tek - Çift Sayılar", "pageStart": 9, "pageEnd": 16 },
+      { "title": "ASAL SAYILAR", "pageStart": 17, "pageEnd": 24 }
+    ]},
+    { "title": "EBOB-EKOK", "pageStart": 25, "pageEnd": 36 },
+    { "title": "Problemler", "pageStart": 37, "pageEnd": 120, "children": [
+      { "title": "Yaş Problemleri", "pageStart": 37, "pageEnd": 52, "children": [
+        { "title": "Yaş Problemleri – Kavrama", "pageStart": 37, "pageEnd": 44 },
+        { "title": "Yaş Problemleri – Pekiştirme", "pageStart": 45, "pageEnd": 52 }
+      ]},
+      { "title": "İşçi Problemleri", "pageStart": 53, "pageEnd": 68 },
+      { "title": "Hareket (Hız) Problemleri", "pageStart": 69, "pageEnd": 88 },
+      { "title": "Yüzde Kar Zarar Problemleri", "pageStart": 89, "pageEnd": 104 },
+      { "title": "Grafik Problemleri", "pageStart": 105, "pageEnd": 120 }
+    ]}
+  ]
+}

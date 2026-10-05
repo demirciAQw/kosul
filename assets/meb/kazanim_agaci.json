@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "note": "ÖRNEK tohum veri. Yayından önce tam MEB/ÖSYM konu listesiyle doldurulmalı. 'id' değerleri kalıcı anahtardır; yayımlandıktan sonra asla değiştirme, yalnızca yeni düğüm ekle.",
+  "subjects": [
+    {
+      "examType": "TYT",
+      "subject": "Matematik",
+      "topics": [
+        { "id": "tyt.mat.temel", "title": "Temel Kavramlar", "aliases": ["Sayılar"], "children": [
+          { "id": "tyt.mat.temel.kumeler", "title": "Sayı Kümeleri" },
+          { "id": "tyt.mat.temel.tek-cift", "title": "Tek ve Çift Sayılar", "aliases": ["Tek Çift Sayılar"] },
+          { "id": "tyt.mat.temel.asal", "title": "Asal Sayılar" }
+        ]},
+        { "id": "tyt.mat.basamak", "title": "Sayı Basamakları" },
+        { "id": "tyt.mat.bolunebilme", "title": "Bölme ve Bölünebilme", "aliases": ["Bölünebilme Kuralları"] },
+        { "id": "tyt.mat.ebob-ekok", "title": "EBOB - EKOK", "aliases": ["En Büyük Ortak Bölen En Küçük Ortak Kat"] },
+        { "id": "tyt.mat.rasyonel", "title": "Rasyonel Sayılar" },
+        { "id": "tyt.mat.esitsizlik", "title": "Basit Eşitsizlikler" },
+        { "id": "tyt.mat.mutlak", "title": "Mutlak Değer" },
+        { "id": "tyt.mat.uslu", "title": "Üslü Sayılar" },
+        { "id": "tyt.mat.koklu", "title": "Köklü Sayılar" },
+        { "id": "tyt.mat.carpanlara", "title": "Çarpanlara Ayırma" },
+        { "id": "tyt.mat.oran", "title": "Oran - Orantı" },
+        { "id": "tyt.mat.problemler", "title": "Problemler", "children": [
+          { "id": "tyt.mat.problemler.sayi", "title": "Sayı Problemleri" },
+          { "id": "tyt.mat.problemler.kesir", "title": "Kesir Problemleri" },
+          { "id": "tyt.mat.problemler.yas", "title": "Yaş Problemleri" },
+          { "id": "tyt.mat.problemler.isci", "title": "İşçi ve Havuz Problemleri", "aliases": ["İşçi Problemleri", "Havuz Problemleri"] },
+          { "id": "tyt.mat.problemler.hareket", "title": "Hareket Problemleri", "aliases": ["Hız Problemleri"] },
+          { "id": "tyt.mat.problemler.yuzde", "title": "Yüzde, Kâr - Zarar Problemleri", "aliases": ["Yüzde Problemleri", "Kar Zarar Problemleri"] },
+          { "id": "tyt.mat.problemler.karisim", "title": "Karışım Problemleri" },
+          { "id": "tyt.mat.problemler.grafik", "title": "Grafik Problemleri" }
+        ]},
+        { "id": "tyt.mat.kumeler", "title": "Kümeler" },
+        { "id": "tyt.mat.fonksiyon", "title": "Fonksiyonlar" },
+        { "id": "tyt.mat.pko", "title": "Permütasyon - Kombinasyon - Olasılık", "aliases": ["Sayma ve Olasılık"] },
+        { "id": "tyt.mat.istatistik", "title": "Veri ve İstatistik", "aliases": ["Veri Analizi"] }
+      ]
+    },
+    {
+      "examType": "TYT",
+      "subject": "Türkçe",
+      "topics": [
+        { "id": "tyt.tur.sozcuk", "title": "Sözcükte Anlam" },
+        { "id": "tyt.tur.cumle", "title": "Cümlede Anlam" },
+        { "id": "tyt.tur.paragraf", "title": "Paragraf" },
+        { "id": "tyt.tur.dilbilgisi", "title": "Dil Bilgisi" }
+      ]
+    }
+  ]
+}

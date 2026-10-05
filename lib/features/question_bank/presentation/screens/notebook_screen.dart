@@ -1,0 +1,286 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../app/routes.dart';
+import '../../domain/question_card.dart';
+import '../../domain/question_grouping.dart';
+import '../../question_bank_providers.dart';
+import '../widgets/filter_sheet.dart';
+import '../widgets/question_tile.dart';
+
+/// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
+class NotebookScreen extends ConsumerStatefulWidget {
+  const NotebookScreen({super.key});
+
+  @override
+  ConsumerState<NotebookScreen> createState() => _NotebookScreenState();
+}
+
+class _NotebookScreenState extends ConsumerState<NotebookScreen> {
+  final _search = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _onChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) ref.read(questionFilterProvider.notifier).setText(value);
+    });
+    setState(() {}); // temizle butonunu göster/gizle
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final filter = ref.watch(questionFilterProvider);
+    final groupBy = ref.watch(questionGroupByProvider);
+    final groups = ref.watch(questionGroupsProvider);
+    final due = ref.watch(dueCountProvider).value ?? 0;
+
+    // Filtre menüsünden "Temizle" ile metin de sıfırlandıysa arama kutusunu boşalt.
+    ref.listen(questionFilterProvider, (prev, next) {
+      if (next.text == null && prev?.text != null && _search.text.isNotEmpty) _search.clear();
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Defterim'),
+        actions: [
+          IconButton(
+            tooltip: 'Filtrele',
+            onPressed: () => showQuestionFilterSheet(context),
+            icon: Badge.count(
+              count: filter.activeCount,
+              isLabelVisible: filter.activeCount > 0,
+              child: const Icon(Icons.tune_rounded),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(AppRoutes.newQuestion),
+        icon: const Icon(Icons.add_a_photo_outlined),
+        label: const Text('Soru ekle'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: TextField(
+              controller: _search,
+              onChanged: _onChanged,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'Kaynak, konu, neden ya da not ara',
+                prefixIcon: const Icon(Icons.search_rounded),
+                suffixIcon: _search.text.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Aramayı temizle',
+                        icon: const Icon(Icons.close_rounded),
+                        onPressed: () {
+                          _search.clear();
+                          ref.read(questionFilterProvider.notifier).setText(null);
+                          setState(() {});
+                        },
+                      ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SegmentedButton<bool>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(value: false, label: Text('Tümü')),
+                      ButtonSegment(value: true, label: Text('Güzel Sorular'), icon: Icon(Icons.star_rounded)),
+                    ],
+                    selected: {filter.starredOnly},
+                    onSelectionChanged: (s) =>
+                        ref.read(questionFilterProvider.notifier).setStarredOnly(s.first),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonalIcon(
+                onPressed: () => context.push(AppRoutes.review),
+                icon: const Icon(Icons.replay_rounded),
+                label: Text(due > 0 ? 'Yanlışlarımı göster ($due)' : 'Yanlışlarımı göster'),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Row(
+              children: [
+                Text('Grupla:', style: theme.textTheme.labelLarge),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SegmentedButton<GroupBy>(
+                    showSelectedIcon: false,
+                    style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                    segments: [for (final g in GroupBy.values) ButtonSegment(value: g, label: Text(g.label))],
+                    selected: {groupBy},
+                    onSelectionChanged: (s) => ref.read(questionGroupByProvider.notifier).set(s.first),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: groups.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
+              data: (list) => list.isEmpty
+                  ? _EmptyState(filtered: !filter.isUnfiltered)
+                  : ListView(
+                      padding: const EdgeInsets.only(bottom: 96),
+                      children: [
+                        for (final g in list)
+                          _GroupTile(group: g, path: g.title, depth: 0, expanded: list.length <= 3),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GroupTile extends StatelessWidget {
+  const _GroupTile({required this.group, required this.path, required this.depth, this.expanded = false});
+
+  final QuestionGroup group;
+  final String path;
+  final int depth;
+  final bool expanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ExpansionTile(
+      key: PageStorageKey<String>(path),
+      initiallyExpanded: expanded,
+      maintainState: false, // kapalı grubun kartları çizilmez: binlerce soruda bile akıcı
+      shape: const Border(),
+      collapsedShape: const Border(),
+      tilePadding: EdgeInsetsDirectional.only(start: 16 + depth * 14.0, end: 16),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              group.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: depth == 0 ? theme.textTheme.titleMedium : theme.textTheme.titleSmall,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text('${group.total}', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+        ],
+      ),
+      subtitle: group.subtitle == null ? null : Text(group.subtitle!),
+      children: [
+        for (final child in group.children)
+          _GroupTile(group: child, path: '$path/${child.title}', depth: depth + 1),
+        if (group.cards.isNotEmpty) _CardGrid(cards: group.cards),
+      ],
+    );
+  }
+}
+
+class _CardGrid extends StatefulWidget {
+  const _CardGrid({required this.cards});
+  final List<QuestionCard> cards;
+
+  @override
+  State<_CardGrid> createState() => _CardGridState();
+}
+
+class _CardGridState extends State<_CardGrid> {
+  static const _page = 30;
+  int _shown = _page;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = widget.cards.length;
+    final visible = total < _shown ? total : _shown;
+    return Column(
+      children: [
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 3 / 4,
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          children: [
+            for (final card in widget.cards.take(visible)) QuestionTile(key: ValueKey(card.id), card: card),
+          ],
+        ),
+        if (visible < total)
+          TextButton(
+            onPressed: () => setState(() => _shown += _page),
+            child: Text('Daha fazla göster (${total - visible})'),
+          ),
+      ],
+    );
+  }
+}
+
+class _EmptyState extends ConsumerWidget {
+  const _EmptyState({required this.filtered});
+  final bool filtered;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(filtered ? Icons.filter_alt_off_outlined : Icons.collections_bookmark_outlined,
+                size: 48, color: theme.colorScheme.primary),
+            const SizedBox(height: 16),
+            Text(filtered ? 'Filtrene uyan soru yok' : 'Defterin henüz boş', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(
+              filtered
+                  ? 'Filtreleri gevşetmeyi dene.'
+                  : 'Bir testi bitirince yanlış ve boşlarını buraya ekle. Her soru çözümüyle birlikte saklanır.',
+              textAlign: TextAlign.center,
+            ),
+            if (filtered) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => ref.read(questionFilterProvider.notifier).reset(),
+                child: const Text('Filtreleri temizle'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
