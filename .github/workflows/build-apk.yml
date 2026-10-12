@@ -29,6 +29,27 @@ jobs:
             cp -r "$RUNNER_TEMP/scaffold/android" ./android
           fi
 
+      # Sabit imza: KEYSTORE_BASE64 ve KEYSTORE_PASSWORD sirlari varsa her APK
+      # ayni anahtarla imzalanir ve telefonda eskisinin USTUNE kurulur (veriler kalir).
+      # Sirlar yoksa derleme yine calisir ama her seferinde farkli imza olur.
+      - name: Imza anahtarini hazirla
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/kocum-release.jks
+            {
+              echo "storeFile=kocum-release.jks"
+              echo "storePassword=$KEYSTORE_PASSWORD"
+              echo "keyAlias=kocum"
+              echo "keyPassword=$KEYSTORE_PASSWORD"
+            } > android/key.properties
+            echo "Sabit imza kullaniliyor."
+          else
+            echo "::warning::KEYSTORE_BASE64 / KEYSTORE_PASSWORD sirlari yok. APK her derlemede farkli imzalanir; yeni surumu kurmadan once eskisini kaldirman gerekir."
+          fi
+
       - name: Bagimliliklari indir
         run: flutter pub get
 
@@ -42,8 +63,9 @@ jobs:
         run: flutter test
         continue-on-error: true
 
+      # Surum kodu her derlemede artar: Android guncellemeyi "eski surum" diye reddetmez.
       - name: APK derle
-        run: flutter build apk --release --target-platform android-arm64
+        run: flutter build apk --release --target-platform android-arm64 --build-number=${{ github.run_number }}
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,3 +1,4 @@
+import '../../curriculum/domain/curriculum.dart';
 import '../../library/domain/library.dart';
 import '../domain/study_session.dart';
 
@@ -158,6 +159,7 @@ class TreeSelection {
           mebNodeId: n.mebNodeId,
           pages: pages,
           estimatedQuestions: pages.isEmpty ? null : n.book.estimateQuestions(pages.length),
+          subject: subjectKey(n.book.examType, n.book.subject),
         ));
         return;
       }

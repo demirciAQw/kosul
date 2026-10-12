@@ -18,6 +18,17 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
       });
 
   @override
+  Future<void> update(QuestionCard card, {ReviewState? ensureReview, bool dropReview = false}) =>
+      _db.transaction(() async {
+        await (_db.update(_db.questionCards)..where((c) => c.id.equals(card.id))).write(_toCompanion(card));
+        if (dropReview) {
+          await (_db.delete(_db.reviewStates)..where((r) => r.cardId.equals(card.id))).go();
+        } else if (ensureReview != null && await reviewStateOf(card.id) == null) {
+          await applyReview(card.id, ensureReview);
+        }
+      });
+
+  @override
   Future<QuestionCard?> findById(String id) async {
     final row = await (_db.select(_db.questionCards)..where((c) => c.id.equals(id))).getSingleOrNull();
     return row == null ? null : _toEntity(row);
@@ -55,6 +66,41 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         return e;
       })
       ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    return q.watch().map((rows) => rows.map(_toEntity).toList());
+  }
+
+  @override
+  Stream<List<QuestionCard>> watchIncomplete() {
+    final q = _db.select(_db.questionCards)
+      ..where((t) =>
+          t.questionImage.isNull() |
+          (t.solutionImage.isNull() & t.solutionText.isNull()) |
+          (t.status.equals(QuestionStatus.correct.name).not() & t.reason.isNull()) |
+          t.mebNodeId.isNull())
+      ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    return q.watch().map((rows) => rows.map(_toEntity).toList());
+  }
+
+  @override
+  Future<List<QuestionCard>> findLinked({String? sessionItemId, String? mockExamId, String? subject}) async {
+    if (sessionItemId == null && mockExamId == null) return const [];
+    final q = _db.select(_db.questionCards)
+      ..where((t) {
+        if (sessionItemId != null) return t.sessionItemId.equals(sessionItemId);
+        Expression<bool> e = t.mockExamId.equals(mockExamId!);
+        final s = subject;
+        if (s != null) e = e & t.subject.equals(s);
+        return e;
+      });
+    return (await q.get()).map(_toEntity).toList();
+  }
+
+  @override
+  Stream<List<QuestionCard>> watchMockExamMistakes() {
+    final q = _db.select(_db.questionCards)
+      ..where((t) =>
+          t.mockExamId.isNotNull() &
+          t.status.isIn([QuestionStatus.wrong.name, QuestionStatus.blank.name]));
     return q.watch().map((rows) => rows.map(_toEntity).toList());
   }
 
@@ -111,6 +157,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
   static String _searchText(QuestionCard c) => normalizeTr([
         c.sourceName,
         c.subject,
+        c.testLabel,
         c.solutionText,
         c.note,
         c.reason?.label,
@@ -120,7 +167,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         id: c.id,
         status: c.status.name,
         origin: c.origin.name,
-        questionImage: c.questionImage,
+        questionImage: Value(c.questionImage),
         solutionImage: Value(c.solutionImage),
         solutionText: Value(c.solutionText),
         sourceName: c.sourceName,
@@ -137,6 +184,10 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         note: Value(c.note),
         searchText: _searchText(c),
         createdAt: c.createdAt,
+        questionNo: Value(c.questionNo),
+        testLabel: Value(c.testLabel),
+        sessionItemId: Value(c.sessionItemId),
+        mockExamId: Value(c.mockExamId),
       );
 
   static QuestionCard _toEntity(QuestionCardRow r) => QuestionCard(
@@ -159,5 +210,9 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         isStarred: r.isStarred,
         note: r.note,
         createdAt: r.createdAt,
+        questionNo: r.questionNo,
+        testLabel: r.testLabel,
+        sessionItemId: r.sessionItemId,
+        mockExamId: r.mockExamId,
       );
 }

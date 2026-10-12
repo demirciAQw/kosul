@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/di/core_providers.dart';
 import '../../../core/utils/formatters.dart';
+import '../../curriculum/domain/curriculum.dart';
 import '../../library/domain/library.dart';
 import '../../library/library_providers.dart';
 import '../../study_session/domain/study_session.dart';
@@ -159,6 +160,7 @@ class _PlanCard extends ConsumerWidget {
       mebNodeId: node?.mebNodeId,
       pages: pages,
       estimatedQuestions: pages.isEmpty ? task.targetQuestions : book?.estimateQuestions(pages.length),
+      subject: book == null ? null : subjectKey(book.examType, book.subject),
     );
     await launchSession(context, ref, [draft]);
   }

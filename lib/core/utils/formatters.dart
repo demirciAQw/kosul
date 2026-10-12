@@ -46,3 +46,16 @@ String weekdayShort(DateTime d) => _weekdays[d.weekday - 1];
 /// 5 Eki – 18 Eki
 String formatDateRange(DateTime a, DateTime b) =>
     '${a.day} ${_months[a.month - 1]} – ${b.day} ${_months[b.month - 1]}';
+
+/// YKS neti: 32,75 (tam sayıysa 32). Negatif olabilir.
+String formatNet(double net) {
+  final rounded = (net * 100).round() / 100;
+  if (rounded == rounded.roundToDouble()) return rounded.toStringAsFixed(0);
+  return rounded.toStringAsFixed(2).replaceAll('.', ',');
+}
+
+/// 12 Eki 2026
+String formatDate(DateTime t) => '${t.day} ${_months[t.month - 1]} ${t.year}';
+
+/// 12 Eki
+String formatDayMonth(DateTime t) => '${t.day} ${_months[t.month - 1]}';

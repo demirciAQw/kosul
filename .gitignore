@@ -1,13 +1,20 @@
+# Flutter / Dart
 .dart_tool/
 .packages
 build/
 *.g.dart
-.flutter-plugins
-.flutter-plugins-dependencies
+
+# Android iskeleti her derlemede yeniden üretilir
+android/
+
+# İmza anahtarı ve şifreleri ASLA depoya girmez (depo herkese açık)
+*.jks
+*.keystore
+key.properties
+imza.env
+imza_bilgileri.txt
+
+# IDE
 .idea/
+.vscode/
 *.iml
-android/.gradle/
-android/local.properties
-android/app/debug/
-android/app/profile/
-android/app/release/

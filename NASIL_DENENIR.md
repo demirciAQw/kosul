@@ -14,6 +14,19 @@ GitHub, APK'yı senin yerine bulutta derler.
 5. Yeşil tik çıkınca işlemin sayfasında en altta **Artifacts → kocum-apk** dosyasını indir, zip'i aç: `app-release.apk`.
 6. APK'yı telefona gönder (Telegram, Drive, USB). Dokun, "bilinmeyen kaynaklardan yükle" iznini ver. HyperOS bir güvenlik taraması gösterirse "Yine de yükle" de.
 
+## Sabit imza (bir kez yapılır, sonra hiç kaldır-yükle yok)
+
+Her derleme farklı bir anahtarla imzalanırsa Android yeni sürümü eskisinin üstüne kurmaz; eskisini kaldırmak gerekir ve **defterdeki tüm veriler silinir**. Sabit imzayla güncellemeler üstüne kurulur, veriler kalır.
+
+1. Sana verilen `imza.env` dosyasını proje klasörünün **dışında** bir yere koy (depo herkese açık; bu dosya ASLA depoya girmemeli).
+2. Terminalde: `gh secret set -f imza.env --repo demirciAQw/kosul`
+   - Ya da GitHub'da **Settings → Secrets and variables → Actions → New repository secret** ile iki sır ekle: `KEYSTORE_BASE64` ve `KEYSTORE_PASSWORD` (değerler `imza.env` içinde).
+3. `kocum-release.jks` ve `imza.env` dosyalarını Drive gibi güvenli bir yerde sakla. Kaybolursa yeni anahtara geçmek için bir kez daha kaldır-yükle gerekir.
+
+Sırlar eklendikten sonraki ilk APK'yı kurmadan önce eski (farklı imzalı) sürümü **son kez** kaldır. Ondan sonraki her APK doğrudan üstüne kurulur.
+
+Actions kaydında "Sabit imza kullaniliyor." satırını görürsen imza çalışıyor demektir.
+
 ## Yol 2: Bilgisayarda Flutter ile (kablolu)
 
 1. Flutter'ı kur: flutter.dev → Install → Android. Android Studio de gerekir. Sonra `flutter doctor` komutunda Android satırı yeşil olmalı.
@@ -23,15 +36,16 @@ GitHub, APK'yı senin yerine bulutta derler.
 3. Redmi'de **Ayarlar → Telefon hakkında** bölümünde HyperOS sürümüne 7 kez dokun. Sonra **Ek ayarlar → Geliştirici seçenekleri**ten **USB hata ayıklama** ve **USB üzerinden yükle** seçeneklerini aç.
 4. Telefonu USB ile bağla, bilgisayara izin ver, sonra: `flutter run --release`
 
-## İlk açılışta ne denemeli? (3 dk)
+## İlk açılışta ne denemeli? (5 dk)
 
 1. **Bugün** sekmesinde **Örnek kitabı ekle** (345 TYT Matematik hazır gelir).
-2. **Yeni oturum**: birkaç konu ya da tek tek sayfa işaretle, **BAŞLA**. Uygulamayı kapatıp aç: süre işlemeye devam eder. Bildirim çubuğunda canlı sayaç görürsün. Sonra **Bitir**.
-3. **Eksiklerini doldur** rozeti çıkar. Doğru / yanlış / boş gir ya da **Sonra** de.
-4. Sonuç ekranında **Yanlış ya da boş soru ekle**: fotoğraf çek, kırp, doğru çözümü ekle, sağ üstten yıldızla.
-5. **Defter** sekmesi: ara, filtrele, Ders / Kitap / Konu diye grupla.
-6. **Plan** sekmesi: tarih aralığı seç, görev havuzu oluştur, görevden oturum başlat.
-7. **Analiz** sekmesi: en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
+2. **Yeni oturum → Kitaptan**: birkaç konu ya da tek tek sayfa işaretle, **BAŞLA**. Uygulamayı kapatıp aç: süre işlemeye devam eder. Yanlışlıkla başlattıysan **İptal et**.
+3. Oturum sürerken bir bölümün yanındaki işaret simgesiyle **optik formu** aç: yanlış numaralarına dokun, **Kaydet**. Sonra **Bitir**.
+4. Sonuç ekranında sayılar dolu gelir. **Yanlışları işaretle** ile değiştirebilir, **Fotoğraflı** ile tam kayıt ekleyebilirsin.
+5. **Defter → Eksikler**: optikten gelen soruların satırından tek dokunuşla neden ve fotoğraf ekle. Fotoğrafta köşeleri sürükleyerek kırp, gerekirse döndür.
+6. **Yeni oturum → Kitapsız**: ders seç, "Video" ya da "Konu çalışması" de, başlat. Bitirince sonuç sorulmaz.
+7. **Deneme** sekmesi: **Deneme ekle**, ders ders doğru ve yanlışı yaz; boş ve net kendiliğinden çıkar. Deneme sayfasında bir dersin **Yanlışları işaretle** düğmesiyle soruları deftere at.
+8. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
 
 Not: Yeni eklenen yanlışlar **ertesi gün** tekrar listesine (Yanlışlarımı göster) düşer. İlk gün "bugün tekrar yok" görmen normaldir.
 

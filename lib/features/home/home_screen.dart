@@ -19,6 +19,7 @@ class HomeScreen extends ConsumerWidget {
     final running = ref.watch(runningSessionProvider).value;
     final pending = ref.watch(pendingSessionsProvider).value ?? const <StudySession>[];
     final due = ref.watch(dueCountProvider).value ?? 0;
+    final incomplete = ref.watch(incompleteCountProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,6 +58,18 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ],
+          if (incomplete > 0) ...[
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.pending_actions_outlined, color: theme.colorScheme.primary),
+                title: const Text('Eksikler'),
+                subtitle: Text('$incomplete sorunun fotoğrafı, çözümü ya da nedeni eksik'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppRoutes.incompleteQuestions),
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
           Card(
             child: ListTile(
@@ -73,6 +86,12 @@ class HomeScreen extends ConsumerWidget {
             title: const Text('Soru ekle'),
             subtitle: const Text('Kitap dışı, deneme ya da Telegram sorusu'),
             onTap: () => context.push(AppRoutes.newQuestion),
+          ),
+          ListTile(
+            leading: const Icon(Icons.assignment_outlined),
+            title: const Text('Deneme ekle'),
+            subtitle: const Text('Netlerini ders ders gir, yanlışları optikten işaretle'),
+            onTap: () => context.push(AppRoutes.newMockExam),
           ),
           ListTile(
             leading: const Icon(Icons.file_open_outlined),
@@ -99,6 +118,7 @@ class HomeScreen extends ConsumerWidget {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      useSafeArea: true,
       builder: (sheet) => SafeArea(
         child: ListView(
           shrinkWrap: true,
@@ -136,7 +156,7 @@ class _StartCard extends StatelessWidget {
             Text('Bugün ne çalışıyorsun?', style: theme.textTheme.titleLarge),
             const SizedBox(height: 4),
             Text(
-              'Konuları ve sayfaları seç, tek dokunuşla sayacı başlat.',
+              'Kitaptan konu ve sayfa seç ya da kitapsız çalış; tek dokunuşla sayacı başlat.',
               style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 16),

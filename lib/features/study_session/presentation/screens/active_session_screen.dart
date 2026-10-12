@@ -8,10 +8,12 @@ import '../../../../app/routes.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/study_session.dart';
 import '../../study_session_providers.dart';
+import '../session_quick_mark.dart';
 import '../widgets/elapsed_clock.dart';
 
-/// Süren oturum. Bilinçli olarak "duraklat" ya da "iptal" YOK: sayaç yalnızca
-/// BİTİR ile kapanır. Geri tuşu oturumu etkilemez; ana ekranda kart olarak durur.
+/// Süren oturum. Bilinçli olarak "duraklat" YOK: sayaç yalnızca BİTİR ile
+/// kapanır. Yanlışlıkla başlatılan oturum için İPTAL vardır (süre kaydedilmez).
+/// Geri tuşu oturumu etkilemez; ana ekranda kart olarak durur.
 class ActiveSessionScreen extends ConsumerWidget {
   const ActiveSessionScreen({super.key});
 
@@ -38,7 +40,7 @@ class _RunningView extends ConsumerStatefulWidget {
 }
 
 class _RunningViewState extends ConsumerState<_RunningView> {
-  bool _finishing = false;
+  bool _busy = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +51,7 @@ class _RunningViewState extends ConsumerState<_RunningView> {
 
     return Column(
       children: [
-        const SizedBox(height: 40),
+        const SizedBox(height: 32),
         ElapsedClock(
           startedAt: s.startedAt,
           style: theme.textTheme.displayLarge?.copyWith(fontWeight: FontWeight.w300, color: scheme.primary),
@@ -65,7 +67,7 @@ class _RunningViewState extends ConsumerState<_RunningView> {
           'Uygulamayı kapatsan da süre işlemeye devam eder.',
           style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -73,33 +75,94 @@ class _RunningViewState extends ConsumerState<_RunningView> {
             separatorBuilder: (context, index) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final item = s.items[i];
+              final meta = [
+                if (item.activity != null) item.activity!.label,
+                if (item.pages.isNotEmpty) 'Sayfa ${item.pageSpec}',
+                if (item.hasResults) '${item.correct ?? 0} D, ${item.wrong ?? 0} Y, ${item.blank ?? 0} B',
+              ].join(', ');
               return Card(
                 margin: EdgeInsets.zero,
                 child: ListTile(
                   title: Text(item.label),
-                  subtitle: item.pages.isEmpty ? null : Text('Sayfa ${item.pageSpec}'),
+                  subtitle: meta.isEmpty ? null : Text(meta),
+                  trailing: item.hasQuestions
+                      ? IconButton(
+                          tooltip: 'Yanlışları işaretle',
+                          onPressed: _busy ? null : () => markSessionItem(context, ref, s, item),
+                          icon: const Icon(Icons.checklist_rounded),
+                        )
+                      : null,
                 ),
               );
             },
           ),
         ),
+        if (s.hasQuestionWork)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            child: Text(
+              'Test biterken yanlışlarını işaretleyebilirsin; ders ve konu otomatik gelir.',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ),
         SafeArea(
           top: false,
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: scheme.error, foregroundColor: scheme.onError),
-                onPressed: _finishing ? null : _finish,
-                icon: const Icon(Icons.stop_rounded),
-                label: const Text('Bitir'),
-              ),
+            child: Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _cancel,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  label: const Text('İptal et'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(backgroundColor: scheme.error, foregroundColor: scheme.onError),
+                    onPressed: _busy ? null : _finish,
+                    icon: const Icon(Icons.stop_rounded),
+                    label: const Text('Bitir'),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _cancel() async {
+    final s = widget.session;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Oturumu iptal et?'),
+        content: Text(
+          'Oturum hiç başlamamış sayılır; ${formatDuration(DateTime.now().difference(s.startedAt))} '
+          'süre kaydedilmez. Bu oturumda fotoğrafsız işaretlediğin sorular da silinir.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('İptal et')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    try {
+      await ref.read(cancelStudySessionProvider).call(s.id);
+      messenger.showSnackBar(const SnackBar(content: Text('Oturum iptal edildi.')));
+      router.go(AppRoutes.home);
+    } on StudySessionException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   Future<void> _finish() async {
@@ -109,8 +172,8 @@ class _RunningViewState extends ConsumerState<_RunningView> {
       builder: (context) => AlertDialog(
         title: const Text('Oturumu bitir?'),
         content: Text(
-          'Süre ${formatDuration(DateTime.now().difference(s.startedAt))} olarak kaydedilecek. '
-          'Doğru, yanlış ve boş sayılarını şimdi ya da daha sonra girebilirsin.',
+          'Süre ${formatDuration(DateTime.now().difference(s.startedAt))} olarak kaydedilecek.'
+          '${s.hasQuestionWork ? ' Doğru, yanlış ve boş sayılarını şimdi ya da daha sonra girebilirsin.' : ''}',
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Çalışmaya devam et')),
@@ -124,13 +187,21 @@ class _RunningViewState extends ConsumerState<_RunningView> {
     // bu yüzden router ve messenger await'ten ÖNCE alınır.
     final router = GoRouter.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    setState(() => _finishing = true);
+    final submit = ref.read(submitSessionResultsProvider);
+    setState(() => _busy = true);
     try {
       await ref.read(finishStudySessionProvider).call(s.id);
-      unawaited(router.pushReplacement(AppRoutes.sessionResults(s.id)));
+      if (s.hasQuestionWork) {
+        unawaited(router.pushReplacement(AppRoutes.sessionResults(s.id)));
+      } else {
+        // Konu anlatımı, video, tekrar: girilecek sonuç yok, oturum doğrudan tamamlanır.
+        await submit.call(s.id, const []);
+        messenger.showSnackBar(const SnackBar(content: Text('Oturum kaydedildi.')));
+        router.go(AppRoutes.home);
+      }
     } on StudySessionException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
-      if (mounted) setState(() => _finishing = false);
+      if (mounted) setState(() => _busy = false);
     }
   }
 }

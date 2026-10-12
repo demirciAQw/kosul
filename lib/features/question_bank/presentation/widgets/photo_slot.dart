@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Soru / çözüm fotoğrafı için 3:4 yuva.
 /// Boşken dokun: fotoğraf ekle. Doluyken dokun ya da kırp butonu: yeniden kırp.
+/// Kayıtlı (eski) bir fotoğraf yeniden kırpılamaz; dokununca yenisi çekilir.
 class PhotoSlot extends StatelessWidget {
   const PhotoSlot({
     super.key,
@@ -15,6 +16,7 @@ class PhotoSlot extends StatelessWidget {
     this.required = false,
     this.hasError = false,
     this.busy = false,
+    this.canCrop = true,
   });
 
   final String label;
@@ -25,6 +27,7 @@ class PhotoSlot extends StatelessWidget {
   final bool required;
   final bool hasError;
   final bool busy;
+  final bool canCrop;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +44,7 @@ class PhotoSlot extends StatelessWidget {
           side: BorderSide(color: hasError ? scheme.error : scheme.outlineVariant, width: hasError ? 1.5 : 1),
         ),
         child: InkWell(
-          onTap: busy ? null : (filled ? onCrop : onPick),
+          onTap: busy ? null : (filled && canCrop ? onCrop : onPick),
           child: busy
               ? const Center(child: CircularProgressIndicator())
               : !filled
@@ -51,6 +54,8 @@ class PhotoSlot extends StatelessWidget {
                         Icon(Icons.add_a_photo_outlined, color: accent, size: 32),
                         const SizedBox(height: 8),
                         Text(required ? '$label *' : label, style: TextStyle(color: accent)),
+                        if (!required)
+                          Text('isteğe bağlı', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: accent)),
                         const SizedBox(height: 4),
                         Text(
                           'Çek ya da seç, sonra kırp',
@@ -78,7 +83,8 @@ class PhotoSlot extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Positioned(
+                        if (canCrop)
+                          Positioned(
                           right: 4,
                           bottom: 4,
                           child: IconButton.filledTonal(

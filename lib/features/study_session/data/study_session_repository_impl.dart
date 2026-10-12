@@ -15,10 +15,12 @@ class DriftStudySessionRepository implements StudySessionRepository {
 
   @override
   Stream<StudySession?> watchRunning() {
-    final q = _db.select(_db.studySessions)
-      ..where((s) => s.status.equals(_running))
-      ..limit(1);
-    return q.watchSingleOrNull().asyncMap((row) async => row == null ? null : await _hydrate(row));
+    // Bloklarla birleşik: oturum sürerken optikten girilen sayılar da yansır.
+    final s = _db.studySessions;
+    final i = _db.sessionItems;
+    final q = _db.select(s).join([leftOuterJoin(i, i.sessionId.equalsExp(s.id))])
+      ..where(s.status.equals(_running));
+    return q.watch().asyncMap((rows) async => rows.isEmpty ? null : await _hydrate(rows.first.readTable(s)));
   }
 
   @override
@@ -31,8 +33,11 @@ class DriftStudySessionRepository implements StudySessionRepository {
 
   @override
   Stream<StudySession?> watchById(String id) {
-    final q = _db.select(_db.studySessions)..where((s) => s.id.equals(id));
-    return q.watchSingleOrNull().asyncMap((row) async => row == null ? null : await _hydrate(row));
+    // Bloklarla birleşik sorgu: optik formdan gelen sayılar ekrana anında yansır.
+    final s = _db.studySessions;
+    final i = _db.sessionItems;
+    final q = _db.select(s).join([leftOuterJoin(i, i.sessionId.equalsExp(s.id))])..where(s.id.equals(id));
+    return q.watch().asyncMap((rows) async => rows.isEmpty ? null : await _hydrate(rows.first.readTable(s)));
   }
 
   @override
@@ -59,6 +64,8 @@ class DriftStudySessionRepository implements StudySessionRepository {
                 contentNodeId: Value(items[i].contentNodeId),
                 mebNodeId: Value(items[i].mebNodeId),
                 estimatedQuestions: Value(items[i].estimatedQuestions),
+                subject: Value(items[i].subject),
+                activity: Value(items[i].activity?.name),
               ),
           ]));
     });
@@ -78,21 +85,64 @@ class DriftStudySessionRepository implements StudySessionRepository {
   }
 
   @override
+  Future<void> cancel(String sessionId) => _db.transaction(() async {
+        final row = await (_db.select(_db.studySessions)
+              ..where((s) => s.id.equals(sessionId) & s.status.equals(_running)))
+            .getSingleOrNull();
+        if (row == null) throw const SessionNotRunningException();
+
+        // Bu oturumda fotoğrafsız/çözümsüz işaretlenen hızlı kartlar: iz bırakma.
+        // (Tekrar durumları yabancı anahtarla zincirleme silinir.)
+        final c = _db.questionCards;
+        await (_db.delete(c)
+              ..where((t) =>
+                  t.sessionId.equals(sessionId) &
+                  t.questionImage.isNull() &
+                  t.solutionImage.isNull() &
+                  t.solutionText.isNull()))
+            .go();
+        // Bloklar zincirleme silinir; fotoğraflı kartların bağı kopar ama kendileri kalır.
+        await (_db.delete(_db.studySessions)..where((s) => s.id.equals(sessionId))).go();
+      });
+
+  @override
   Future<void> saveResults(String sessionId, List<ItemResult> results) =>
       _db.transaction(() async {
         for (final r in results) {
-          await (_db.update(_db.sessionItems)
-                ..where((i) => i.id.equals(r.itemId) & i.sessionId.equals(sessionId)))
-              .write(SessionItemsCompanion(
-            correct: Value(r.correct),
-            wrong: Value(r.wrong),
-            blank: Value(r.blank),
-          ));
+          await _writeItem(r, sessionId: sessionId);
         }
         await (_db.update(_db.studySessions)
               ..where((s) => s.id.equals(sessionId) & s.status.equals(_running).not()))
             .write(StudySessionsCompanion(status: Value(SessionStatus.completed.name)));
+
+        // Oturum sürerken işaretlenen kartların soru başına süresi o an bilinmiyordu.
+        final session =
+            await (_db.select(_db.studySessions)..where((s) => s.id.equals(sessionId))).getSingleOrNull();
+        final end = session?.endedAt;
+        if (session == null || end == null) return;
+        final items = await (_db.select(_db.sessionItems)..where((i) => i.sessionId.equals(sessionId))).get();
+        final solved = items.fold<int>(0, (sum, i) => sum + (i.correct ?? 0) + (i.wrong ?? 0) + (i.blank ?? 0));
+        if (solved == 0) return;
+        final perQuestion = end.difference(session.startedAt).inSeconds / solved;
+        await (_db.update(_db.questionCards)
+              ..where((t) => t.sessionId.equals(sessionId) & t.avgSecondsPerQuestion.isNull()))
+            .write(QuestionCardsCompanion(avgSecondsPerQuestion: Value(perQuestion)));
       });
+
+  @override
+  Future<void> saveItemResult(ItemResult result) => _writeItem(result);
+
+  Future<void> _writeItem(ItemResult r, {String? sessionId}) =>
+      (_db.update(_db.sessionItems)
+            ..where((i) {
+              final byId = i.id.equals(r.itemId);
+              return sessionId == null ? byId : byId & i.sessionId.equals(sessionId);
+            }))
+          .write(SessionItemsCompanion(
+        correct: Value(r.correct),
+        wrong: Value(r.wrong),
+        blank: Value(r.blank),
+      ));
 
   Future<StudySession> _hydrate(StudySessionRow row) async {
     final items = await (_db.select(_db.sessionItems)
@@ -117,6 +167,8 @@ class DriftStudySessionRepository implements StudySessionRepository {
             correct: i.correct,
             wrong: i.wrong,
             blank: i.blank,
+            subject: i.subject,
+            activity: StudyActivity.values.byNameOrNull(i.activity),
           ),
       ],
     );

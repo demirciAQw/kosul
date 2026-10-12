@@ -31,7 +31,10 @@ class QuestionTile extends ConsumerWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            MediaImage(card.questionImage, cacheWidth: 400),
+            if (card.questionImage != null)
+              MediaImage(card.questionImage!, cacheWidth: 400)
+            else
+              _NoPhoto(card: card),
             Positioned(
               left: 0,
               right: 0,
@@ -85,6 +88,43 @@ class QuestionTile extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Fotoğrafsız (hızlı işaretlenmiş) kartın yer tutucusu: nerede olduğunu söyler.
+class _NoPhoto extends StatelessWidget {
+  const _NoPhoto({required this.card});
+  final QuestionCard card;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = statusColor(card.status);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 36),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            card.questionNo == null ? '?' : '${card.questionNo}',
+            style: theme.textTheme.displaySmall?.copyWith(color: color, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Text(
+              card.testLabel ?? card.sourceName,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+          Text(
+            'Fotoğraf yok',
+            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ],
       ),
     );
   }

@@ -2,10 +2,13 @@
 //   dart tool/patch_android.dart
 //
 //  - Bildirim izni (oturum kronometresi için)
-//  - Fotoğraf kırpma ekranı (uCrop)
 //  - Uygulama adı: Koçum
 //  - flutter_local_notifications için core library desugaring
-//  - Eski eklentileri (ör. image_cropper, compileSdk 33) yeni Android SDK ile derleme
+//  - Sabit imza: android/key.properties varsa release APK onunla imzalanır
+//    (yoksa eskisi gibi hata ayıklama anahtarı kullanılır)
+//  - Eski eklentileri yeni Android SDK ile derleme
+//
+// v0.2: harici kırpıcı (uCrop / image_cropper) kaldırıldı; kırpma uygulama içinde.
 import 'dart:io';
 
 const _desugarVersion = '2.1.4';
@@ -22,8 +25,10 @@ void main() {
   final groovy = File('android/app/build.gradle');
   if (kts.existsSync()) {
     _patchKts(kts);
+    _patchSigningKts(kts);
   } else if (groovy.existsSync()) {
     _patchGroovy(groovy);
+    _patchSigningGroovy(groovy);
   } else {
     stderr.writeln('android/app/build.gradle(.kts) bulunamadı.');
     exit(1);
@@ -41,16 +46,11 @@ void _patchManifest(File file) {
       '<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <application',
     );
   }
-  if (!s.contains('UCropActivity')) {
-    s = s.replaceFirst(
-      '</application>',
-      '    <activity\n'
-          '            android:name="com.yalantis.ucrop.UCropActivity"\n'
-          '            android:screenOrientation="portrait"\n'
-          '            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>\n'
-          '    </application>',
-    );
-  }
+  // Eski sürümün eklediği uCrop etkinliği: kütüphane artık yok, kaynağı da yok.
+  s = s.replaceAll(
+    RegExp(r'\s*<activity\s+android:name="com\.yalantis\.ucrop\.UCropActivity"[^>]*/>'),
+    '',
+  );
   s = s.replaceFirst(RegExp(r'android:label="[^"]*"'), 'android:label="Koçum"');
   file.writeAsStringSync(s);
 }
@@ -87,9 +87,102 @@ void _patchGroovy(File file) {
   file.writeAsStringSync(s);
 }
 
+// ───────────────────────── Sabit imza ─────────────────────────
+//
+// Her derleme farklı bir hata ayıklama anahtarıyla imzalanırsa Android yeni
+// sürümü eskisinin üstüne kurmaz; kaldır-yükle gerekir ve veriler silinir.
+// key.properties (CI'da GitHub Secrets'tan üretilir) varsa release APK hep
+// aynı anahtarla imzalanır ve güncellemeler üstüne kurulur.
+
+const _signingMarker = 'kocum-release-signing';
+
+void _patchSigningKts(File file) {
+  var s = file.readAsStringSync();
+  if (s.contains(_signingMarker)) return;
+
+  const header = '''
+// $_signingMarker: android/key.properties varsa sabit anahtarla imzala.
+val kocumKeystoreProperties = java.util.Properties()
+val kocumKeystoreFile = rootProject.file("key.properties")
+if (kocumKeystoreFile.exists()) {
+    kocumKeystoreFile.inputStream().use { kocumKeystoreProperties.load(it) }
+}
+
+''';
+  const configs = '''
+    signingConfigs {
+        create("release") {
+            if (kocumKeystoreFile.exists()) {
+                keyAlias = kocumKeystoreProperties.getProperty("keyAlias")
+                keyPassword = kocumKeystoreProperties.getProperty("keyPassword")
+                storeFile = kocumKeystoreProperties.getProperty("storeFile")?.let { file(it) }
+                storePassword = kocumKeystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
+    buildTypes {''';
+  const pick =
+      'signingConfig = if (kocumKeystoreFile.exists()) signingConfigs.getByName("release") '
+      'else signingConfigs.getByName("debug")';
+
+  final androidBlock = RegExp(r'^android \{', multiLine: true);
+  if (!androidBlock.hasMatch(s) || !s.contains('    buildTypes {')) {
+    stderr.writeln('Uyarı: build.gradle.kts beklenen biçimde değil; sabit imza eklenemedi.');
+    return;
+  }
+  s = s.replaceFirst(androidBlock, '${header}android {');
+  s = s.replaceFirst('    buildTypes {', configs);
+  if (s.contains('signingConfig = signingConfigs.getByName("debug")')) {
+    s = s.replaceFirst('signingConfig = signingConfigs.getByName("debug")', pick);
+  } else {
+    s = s.replaceFirst(RegExp(r'release \{'), 'release {\n            $pick');
+  }
+  file.writeAsStringSync(s);
+}
+
+void _patchSigningGroovy(File file) {
+  var s = file.readAsStringSync();
+  if (s.contains(_signingMarker)) return;
+
+  const header = '''
+// $_signingMarker: android/key.properties varsa sabit anahtarla imzala.
+def kocumKeystoreProperties = new Properties()
+def kocumKeystoreFile = rootProject.file('key.properties')
+if (kocumKeystoreFile.exists()) {
+    kocumKeystoreFile.withReader('UTF-8') { kocumKeystoreProperties.load(it) }
+}
+
+''';
+  const configs = '''
+    signingConfigs {
+        release {
+            if (kocumKeystoreFile.exists()) {
+                keyAlias kocumKeystoreProperties['keyAlias']
+                keyPassword kocumKeystoreProperties['keyPassword']
+                storeFile file(kocumKeystoreProperties['storeFile'])
+                storePassword kocumKeystoreProperties['storePassword']
+            }
+        }
+    }
+
+    buildTypes {''';
+  const pick = 'signingConfig kocumKeystoreFile.exists() ? signingConfigs.release : signingConfigs.debug';
+
+  final androidBlock = RegExp(r'^android \{', multiLine: true);
+  if (!androidBlock.hasMatch(s) || !s.contains('    buildTypes {')) {
+    stderr.writeln('Uyarı: build.gradle beklenen biçimde değil; sabit imza eklenemedi.');
+    return;
+  }
+  s = s.replaceFirst(androidBlock, '${header}android {');
+  s = s.replaceFirst('    buildTypes {', configs);
+  s = s.replaceFirst(RegExp(r'signingConfig\s*=?\s*signingConfigs\.debug'), pick);
+  file.writeAsStringSync(s);
+}
+
 const _marker = 'kocum-force-compile-sdk';
 
-/// Bazı eklentiler eski bir compileSdk ile yayınlanmış (ör. image_cropper: 33)
+/// Bazı eklentiler eski bir compileSdk ile yayınlanmış
 /// ama bağımlılıkları 34 ve üstünü istiyor; derleme "checkReleaseAarMetadata"
 /// adımında düşüyor. Tüm kütüphane modüllerini yeni SDK ile derleriz.
 void _patchRootGradle() {

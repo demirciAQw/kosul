@@ -163,7 +163,7 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: _showSolution ? _Solution(card: card) : _Question(path: card.questionImage),
+            child: _showSolution ? _Solution(card: card) : _Question(card: card),
           ),
         ),
         SafeArea(
@@ -224,17 +224,43 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
 }
 
 class _Question extends StatelessWidget {
-  const _Question({required this.path});
-  final String path;
+  const _Question({required this.card});
+  final QuestionCard card;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => openImageZoom(context, path),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: MediaImage(path, fit: BoxFit.fitWidth, cacheWidth: 1440),
+  Widget build(BuildContext context) {
+    final path = card.questionImage;
+    if (path == null) {
+      // Fotoğrafsız hızlı kart: soruyu kitaptan açıp çözmek için yerini göster.
+      final theme = Theme.of(context);
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Kitabı aç ve soruyu yeniden çöz', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Text(card.sourceName, style: theme.textTheme.bodyLarge),
+              if (card.testLabel != null) Text(card.testLabel!, style: theme.textTheme.bodyMedium),
+              if (card.questionNo != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text('${card.questionNo}. soru', style: theme.textTheme.headlineMedium),
+                ),
+            ],
+          ),
         ),
       );
+    }
+    return GestureDetector(
+      onTap: () => openImageZoom(context, path),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: MediaImage(path, fit: BoxFit.fitWidth, cacheWidth: 1440),
+      ),
+    );
+  }
 }
 
 class _Solution extends StatelessWidget {
@@ -245,6 +271,12 @@ class _Solution extends StatelessWidget {
   Widget build(BuildContext context) {
     final image = card.solutionImage;
     final text = card.solutionText;
+    if (image == null && text == null) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Text('Bu soruya henüz çözüm eklenmemiş. Defterde soruya dokunup ekleyebilirsin.'),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

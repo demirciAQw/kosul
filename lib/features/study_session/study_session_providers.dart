@@ -11,6 +11,8 @@ final startStudySessionProvider = Provider(
     (ref) => StartStudySession(ref.watch(studySessionRepositoryProvider), ref.watch(clockProvider)));
 final finishStudySessionProvider = Provider(
     (ref) => FinishStudySession(ref.watch(studySessionRepositoryProvider), ref.watch(clockProvider)));
+final cancelStudySessionProvider =
+    Provider((ref) => CancelStudySession(ref.watch(studySessionRepositoryProvider)));
 final submitSessionResultsProvider =
     Provider((ref) => SubmitSessionResults(ref.watch(studySessionRepositoryProvider)));
 

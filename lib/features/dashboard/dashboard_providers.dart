@@ -5,8 +5,10 @@ import '../../core/utils/enum_x.dart';
 import '../curriculum/curriculum_providers.dart';
 import '../curriculum/domain/curriculum.dart';
 import '../question_bank/domain/question_card.dart';
+import '../question_bank/question_bank_providers.dart';
 import 'data/dashboard_repository_impl.dart';
 import 'domain/dashboard.dart';
+import 'domain/patterns.dart';
 
 final dashboardRepositoryProvider = Provider<DashboardRepository>(
     (ref) => DriftDashboardRepository(ref.watch(appDatabaseProvider)));
@@ -61,3 +63,20 @@ final mistakeStatsProvider = StreamProvider<List<LabeledStat>>((ref) {
 
 final dailyStudyProvider = StreamProvider<List<DailyStudy>>((ref) =>
     ref.watch(dashboardRepositoryProvider).watchDailyStudy(days: 7, today: ref.watch(clockProvider)()));
+
+final _mistakeCardsProvider = StreamProvider<List<QuestionCard>>((ref) => ref
+    .watch(questionCardRepositoryProvider)
+    .watch(const QuestionFilter(statuses: {QuestionStatus.wrong, QuestionStatus.blank})));
+
+/// Seçili zaman aralığında ders bazlı hata örüntüleri.
+final subjectPatternsProvider = Provider<AsyncValue<List<SubjectPattern>>>((ref) {
+  final cards = ref.watch(_mistakeCardsProvider);
+  final days = ref.watch(dashboardRangeProvider);
+  final now = ref.watch(clockProvider)();
+  final since = days == 0 ? null : DateTime(now.year, now.month, now.day - days + 1);
+  final curriculum = {for (final n in ref.watch(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
+  return cards.whenData((list) => findSubjectPatterns(
+        since == null ? list : list.where((c) => !c.createdAt.isBefore(since)),
+        curriculum,
+      ));
+});

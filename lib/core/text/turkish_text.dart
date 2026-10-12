@@ -32,3 +32,6 @@ double diceCoefficient(Set<String> a, Set<String> b) {
   final common = small.where(large.contains).length;
   return 2 * common / (a.length + b.length);
 }
+
+/// Türkçe küçük harf: "İşlem hatası" → "işlem hatası" (noktasız/noktalı i doğru).
+String lowerTr(String input) => input.replaceAll('İ', 'i').replaceAll('I', 'ı').toLowerCase();

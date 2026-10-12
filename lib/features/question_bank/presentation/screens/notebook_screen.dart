@@ -45,6 +45,7 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
     final groupBy = ref.watch(questionGroupByProvider);
     final groups = ref.watch(questionGroupsProvider);
     final due = ref.watch(dueCountProvider).value ?? 0;
+    final incomplete = ref.watch(incompleteCountProvider);
 
     // Filtre menüsünden "Temizle" ile metin de sıfırlandıysa arama kutusunu boşalt.
     ref.listen(questionFilterProvider, (prev, next) {
@@ -67,6 +68,7 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'notebook-add',
         onPressed: () => context.push(AppRoutes.newQuestion),
         icon: const Icon(Icons.add_a_photo_outlined),
         label: const Text('Soru ekle'),
@@ -117,13 +119,28 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonalIcon(
-                onPressed: () => context.push(AppRoutes.review),
-                icon: const Icon(Icons.replay_rounded),
-                label: Text(due > 0 ? 'Yanlışlarımı göster ($due)' : 'Yanlışlarımı göster'),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () => context.push(AppRoutes.review),
+                    icon: const Icon(Icons.replay_rounded),
+                    label: Text(due > 0 ? 'Tekrar ($due)' : 'Tekrar'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => context.push(AppRoutes.incompleteQuestions),
+                    icon: Badge(
+                      isLabelVisible: incomplete > 0,
+                      smallSize: 8,
+                      child: const Icon(Icons.pending_actions_outlined),
+                    ),
+                    label: Text(incomplete > 0 ? 'Eksikler ($incomplete)' : 'Eksikler'),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(

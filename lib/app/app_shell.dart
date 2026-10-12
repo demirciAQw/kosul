@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/question_bank/question_bank_providers.dart';
 
-/// Alt gezinme çubuğu: Bugün, Plan, Defter, Analiz.
+/// Alt gezinme çubuğu: Bugün, Plan, Defter, Deneme, Analiz.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
   final StatefulNavigationShell shell;
@@ -16,6 +16,7 @@ class AppShell extends ConsumerWidget {
       body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         onDestinationSelected: (i) => shell.goBranch(i, initialLocation: i == shell.currentIndex),
         destinations: [
           const NavigationDestination(
@@ -40,6 +41,11 @@ class AppShell extends ConsumerWidget {
               child: const Icon(Icons.collections_bookmark_rounded),
             ),
             label: 'Defter',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.assignment_outlined),
+            selectedIcon: Icon(Icons.assignment_rounded),
+            label: 'Deneme',
           ),
           const NavigationDestination(
             icon: Icon(Icons.insights_outlined),

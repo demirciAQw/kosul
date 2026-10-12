@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/formatters.dart';
 import '../dashboard_providers.dart';
 import '../domain/dashboard.dart';
+import '../domain/patterns.dart';
 
 /// "En çok hangi konuda/nedenden yanlış yapıyorum ve ne kadar süre kaybediyorum?"
 class DashboardScreen extends ConsumerWidget {
@@ -17,19 +18,13 @@ class DashboardScreen extends ConsumerWidget {
     final range = ref.watch(dashboardRangeProvider);
     final stats = ref.watch(mistakeStatsProvider);
     final daily = ref.watch(dailyStudyProvider);
+    final patterns = ref.watch(subjectPatternsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Analiz')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [
-          SegmentedButton<MistakeDimension>(
-            showSelectedIcon: false,
-            segments: [for (final d in MistakeDimension.values) ButtonSegment(value: d, label: Text(d.label))],
-            selected: {dimension},
-            onSelectionChanged: (s) => ref.read(dashboardDimensionProvider.notifier).set(s.first),
-          ),
-          const SizedBox(height: 8),
           SegmentedButton<int>(
             showSelectedIcon: false,
             segments: const [
@@ -42,6 +37,23 @@ class DashboardScreen extends ConsumerWidget {
             onSelectionChanged: (s) => ref.read(dashboardRangeProvider.notifier).set(s.first),
           ),
           const SizedBox(height: 20),
+          Text('Derslere göre örüntüler', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          patterns.when(
+            loading: () => const SizedBox.shrink(),
+            error: (e, _) => Text('Örüntüler okunamadı: $e'),
+            data: (list) => _PatternSection(patterns: list),
+          ),
+          const SizedBox(height: 28),
+          Text('En çok yanlış', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          SegmentedButton<MistakeDimension>(
+            showSelectedIcon: false,
+            segments: [for (final d in MistakeDimension.values) ButtonSegment(value: d, label: Text(d.label))],
+            selected: {dimension},
+            onSelectionChanged: (s) => ref.read(dashboardDimensionProvider.notifier).set(s.first),
+          ),
+          const SizedBox(height: 16),
           stats.when(
             loading: () => const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator())),
             error: (e, _) => Text('Analiz yüklenemedi: $e'),
@@ -55,6 +67,52 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PatternSection extends StatelessWidget {
+  const _PatternSection({required this.patterns});
+  final List<SubjectPattern> patterns;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    if (patterns.isEmpty) {
+      return Text(
+        'Bir derste en az 3 yanlış ya da boş biriktiğinde, hangi konuda ve hangi nedenle '
+        'kaçırdığın burada yazılır.',
+        style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      );
+    }
+    return Column(
+      children: [
+        for (final p in patterns.take(5))
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: Text(p.subject, style: theme.textTheme.titleSmall)),
+                      Text('${p.mistakes} yanlış ve boş',
+                          style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  for (final line in p.insights)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(line, style: theme.textTheme.bodyMedium),
+                    ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

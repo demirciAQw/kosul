@@ -13,6 +13,7 @@ Future<void> showQuestionFilterSheet(BuildContext context) => showModalBottomShe
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
+      useSafeArea: true,
       builder: (_) => const _FilterSheet(),
     );
 

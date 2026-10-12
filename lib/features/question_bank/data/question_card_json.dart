@@ -9,7 +9,7 @@ extension QuestionCardJson on QuestionCard {
         'id': id,
         'status': status.name,
         'origin': origin.name,
-        'questionImage': questionImage,
+        if (questionImage != null) 'questionImage': questionImage,
         if (solutionImage != null) 'solutionImage': solutionImage,
         if (solutionText != null) 'solutionText': solutionText,
         'sourceName': sourceName,
@@ -25,6 +25,9 @@ extension QuestionCardJson on QuestionCard {
         'isStarred': isStarred,
         if (note != null) 'note': note,
         'createdAt': createdAt.toUtc().toIso8601String(),
+        if (questionNo != null) 'questionNo': questionNo,
+        if (testLabel != null) 'testLabel': testLabel,
+        if (mockExamId != null) 'mockExamId': mockExamId,
       };
 }
 
@@ -45,11 +48,11 @@ QuestionCard questionCardFromJson(Map<String, dynamic> json, {String path = r'$'
     throw JsonFormatException(r.at('isStarred'), 'true/false bekleniyordu');
   }
 
-  final card = QuestionCard(
+  return QuestionCard(
     id: r.requireString('id'),
     status: status,
     origin: QuestionOrigin.values.byNameOr(r.optString('origin'), QuestionOrigin.independent),
-    questionImage: r.requireString('questionImage'),
+    questionImage: r.optString('questionImage'),
     solutionImage: r.optString('solutionImage'),
     solutionText: r.optString('solutionText', maxLength: 10000),
     sourceName: r.requireString('sourceName'),
@@ -67,9 +70,8 @@ QuestionCard questionCardFromJson(Map<String, dynamic> json, {String path = r'$'
     isStarred: (starred as bool?) ?? false,
     note: r.optString('note', maxLength: 5000),
     createdAt: created.toLocal(),
+    questionNo: r.optInt('questionNo', min: 1),
+    testLabel: r.optString('testLabel'),
+    mockExamId: r.optString('mockExamId'),
   );
-  if (card.solutionImage == null && card.solutionText == null) {
-    throw JsonFormatException(path, 'Doğru çözüm (görsel ya da metin) zorunlu');
-  }
-  return card;
 }

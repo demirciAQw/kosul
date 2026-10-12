@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
@@ -11,6 +12,15 @@ import 'features/curriculum/data/curriculum_data.dart';
 /// Kompozisyon kökü: asenkron altyapı burada kurulur ve DI'a verilir.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Android 15 uygulamaları kenardan kenara çizer. Bunu her sürümde aynı
+  // yapıyoruz; üst ve alt boşlukları AppBar, SafeArea ve NavigationBar bırakır.
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+  ));
 
   final database = AppDatabase();
   final media = await LocalMediaStorage.open();

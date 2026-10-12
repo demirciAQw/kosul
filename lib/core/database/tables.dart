@@ -130,6 +130,12 @@ class SessionItems extends Table {
   IntColumn get blank => integer().nullable()();
   IntColumn get sortOrder => integer()();
 
+  /// "TYT Matematik". Kitapsız oturumlarda dersin tek kaynağı (v2).
+  TextColumn get subject => text().nullable()();
+
+  /// questions | lecture | video | review | other. Kitaplı bloklarda null = soru çözümü (v2).
+  TextColumn get activity => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -144,7 +150,10 @@ class QuestionCards extends Table {
   TextColumn get id => text()();
   TextColumn get status => text()(); // wrong | blank | correct
   TextColumn get origin => text()(); // book | independent | mockExam
-  TextColumn get questionImage => text()(); // medya köküne göre GÖRELİ yol
+
+  /// Medya köküne göre GÖRELİ yol. v2'den itibaren isteğe bağlı: fotoğrafsız
+  /// "hızlı" kartlar Eksikler listesinde tamamlanmayı bekler.
+  TextColumn get questionImage => text().nullable()();
   TextColumn get solutionImage => text().nullable()();
   TextColumn get solutionText => text().nullable()();
   TextColumn get sourceName => text()();
@@ -165,15 +174,23 @@ class QuestionCards extends Table {
   TextColumn get searchText => text()(); // normalizeTr ile katlanmış arama metni
   DateTimeColumn get createdAt => dateTime()();
 
+  // ── v2: "testin 7. sorusu" ile hızlı kayıt ──
+  IntColumn get questionNo => integer().nullable()();
+
+  /// Anlık görüntü: "Problemler › Yaş Problemleri – Kavrama" (kitap silinse de okunur kalır).
+  TextColumn get testLabel => text().nullable()();
+  TextColumn get sessionItemId =>
+      text().nullable().references(SessionItems, #id, onDelete: KeyAction.setNull)();
+  TextColumn get mockExamId =>
+      text().nullable().references(MockExams, #id, onDelete: KeyAction.setNull)();
+
   @override
   Set<Column> get primaryKey => {id};
 
-  // "Doğru çözüm zorunlu" kuralı UI'a ek olarak veritabanı seviyesinde de garanti.
+  // v1'deki "doğru çözüm zorunlu" kuralı kaldırıldı: çözüm artık isteğe bağlı,
+  // eksik kartlar Eksikler listesinde bekler.
   @override
-  List<String> get customConstraints => [
-        'CHECK (difficulty BETWEEN 1 AND 10)',
-        "CHECK (solution_image IS NOT NULL OR length(trim(coalesce(solution_text, ''))) > 0)",
-      ];
+  List<String> get customConstraints => ['CHECK (difficulty BETWEEN 1 AND 10)'];
 }
 
 /// SM-2 aralıklı tekrar durumu (kartla 1:1, ayrı tablo: zamanlayıcı değişirse
@@ -190,6 +207,44 @@ class ReviewStates extends Table {
 
   @override
   Set<Column> get primaryKey => {cardId};
+}
+
+// ───────────────────────── Deneme sınavları (v2) ─────────────────────────
+
+@DataClassName('MockExamRow')
+class MockExams extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get kind => text()(); // tyt | ayt | ydt | branch
+  DateTimeColumn get takenOn => dateTime()();
+  IntColumn get durationMinutes => integer().nullable()();
+  TextColumn get note => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Denemenin ders bölümleri: "TYT Matematik, 40 soru, 28 D, 6 Y, 6 B".
+@DataClassName('MockExamSectionRow')
+class MockExamSections extends Table {
+  TextColumn get id => text()();
+  TextColumn get examId => text().references(MockExams, #id, onDelete: KeyAction.cascade)();
+  TextColumn get subject => text()(); // "TYT Matematik"
+  IntColumn get questionCount => integer()();
+  IntColumn get correct => integer()();
+  IntColumn get wrong => integer()();
+  IntColumn get blank => integer()();
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+        'CHECK (correct >= 0 AND wrong >= 0 AND blank >= 0)',
+        'CHECK (correct + wrong + blank <= question_count)',
+      ];
 }
 
 /// Küçük anahtar-değer deposu (tohum veri sürümü, ayarlar…).

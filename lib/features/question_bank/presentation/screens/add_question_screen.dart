@@ -9,9 +9,11 @@ import '../../../../app/routes.dart';
 import '../../../../core/di/core_providers.dart';
 import '../../../../core/media/media_storage.dart';
 import '../../../../core/media/photo_capture_service.dart';
+import '../../../../core/media/photo_flow.dart';
 import '../../../../core/text/turkish_text.dart';
 import '../../../curriculum/curriculum_providers.dart';
 import '../../../curriculum/domain/curriculum.dart';
+import '../../../curriculum/domain/yks.dart';
 import '../../../library/domain/library.dart';
 import '../../../library/library_providers.dart';
 import '../../domain/question_card.dart';
@@ -19,9 +21,17 @@ import '../../question_bank_providers.dart';
 import '../question_prefill.dart';
 import '../widgets/photo_slot.dart';
 
+/// Soru ekleme ve (Eksikler'den) tamamlama ekranı.
+///
+/// v2: yalnızca ders zorunlu. Fotoğraf, çözüm ve neden isteğe bağlı; eksik
+/// kalan kart Eksikler listesinde bekler. Neden seçimi tek dokunuşluk çiplerle.
 class AddQuestionScreen extends ConsumerStatefulWidget {
-  const AddQuestionScreen({super.key, this.prefill});
+  const AddQuestionScreen({super.key, this.prefill, this.editCardId});
+
   final QuestionPrefill? prefill;
+
+  /// Doluysa var olan kart düzenlenir.
+  final String? editCardId;
 
   @override
   ConsumerState<AddQuestionScreen> createState() => _AddQuestionScreenState();
@@ -33,15 +43,26 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   final _testTotal = TextEditingController();
   final _avgSeconds = TextEditingController();
   final _note = TextEditingController();
+  final _questionNo = TextEditingController();
 
   late final MediaStorage _media;
   late final PhotoCaptureService _capture;
 
+  QuestionCard? _original; // düzenleme modunda
+  bool _loading = false;
+
   QuestionStatus _status = QuestionStatus.wrong;
   QuestionOrigin _origin = QuestionOrigin.independent;
-  CapturedPhoto? _question; // geçici: kırpılmış + sıkıştırılmış, orijinaliyle birlikte
+
+  // Yeni çekilen (geçici) fotoğraflar.
+  CapturedPhoto? _question;
   CapturedPhoto? _solution;
-  String? _bookId, _contentNodeId, _sessionId, _subject, _mebNodeId;
+
+  // Düzenlemede kayıtlı fotoğrafı kaldırma isteği.
+  bool _clearStoredQuestion = false;
+  bool _clearStoredSolution = false;
+
+  String? _bookId, _contentNodeId, _sessionId, _sessionItemId, _mockExamId, _subject, _mebNodeId, _testLabel;
   MistakeReason? _reason;
   int _difficulty = 5;
   bool _starred = false;
@@ -50,28 +71,71 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   bool _pickingSolution = false;
   Set<DraftIssue> _issues = const {};
 
+  bool get _editing => widget.editCardId != null;
+
   @override
   void initState() {
     super.initState();
     _media = ref.read(mediaStorageProvider);
     _capture = ref.read(photoCaptureProvider);
-    final p = widget.prefill;
-    if (p != null) {
-      _origin = p.origin;
-      _bookId = p.bookId;
-      _contentNodeId = p.contentNodeId;
-      _sessionId = p.sessionId;
-      _subject = p.subject;
-      _mebNodeId = p.mebNodeId;
-      _source.text = p.sourceName ?? '';
-      if (p.testTotalQuestions != null) _testTotal.text = '${p.testTotalQuestions}';
-      if (p.avgSecondsPerQuestion != null) _avgSeconds.text = '${p.avgSecondsPerQuestion!.round()}';
+    if (_editing) {
+      _loading = true;
+      unawaited(_loadCard(widget.editCardId!));
+    } else {
+      _applyPrefill(widget.prefill);
     }
+  }
+
+  void _applyPrefill(QuestionPrefill? p) {
+    if (p == null) return;
+    _origin = p.origin;
+    _status = p.status;
+    _bookId = p.bookId;
+    _contentNodeId = p.contentNodeId;
+    _sessionId = p.sessionId;
+    _sessionItemId = p.sessionItemId;
+    _mockExamId = p.mockExamId;
+    _subject = p.subject;
+    _mebNodeId = p.mebNodeId;
+    _testLabel = p.testLabel;
+    _source.text = p.sourceName ?? '';
+    if (p.testTotalQuestions != null) _testTotal.text = '${p.testTotalQuestions}';
+    if (p.avgSecondsPerQuestion != null) _avgSeconds.text = '${p.avgSecondsPerQuestion!.round()}';
+    if (p.questionNo != null) _questionNo.text = '${p.questionNo}';
+  }
+
+  Future<void> _loadCard(String id) async {
+    final card = await ref.read(questionCardRepositoryProvider).findById(id);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _original = card;
+      if (card == null) return;
+      _status = card.status;
+      _origin = card.origin;
+      _bookId = card.bookId;
+      _contentNodeId = card.contentNodeId;
+      _sessionId = card.sessionId;
+      _sessionItemId = card.sessionItemId;
+      _mockExamId = card.mockExamId;
+      _subject = card.subject;
+      _mebNodeId = card.mebNodeId;
+      _testLabel = card.testLabel;
+      _reason = card.reason;
+      _difficulty = card.difficulty;
+      _starred = card.isStarred;
+      _source.text = card.sourceName == unknownSourceName ? '' : card.sourceName;
+      _solutionText.text = card.solutionText ?? '';
+      _note.text = card.note ?? '';
+      if (card.testTotalQuestions != null) _testTotal.text = '${card.testTotalQuestions}';
+      if (card.avgSecondsPerQuestion != null) _avgSeconds.text = '${card.avgSecondsPerQuestion!.round()}';
+      if (card.questionNo != null) _questionNo.text = '${card.questionNo}';
+    });
   }
 
   @override
   void dispose() {
-    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note]) {
+    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note, _questionNo]) {
       c.dispose();
     }
     // Kaydedilmeden çıkıldıysa geçici dosyaları temizle (kaydedilenler zaten kalıcı depoda).
@@ -81,23 +145,44 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     super.dispose();
   }
 
+  /// Yuvada gösterilecek dosya: yeni çekim varsa o, yoksa kayıtlı fotoğraf.
+  String? _displayPath({required bool solution}) {
+    final fresh = solution ? _solution : _question;
+    if (fresh != null) return fresh.path;
+    final stored = solution ? _original?.solutionImage : _original?.questionImage;
+    final cleared = solution ? _clearStoredSolution : _clearStoredQuestion;
+    if (stored == null || cleared) return null;
+    return _media.resolve(stored).path;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return Scaffold(appBar: AppBar(), body: const Center(child: CircularProgressIndicator()));
+    }
+    if (_editing && _original == null) {
+      return Scaffold(appBar: AppBar(), body: const Center(child: Text('Soru bulunamadı.')));
+    }
+
     final theme = Theme.of(context);
     final books = ref.watch(libraryProvider).value ?? const <Book>[];
     final curriculum = ref.watch(curriculumProvider).value ?? const <CurriculumNode>[];
-    final subjects = {
+    final subjects = allSubjectKeys(extra: [
       for (final n in curriculum) n.subjectLabel,
       for (final b in books) subjectKey(b.examType, b.subject),
-    }.toList()
-      ..sort();
+      if (_subject != null) _subject!,
+    ]);
     final topics = _subject == null
         ? const <CurriculumNode>[]
         : depthFirst(curriculum.where((n) => n.subjectLabel == _subject));
+    final contextLine = [
+      if (_testLabel != null) _testLabel!,
+      if (_questionNo.text.trim().isNotEmpty) '${_questionNo.text.trim()}. soru',
+    ].join(', ');
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Soru ekle'),
+        title: Text(_editing ? 'Soruyu tamamla' : 'Soru ekle'),
         actions: [
           IconButton(
             tooltip: _starred ? 'Güzel Sorular klasöründen çıkar' : 'Güzel Sorular klasörüne ekle',
@@ -112,6 +197,17 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
+          if (contextLine.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.bookmark_outline_rounded, size: 18, color: theme.colorScheme.primary),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(contextLine, style: theme.textTheme.titleSmall)),
+                ],
+              ),
+            ),
           SegmentedButton<QuestionStatus>(
             showSelectedIcon: false,
             segments: const [
@@ -128,26 +224,24 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               Expanded(
                 child: PhotoSlot(
                   label: 'Soru',
-                  required: true,
-                  path: _question?.path,
+                  path: _displayPath(solution: false),
+                  canCrop: _question != null,
                   busy: _pickingQuestion,
-                  hasError: _issues.contains(DraftIssue.missingQuestionImage),
                   onPick: () => _pickPhoto(solution: false),
                   onCrop: () => _recrop(solution: false),
-                  onClear: () => _replacePhoto(solution: false, next: null),
+                  onClear: () => _clearPhoto(solution: false),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: PhotoSlot(
                   label: 'Doğru çözüm',
-                  required: true,
-                  path: _solution?.path,
+                  path: _displayPath(solution: true),
+                  canCrop: _solution != null,
                   busy: _pickingSolution,
-                  hasError: _issues.contains(DraftIssue.missingSolution),
                   onPick: () => _pickPhoto(solution: true),
                   onCrop: () => _recrop(solution: true),
-                  onClear: () => _replacePhoto(solution: true, next: null),
+                  onClear: () => _clearPhoto(solution: true),
                 ),
               ),
             ],
@@ -155,16 +249,82 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _solutionText,
-            minLines: 2,
+            minLines: 1,
             maxLines: 6,
             textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(
-              labelText: 'Çözüm notu',
-              helperText: 'Çözüm fotoğrafı eklemediysen zorunlu',
-              errorText: _issues.contains(DraftIssue.missingSolution) ? DraftIssue.missingSolution.message : null,
+            decoration: const InputDecoration(
+              labelText: 'Çözüm notu (isteğe bağlı)',
+              helperText: 'Fotoğraf ya da not: biri yeterli. İkisi de yoksa soru Eksikler\'de bekler.',
+              helperMaxLines: 2,
             ),
           ),
-          _SectionTitle('Kaynak'),
+          if (_status != QuestionStatus.correct) ...[
+            _SectionTitle(_status == QuestionStatus.blank ? 'Neden boş bıraktın?' : 'Neden yanlış yaptın?'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final r in MistakeReason.values)
+                  ChoiceChip(
+                    label: Text(r.label),
+                    selected: _reason == r,
+                    onSelected: (on) => setState(() => _reason = on ? r : null),
+                  ),
+              ],
+            ),
+          ],
+          const _SectionTitle('Ders ve konu'),
+          DropdownMenu<String>(
+            key: ValueKey('subject-$_subject'),
+            initialSelection: _subject,
+            expandedInsets: EdgeInsets.zero,
+            menuHeight: 360,
+            label: const Text('Ders'),
+            errorText: _issues.contains(DraftIssue.missingSubject) ? DraftIssue.missingSubject.message : null,
+            dropdownMenuEntries: [for (final s in subjects) DropdownMenuEntry(value: s, label: s)],
+            onSelected: (s) => setState(() {
+              if (s != _subject) _mebNodeId = null;
+              _subject = s;
+              _issues = {..._issues}..remove(DraftIssue.missingSubject);
+            }),
+          ),
+          const SizedBox(height: 12),
+          if (topics.isNotEmpty)
+            DropdownMenu<String>(
+              key: ValueKey('topic-$_subject'),
+              initialSelection: _mebNodeId,
+              expandedInsets: EdgeInsets.zero,
+              menuHeight: 360,
+              label: const Text('Konu'),
+              helperText: 'Yazarak ara',
+              enableFilter: true,
+              requestFocusOnTap: true,
+              // Türkçe katlamalı arama: "isci" yazınca "İşçi ve Havuz" bulunur.
+              filterCallback: (entries, filter) {
+                final q = normalizeTr(filter);
+                return q.isEmpty ? entries : entries.where((e) => normalizeTr(e.label).contains(q)).toList();
+              },
+              dropdownMenuEntries: [
+                for (final t in topics)
+                  DropdownMenuEntry(
+                    value: t.id,
+                    label: t.title,
+                    labelWidget: Padding(
+                      padding: EdgeInsetsDirectional.only(start: t.depth * 16.0),
+                      child: Text(t.title, style: t.depth == 0 ? const TextStyle(fontWeight: FontWeight.w600) : null),
+                    ),
+                  ),
+              ],
+              onSelected: (id) => setState(() => _mebNodeId = id),
+            )
+          else
+            Text(
+              _subject == null
+                  ? 'Konu seçmek için önce dersi seç.'
+                  : 'Bu ders için konu listesi henüz yok; analizde nedenlere göre gruplanır.',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          const _SectionTitle('Kaynak'),
           SegmentedButton<QuestionOrigin>(
             showSelectedIcon: false,
             segments: [for (final o in QuestionOrigin.values) ButtonSegment(value: o, label: Text(o.label))],
@@ -178,7 +338,6 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               initialSelection: _bookId,
               expandedInsets: EdgeInsets.zero,
               label: const Text('Kitap'),
-              errorText: _issues.contains(DraftIssue.missingSource) ? 'Kitap seç' : null,
               dropdownMenuEntries: [for (final b in books) DropdownMenuEntry(value: b.id, label: b.title)],
               onSelected: (id) => _selectBook(books.where((b) => b.id == id).firstOrNull),
             )
@@ -188,86 +347,54 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               decoration: InputDecoration(
                 labelText: _origin == QuestionOrigin.mockExam ? 'Deneme adı' : 'Kaynak',
                 hintText: _origin == QuestionOrigin.mockExam ? 'Örn. 3D TYT Deneme 4' : 'Örn. Telegram, hoca föyü',
-                errorText: _issues.contains(DraftIssue.missingSource) ? DraftIssue.missingSource.message : null,
               ),
             ),
-          _SectionTitle('Ders ve konu'),
-          DropdownMenu<String>(
-            key: ValueKey('subject-$_subject'),
-            initialSelection: _subject,
-            expandedInsets: EdgeInsets.zero,
-            label: const Text('Ders'),
-            errorText: _issues.contains(DraftIssue.missingSubject) ? DraftIssue.missingSubject.message : null,
-            dropdownMenuEntries: [for (final s in subjects) DropdownMenuEntry(value: s, label: s)],
-            onSelected: (s) => setState(() {
-              if (s != _subject) _mebNodeId = null;
-              _subject = s;
-            }),
-          ),
-          const SizedBox(height: 12),
-          DropdownMenu<String>(
-            key: ValueKey('topic-$_subject'),
-            enabled: topics.isNotEmpty,
-            initialSelection: _mebNodeId,
-            expandedInsets: EdgeInsets.zero,
-            menuHeight: 360,
-            label: const Text('MEB konusu'),
-            helperText: topics.isEmpty ? 'Önce dersi seç' : 'Yazarak ara',
-            enableFilter: true,
-            requestFocusOnTap: true,
-            // Türkçe katlamalı arama: "isci" yazınca "İşçi ve Havuz" bulunur.
-            filterCallback: (entries, filter) {
-              final q = normalizeTr(filter);
-              return q.isEmpty ? entries : entries.where((e) => normalizeTr(e.label).contains(q)).toList();
-            },
-            dropdownMenuEntries: [
-              for (final t in topics)
-                DropdownMenuEntry(
-                  value: t.id,
-                  label: t.title,
-                  labelWidget: Padding(
-                    padding: EdgeInsetsDirectional.only(start: t.depth * 16.0),
-                    child: Text(t.title, style: t.depth == 0 ? const TextStyle(fontWeight: FontWeight.w600) : null),
-                  ),
-                ),
-            ],
-            onSelected: (id) => setState(() => _mebNodeId = id),
-          ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _NumberField(controller: _testTotal, label: 'Testteki soru sayısı')),
+              Expanded(
+                child: _NumberField(
+                  controller: _questionNo,
+                  label: 'Soru no',
+                  errorText: _issues.contains(DraftIssue.invalidQuestionNo) ? 'En az 1' : null,
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _NumberField(controller: _avgSeconds, label: 'Soru başına süre', suffix: 'sn')),
+              Expanded(child: _NumberField(controller: _testTotal, label: 'Testteki soru sayısı')),
             ],
           ),
-          if (_status != QuestionStatus.correct) ...[
-            const SizedBox(height: 12),
-            DropdownMenu<MistakeReason>(
-              initialSelection: _reason,
-              expandedInsets: EdgeInsets.zero,
-              label: Text(_status == QuestionStatus.blank ? 'Neden boş bıraktın?' : 'Neden yanlış yaptın?'),
-              errorText: _issues.contains(DraftIssue.missingReason) ? 'Bir neden seç' : null,
-              dropdownMenuEntries: [
-                for (final r in MistakeReason.values) DropdownMenuEntry(value: r, label: r.label),
+          const SizedBox(height: 8),
+          Theme(
+            data: theme.copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: const EdgeInsets.only(bottom: 8),
+              title: Text('Diğer ayrıntılar', style: theme.textTheme.titleSmall),
+              subtitle: Text('Süre, zorluk ve not', style: theme.textTheme.bodySmall),
+              children: [
+                _NumberField(controller: _avgSeconds, label: 'Soru başına süre', suffix: 'sn'),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Zorluk: $_difficulty / 10', style: theme.textTheme.titleSmall),
+                ),
+                Slider(
+                  value: _difficulty.toDouble(),
+                  min: 1,
+                  max: 10,
+                  divisions: 9,
+                  label: '$_difficulty',
+                  onChanged: (v) => setState(() => _difficulty = v.round()),
+                ),
+                TextField(
+                  controller: _note,
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: const InputDecoration(labelText: 'Not (isteğe bağlı)'),
+                ),
               ],
-              onSelected: (r) => setState(() => _reason = r),
             ),
-          ],
-          _SectionTitle('Zorluk: $_difficulty / 10'),
-          Slider(
-            value: _difficulty.toDouble(),
-            min: 1,
-            max: 10,
-            divisions: 9,
-            label: '$_difficulty',
-            onChanged: (v) => setState(() => _difficulty = v.round()),
-          ),
-          TextField(
-            controller: _note,
-            minLines: 1,
-            maxLines: 4,
-            decoration: const InputDecoration(labelText: 'Not (isteğe bağlı)'),
           ),
           if (_starred)
             Padding(
@@ -284,13 +411,15 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
           child: Row(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _saving ? null : () => _save(addAnother: true),
-                  child: const Text('Kaydet, yenisini ekle'),
+              if (!_editing) ...[
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _saving ? null : () => _save(addAnother: true),
+                    child: const Text('Kaydet, yenisini ekle'),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: FilledButton(
                   onPressed: _saving ? null : () => _save(addAnother: false),
@@ -319,44 +448,22 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   }
 
   Future<void> _pickPhoto({required bool solution}) async {
-    final source = await showModalBottomSheet<PhotoSource>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheet) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Kamerayla çek'),
-              onTap: () => Navigator.pop(sheet, PhotoSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Galeriden seç'),
-              onTap: () => Navigator.pop(sheet, PhotoSource.gallery),
-            ),
-          ],
-        ),
-      ),
-    );
+    final source = await askPhotoSource(context);
     if (source == null || !mounted) return;
-    final style = CropUiStyle.fromTheme(Theme.of(context));
     await _runPhotoOp(
       solution,
-      () => _capture.capture(source, title: _cropTitle(solution), style: style),
+      () => capturePhoto(context, _capture, source, title: _cropTitle(solution)),
     );
   }
 
-  /// Her zaman tam çözünürlüklü orijinalden kırpar: fazla ya da eksik
-  /// kırptıysan geri dönüp düzeltebilirsin, netlik kaybolmaz.
+  /// Her zaman orijinalden kırpar: fazla ya da eksik kırptıysan geri dönüp
+  /// düzeltebilirsin, netlik kaybolmaz.
   Future<void> _recrop({required bool solution}) async {
     final current = solution ? _solution : _question;
     if (current == null) return;
-    final style = CropUiStyle.fromTheme(Theme.of(context));
     await _runPhotoOp(
       solution,
-      () => _capture.recrop(current, title: _cropTitle(solution), style: style),
+      () => recropPhoto(context, _capture, current, title: _cropTitle(solution)),
     );
   }
 
@@ -369,7 +476,9 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       final next = await op();
       if (next == null) return;
       if (!mounted) {
-        unawaited(_media.discardTemp(next.path));
+        for (final path in next.tempFiles) {
+          unawaited(_media.discardTemp(path));
+        }
         return;
       }
       _replacePhoto(solution: solution, next: next);
@@ -401,9 +510,22 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       } else {
         _question = next;
       }
-      if (next != null) {
-        _issues = {..._issues}
-          ..remove(solution ? DraftIssue.missingSolution : DraftIssue.missingQuestionImage);
+    });
+  }
+
+  /// Yeni çekim varsa onu bırakır (kayıtlı fotoğraf geri görünür); yoksa
+  /// kayıtlı fotoğrafı kaldırılacak olarak işaretler.
+  void _clearPhoto({required bool solution}) {
+    final fresh = solution ? _solution : _question;
+    if (fresh != null) {
+      _replacePhoto(solution: solution, next: null);
+      return;
+    }
+    setState(() {
+      if (solution) {
+        _clearStoredSolution = true;
+      } else {
+        _clearStoredQuestion = true;
       }
     });
   }
@@ -420,10 +542,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       bookId: fromBook ? _bookId : null,
       contentNodeId: fromBook ? _contentNodeId : null,
       sessionId: _sessionId,
+      sessionItemId: _sessionItemId,
+      mockExamId: _mockExamId,
       subject: _subject,
       mebNodeId: _mebNodeId,
-      testTotalQuestions: int.tryParse(_testTotal.text),
-      avgSecondsPerQuestion: double.tryParse(_avgSeconds.text),
+      testLabel: _testLabel,
+      questionNo: int.tryParse(_questionNo.text.trim()),
+      testTotalQuestions: int.tryParse(_testTotal.text.trim()),
+      avgSecondsPerQuestion: double.tryParse(_avgSeconds.text.trim()),
       reason: _status == QuestionStatus.correct ? null : _reason,
       difficulty: _difficulty,
       isStarred: _starred,
@@ -447,8 +573,21 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
-      await ref.read(saveQuestionCardProvider).call(draft);
+      final original = _original;
+      final QuestionCard saved;
+      if (original != null) {
+        saved = await ref.read(updateQuestionCardProvider).call(
+              original,
+              draft,
+              clearQuestionImage: _clearStoredQuestion,
+              clearSolutionImage: _clearStoredSolution,
+            );
+      } else {
+        saved = await ref.read(saveQuestionCardProvider).call(draft);
+      }
       if (!mounted) return;
+      final missing = saved.missingParts(topicAvailable: false);
+      final hint = missing.isEmpty ? '' : ' Eksik: ${missing.map((m) => lowerTr(m.label)).join(', ')}.';
       if (addAnother) {
         // Kaynak, ders, konu ve süre aynı kalır: aynı testten art arda hızlı giriş.
         _replacePhoto(solution: false, next: null);
@@ -456,13 +595,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
         setState(() {
           _solutionText.clear();
           _note.clear();
+          _questionNo.clear();
           _reason = null;
           _starred = false;
           _difficulty = 5;
         });
-        messenger.showSnackBar(const SnackBar(content: Text('Soru kaydedildi. Sıradakini ekleyebilirsin.')));
+        messenger.showSnackBar(SnackBar(content: Text('Soru kaydedildi.$hint Sıradakini ekleyebilirsin.')));
       } else {
-        messenger.showSnackBar(const SnackBar(content: Text('Soru kaydedildi.')));
+        messenger.showSnackBar(SnackBar(content: Text('Soru kaydedildi.$hint')));
         router.canPop() ? router.pop() : router.go(AppRoutes.home);
       }
     } on Exception catch (e) {
@@ -488,16 +628,19 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _NumberField extends StatelessWidget {
-  const _NumberField({required this.controller, required this.label, this.suffix});
+  const _NumberField({required this.controller, required this.label, this.suffix, this.errorText, this.onChanged});
   final TextEditingController controller;
   final String label;
   final String? suffix;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) => TextField(
         controller: controller,
         keyboardType: TextInputType.number,
+        onChanged: onChanged,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
-        decoration: InputDecoration(labelText: label, suffixText: suffix),
+        decoration: InputDecoration(labelText: label, suffixText: suffix, errorText: errorText),
       );
 }

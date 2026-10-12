@@ -9,6 +9,7 @@ import 'data/question_card_repository_impl.dart';
 import 'domain/question_bank.dart';
 import 'domain/question_card.dart';
 import 'domain/question_grouping.dart';
+import 'domain/quick_mark.dart';
 
 final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
     (ref) => DriftQuestionCardRepository(ref.watch(appDatabaseProvider)));
@@ -16,6 +17,18 @@ final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
 final saveQuestionCardProvider = Provider((ref) => SaveQuestionCard(
       repository: ref.watch(questionCardRepositoryProvider),
       media: ref.watch(mediaStorageProvider),
+      ids: ref.watch(idGeneratorProvider),
+      clock: ref.watch(clockProvider),
+    ));
+
+final updateQuestionCardProvider = Provider((ref) => UpdateQuestionCard(
+      repository: ref.watch(questionCardRepositoryProvider),
+      media: ref.watch(mediaStorageProvider),
+      clock: ref.watch(clockProvider),
+    ));
+
+final quickMarkProvider = Provider((ref) => QuickMarkQuestions(
+      repository: ref.watch(questionCardRepositoryProvider),
       ids: ref.watch(idGeneratorProvider),
       clock: ref.watch(clockProvider),
     ));
@@ -84,3 +97,33 @@ final dueCountProvider = StreamProvider<int>(
 /// Oturum başında bir kez okunur; tekrar sırasında liste kaymasın diye canlı akış değildir.
 final dueReviewsProvider = FutureProvider.autoDispose<List<DueReview>>(
     (ref) => ref.watch(questionCardRepositoryProvider).dueNow(ref.watch(clockProvider)()));
+
+// ───────────────────────── Eksikler ─────────────────────────
+
+typedef IncompleteCard = ({QuestionCard card, List<MissingPart> missing});
+
+final _incompleteRawProvider = StreamProvider<List<QuestionCard>>(
+    (ref) => ref.watch(questionCardRepositoryProvider).watchIncomplete());
+
+/// Fotoğrafı, çözümü, nedeni ya da konusu eksik kartlar. Konu yalnızca o dersin
+/// müfredatında konu listesi varsa eksik sayılır.
+final incompleteQuestionsProvider = Provider<AsyncValue<List<IncompleteCard>>>((ref) {
+  final raw = ref.watch(_incompleteRawProvider);
+  final curriculum = ref.watch(curriculumProvider).value ?? const <CurriculumNode>[];
+  final withTopics = {for (final n in curriculum) n.subjectLabel};
+  return raw.whenData((cards) {
+    final out = <IncompleteCard>[];
+    for (final c in cards) {
+      final missing = c.missingParts(topicAvailable: withTopics.contains(c.subject));
+      if (missing.isNotEmpty) out.add((card: c, missing: missing));
+    }
+    return out;
+  });
+});
+
+final incompleteCountProvider =
+    Provider<int>((ref) => ref.watch(incompleteQuestionsProvider).value?.length ?? 0);
+
+/// Denemelerden gelen yanlış ve boşlar (deneme analizinde konu bazlı net kaybı).
+final mockExamMistakesProvider = StreamProvider<List<QuestionCard>>(
+    (ref) => ref.watch(questionCardRepositoryProvider).watchMockExamMistakes());

@@ -5,16 +5,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../../curriculum/domain/curriculum.dart';
-import '../../../library/domain/library.dart';
-import '../../../library/library_providers.dart';
-import '../../../question_bank/domain/question_card.dart';
-import '../../../question_bank/presentation/question_prefill.dart';
 import '../../domain/study_session.dart';
 import '../../study_session_providers.dart';
+import '../session_quick_mark.dart';
 
 /// "Eksiklerini doldur": bitmiş oturumun D/Y/B sonuçları. "Sonra" ile
 /// ertelenebilir; rozet, sonuçlar kaydedilene kadar ana ekranda kalır.
+///
+/// Her blokta iki yol var: sayıları elle yazmak ya da optik formda yanlış ve
+/// boşlara dokunmak (sayılar kendiliğinden dolar, sorular deftere düşer).
 class SessionResultsScreen extends ConsumerStatefulWidget {
   const SessionResultsScreen({super.key, required this.sessionId});
   final String sessionId;
@@ -54,7 +53,8 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
   }
 
   Widget _body(StudySession s) {
-    final fields = [for (final item in s.items) _fieldsFor(item)];
+    final questionItems = [for (final i in s.items) if (i.hasQuestions) i];
+    final fields = [for (final item in questionItems) _fieldsFor(item)];
     final duration = s.elapsedAt(DateTime.now());
     return Column(
       children: [
@@ -75,7 +75,14 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
               ),
               const SizedBox(height: 12),
               for (final item in s.items)
-                _ItemCard(item: item, fields: _fieldsFor(item), onAddQuestion: () => _addQuestion(s, item)),
+                item.hasQuestions
+                    ? _ItemCard(
+                        item: item,
+                        fields: _fieldsFor(item),
+                        onMark: () => _mark(s, item),
+                        onAddQuestion: () => _addQuestion(s, item),
+                      )
+                    : _NoQuestionsCard(item: item),
             ],
           ),
         ),
@@ -96,26 +103,29 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
     );
   }
 
-  /// Hata ekleme ekranını oturum bağlamıyla önceden doldurur: kaynak, MEB
-  /// konusu, testteki soru sayısı ve soru başına ortalama süre otomatik gelir.
+  double? _currentSecondsPerQuestion(StudySession s) {
+    final solved = _fields.values.fold<int>(0, (sum, f) => sum + f.solved);
+    return solved > 0 ? s.elapsedAt(DateTime.now()).inSeconds / solved : null;
+  }
+
+  /// Optik form: işaretlenen sayılar alanlara yazılır, sorular deftere düşer.
+  Future<void> _mark(StudySession s, SessionItem item) async {
+    final result = await markSessionItem(context, ref, s, item);
+    if (result == null || !mounted) return;
+    _fieldsFor(item).set(result.correct, result.wrong, result.blank);
+  }
+
+  /// Fotoğraflı tam kayıt: kaynak, konu, testteki soru sayısı ve süre otomatik gelir.
   void _addQuestion(StudySession s, SessionItem item) {
-    final books = ref.read(libraryProvider).value ?? const <Book>[];
-    final book = books.where((b) => b.id == item.bookId).firstOrNull;
-    final totalSolved = _fields.values.fold<int>(0, (sum, f) => sum + f.solved);
     final itemSolved = _fieldsFor(item).solved;
     context.push(
       AppRoutes.newQuestion,
-      extra: QuestionPrefill(
-        origin: QuestionOrigin.book,
-        sessionId: s.id,
-        bookId: item.bookId,
-        contentNodeId: item.contentNodeId,
-        mebNodeId: item.mebNodeId,
-        sourceName: book?.title ?? item.label.split(' › ').first,
-        subject: book == null ? null : subjectKey(book.examType, book.subject),
-        testTotalQuestions: itemSolved > 0 ? itemSolved : item.estimatedQuestions,
-        avgSecondsPerQuestion:
-            totalSolved > 0 ? s.elapsedAt(DateTime.now()).inSeconds / totalSolved : null,
+      extra: sessionItemPrefill(
+        ref,
+        s,
+        item,
+        avgSecondsPerQuestion: _currentSecondsPerQuestion(s),
+        testTotalQuestions: itemSolved > 0 ? itemSolved : null,
       ),
     );
   }
@@ -125,9 +135,10 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
-      await ref
-          .read(submitSessionResultsProvider)
-          .call(s.id, [for (final item in s.items) _fieldsFor(item).toResult(item.id)]);
+      await ref.read(submitSessionResultsProvider).call(s.id, [
+        for (final item in s.items)
+          if (item.hasQuestions) _fieldsFor(item).toResult(item.id),
+      ]);
       messenger.showSnackBar(const SnackBar(content: Text('Sonuçlar kaydedildi.')));
       router.go(AppRoutes.home);
     } on Exception catch (e) {
@@ -151,6 +162,12 @@ class _ResultFields {
 
   int get solved => _v(correct) + _v(wrong) + _v(blank);
   List<Listenable> get listenables => [correct, wrong, blank];
+
+  void set(int c, int w, int b) {
+    correct.text = '$c';
+    wrong.text = '$w';
+    blank.text = '$b';
+  }
 
   ItemResult toResult(String itemId) =>
       ItemResult(itemId: itemId, correct: _v(correct), wrong: _v(wrong), blank: _v(blank));
@@ -195,9 +212,16 @@ class _Summary extends StatelessWidget {
 }
 
 class _ItemCard extends StatelessWidget {
-  const _ItemCard({required this.item, required this.fields, required this.onAddQuestion});
+  const _ItemCard({
+    required this.item,
+    required this.fields,
+    required this.onMark,
+    required this.onAddQuestion,
+  });
+
   final SessionItem item;
   final _ResultFields fields;
+  final VoidCallback onMark;
   final VoidCallback onAddQuestion;
 
   @override
@@ -209,7 +233,7 @@ class _ItemCard extends StatelessWidget {
     ].join(', ');
     return Card(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -226,16 +250,45 @@ class _ItemCard extends StatelessWidget {
                 Expanded(child: _CountField(label: 'Boş', controller: fields.blank)),
               ],
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: onAddQuestion,
-                icon: const Icon(Icons.add_a_photo_outlined),
-                label: const Text('Yanlış ya da boş soru ekle'),
-              ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    style: FilledButton.styleFrom(minimumSize: const Size(0, 44)),
+                    onPressed: onMark,
+                    icon: const Icon(Icons.checklist_rounded),
+                    label: const Text('Yanlışları işaretle'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onAddQuestion,
+                  icon: const Icon(Icons.add_a_photo_outlined),
+                  label: const Text('Fotoğraflı'),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Konu anlatımı, video, tekrar: yalnızca süre sayılır.
+class _NoQuestionsCard extends StatelessWidget {
+  const _NoQuestionsCard({required this.item});
+  final SessionItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.timer_outlined, color: theme.colorScheme.primary),
+        title: Text(item.label),
+        subtitle: const Text('Süre kaydedilir; girilecek sonuç yok.'),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/routes.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../curriculum/curriculum_providers.dart';
 import '../../../curriculum/domain/curriculum.dart';
@@ -51,6 +52,11 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
               color: card.isStarred ? Colors.amber.shade600 : null,
             ),
           ),
+          IconButton(
+            tooltip: 'Düzenle',
+            onPressed: () => context.push(AppRoutes.editQuestion(card.id)),
+            icon: const Icon(Icons.edit_outlined),
+          ),
           PopupMenuButton<String>(
             onSelected: (_) => _confirmDelete(card),
             itemBuilder: (context) => const [PopupMenuItem(value: 'delete', child: Text('Soruyu sil'))],
@@ -60,13 +66,24 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [
-          GestureDetector(
-            onTap: () => openImageZoom(context, card.questionImage),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: MediaImage(card.questionImage, fit: BoxFit.fitWidth, cacheWidth: 1440),
+          if (card.questionImage != null)
+            GestureDetector(
+              onTap: () => openImageZoom(context, card.questionImage!),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: MediaImage(card.questionImage!, fit: BoxFit.fitWidth, cacheWidth: 1440),
+              ),
+            )
+          else
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.image_not_supported_outlined),
+                title: Text(card.locationText),
+                subtitle: const Text('Fotoğrafı yok. Eklemek için dokun.'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppRoutes.editQuestion(card.id)),
+              ),
             ),
-          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -75,6 +92,8 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
               meta(card.subject),
               if (topic != null) meta(topic.title),
               meta(card.sourceName),
+              if (card.testLabel != null) meta(card.testLabel!),
+              if (card.questionNo != null) meta('${card.questionNo}. soru'),
               if (card.reason != null) meta(card.reason!.label),
               meta('Zorluk ${card.difficulty}/10'),
               if (card.avgSecondsPerQuestion != null) meta('${card.avgSecondsPerQuestion!.round()} sn/soru'),
@@ -82,7 +101,13 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          if (!_showSolution)
+          if (!card.hasSolution)
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.editQuestion(card.id)),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Çözüm ekle'),
+            )
+          else if (!_showSolution)
             FilledButton.tonalIcon(
               onPressed: () => setState(() => _showSolution = true),
               icon: const Icon(Icons.visibility_outlined),

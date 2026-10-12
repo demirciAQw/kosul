@@ -16,14 +16,17 @@ part 'app_database.g.dart';
   SessionItems,
   QuestionCards,
   ReviewStates,
+  MockExams,
+  MockExamSections,
   AppMeta,
 ])
 class AppDatabase extends _$AppDatabase {
   /// Testlerde: `AppDatabase(NativeDatabase.memory())`
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'kocum'));
 
+  /// v2: fotoğrafsız/çözümsüz kartlar, soru numarası, kitapsız oturum, denemeler.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -34,12 +37,38 @@ class AppDatabase extends _$AppDatabase {
             'CREATE UNIQUE INDEX ux_single_running_session '
             "ON study_sessions(status) WHERE status = 'running'",
           );
+          await _createV2Indexes();
         },
         onUpgrade: (m, from, to) async {
-          // v2+: `dart run drift_dev make-migrations` ile adım adım, test edilmiş geçişler.
+          if (from < 2) {
+            await m.addColumn(sessionItems, sessionItems.subject);
+            await m.addColumn(sessionItems, sessionItems.activity);
+            await m.createTable(mockExams);
+            await m.createTable(mockExamSections);
+            // Tablo yeniden kurulur: soru fotoğrafı isteğe bağlı olur, "çözüm
+            // zorunlu" CHECK kuralı kalkar, yeni sütunlar eklenir. Drift eski
+            // indeksleri kendisi yeniden oluşturur. (Bu aşamada foreign_keys
+            // kapalıdır; tekrar durumları silinmez.)
+            await m.alterTable(TableMigration(questionCards, newColumns: [
+              questionCards.questionNo,
+              questionCards.testLabel,
+              questionCards.sessionItemId,
+              questionCards.mockExamId,
+            ]));
+            await _createV2Indexes();
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+
+  Future<void> _createV2Indexes() async {
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS ix_cards_session_item ON question_cards(session_item_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_cards_mock_exam ON question_cards(mock_exam_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_cards_session ON question_cards(session_id)');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS ix_mock_sections_exam ON mock_exam_sections(exam_id)');
+  }
 }

@@ -1,7 +1,7 @@
 name: kocum
 description: "Koçum: YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi."
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ^3.8.0
@@ -25,11 +25,10 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.0
 
-  # Fotoğraf: çekim/seçim + kırpma + otomatik sıkıştırma (WebP)
+  # Fotoğraf: çekim/seçim + otomatik sıkıştırma (WebP).
+  # Kırpma/döndürme uygulamanın kendi ekranında (lib/core/media/crop_screen.dart).
   image_picker: ^1.1.2
   flutter_image_compress: ^2.3.0
-  # Kırpma/döndürme: Android'de yerel uCrop ekranı (serbest kırpma, ızgara, döndürme)
-  image_cropper: ^9.1.0
 
   # JSON şablon içe aktarma (dosya seç) / dışa aktarma (paylaş: Telegram, WhatsApp, Drive)
   file_picker: ^10.0.0

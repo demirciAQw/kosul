@@ -3,7 +3,20 @@ import '../../../core/utils/id_generator.dart';
 
 enum SessionStatus { running, awaitingResults, completed }
 
-/// Oturuma eklenecek bir seçim bloğu (seçim ağacından üretilir).
+/// Kitapsız oturumda ne yapıldığı. Yalnızca "Soru çözümü" doğru/yanlış/boş ister.
+enum StudyActivity {
+  questions('Soru çözümü', true),
+  lecture('Konu çalışması', false),
+  video('Video', false),
+  review('Tekrar', false),
+  other('Diğer', false);
+
+  const StudyActivity(this.label, this.hasQuestions);
+  final String label;
+  final bool hasQuestions;
+}
+
+/// Oturuma eklenecek bir seçim bloğu (seçim ağacından ya da kitapsız formdan üretilir).
 class SessionItemDraft {
   const SessionItemDraft({
     required this.label,
@@ -12,6 +25,8 @@ class SessionItemDraft {
     this.contentNodeId,
     this.mebNodeId,
     this.estimatedQuestions,
+    this.subject,
+    this.activity,
   });
 
   final String label; // "345 TYT Mat › Problemler › Yaş Problemleri"
@@ -20,6 +35,8 @@ class SessionItemDraft {
   final String? mebNodeId;
   final List<int> pages; // sıralı
   final int? estimatedQuestions;
+  final String? subject; // "TYT Matematik"
+  final StudyActivity? activity; // kitaplı bloklarda null = soru çözümü
 }
 
 class SessionItem {
@@ -34,6 +51,8 @@ class SessionItem {
     this.correct,
     this.wrong,
     this.blank,
+    this.subject,
+    this.activity,
   });
 
   final String id;
@@ -46,10 +65,24 @@ class SessionItem {
   final int? correct;
   final int? wrong;
   final int? blank;
+  final String? subject;
+  final StudyActivity? activity;
 
   bool get hasResults => correct != null || wrong != null || blank != null;
   int get solved => (correct ?? 0) + (wrong ?? 0) + (blank ?? 0);
   String get pageSpec => formatPages(pages);
+
+  /// Doğru/yanlış/boş girilecek bir blok mu? (Konu anlatımı, video vb. değil.)
+  bool get hasQuestions => activity?.hasQuestions ?? true;
+  bool get isBookless => bookId == null;
+
+  /// Kart ve listelerde gösterilecek test adı: kitap adı olmadan.
+  /// "345 TYT Mat › Problemler › Yaş" → "Problemler › Yaş"
+  String get testLabel {
+    if (isBookless) return label;
+    final parts = label.split(' › ');
+    return parts.length > 1 ? parts.skip(1).join(' › ') : label;
+  }
 }
 
 class StudySession {
@@ -71,6 +104,7 @@ class StudySession {
   Duration elapsedAt(DateTime now) => (endedAt ?? now).difference(startedAt);
 
   int get totalSolved => items.fold(0, (sum, i) => sum + i.solved);
+  bool get hasQuestionWork => items.any((i) => i.hasQuestions);
 
   double? get secondsPerQuestion {
     final end = endedAt;
@@ -118,7 +152,17 @@ abstract interface class StudySessionRepository {
   /// Koşan bir oturum varsa [SessionAlreadyRunningException].
   Future<StudySession> start(List<SessionItemDraft> items, DateTime at);
   Future<void> finish(String sessionId, DateTime at);
+
+  /// Yanlışlıkla başlatılan oturumu iz bırakmadan siler. Bu oturumda fotoğrafsız
+  /// işaretlenmiş "hızlı" kartlar da silinir; fotoğraflı kartlar defterde kalır.
+  Future<void> cancel(String sessionId);
+
+  /// Tüm sonuçları yazar ve oturumu tamamlar. Soru başına süresi henüz
+  /// bilinmeyen kartlara oturumun ortalaması işlenir.
   Future<void> saveResults(String sessionId, List<ItemResult> results);
+
+  /// Tek bloğun sayılarını yazar (optik formdan); oturumun durumunu değiştirmez.
+  Future<void> saveItemResult(ItemResult result);
 }
 
 // ───────────────────────── Use case'ler ─────────────────────────
@@ -142,6 +186,13 @@ class FinishStudySession {
   final Clock _clock;
 
   Future<void> call(String sessionId) => _repository.finish(sessionId, _clock());
+}
+
+class CancelStudySession {
+  CancelStudySession(this._repository);
+  final StudySessionRepository _repository;
+
+  Future<void> call(String sessionId) => _repository.cancel(sessionId);
 }
 
 class SubmitSessionResults {

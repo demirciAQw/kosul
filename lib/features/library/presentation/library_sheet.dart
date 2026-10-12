@@ -61,6 +61,7 @@ Future<void> showLibrarySheet(BuildContext context) => showModalBottomSheet<void
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => const _LibrarySheet(),
     );
 

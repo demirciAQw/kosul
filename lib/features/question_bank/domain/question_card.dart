@@ -32,16 +32,27 @@ enum MistakeReason {
   final String label;
 }
 
+/// Kartı "tamamlanmış" saymak için eksik olabilecek parçalar (Eksikler listesi).
+enum MissingPart {
+  photo('Fotoğraf'),
+  solution('Çözüm'),
+  reason('Neden'),
+  topic('Konu');
+
+  const MissingPart(this.label);
+  final String label;
+}
+
 class QuestionCard {
   const QuestionCard({
     required this.id,
     required this.status,
     required this.origin,
-    required this.questionImage,
     required this.sourceName,
     required this.subject,
     required this.difficulty,
     required this.createdAt,
+    this.questionImage,
     this.solutionImage,
     this.solutionText,
     this.bookId,
@@ -53,12 +64,16 @@ class QuestionCard {
     this.avgSecondsPerQuestion,
     this.isStarred = false,
     this.note,
+    this.questionNo,
+    this.testLabel,
+    this.sessionItemId,
+    this.mockExamId,
   });
 
   final String id;
   final QuestionStatus status;
   final QuestionOrigin origin;
-  final String questionImage; // göreli medya yolu
+  final String? questionImage; // göreli medya yolu; hızlı kartlarda null
   final String? solutionImage;
   final String? solutionText;
   final String sourceName;
@@ -75,9 +90,41 @@ class QuestionCard {
   final String? note;
   final DateTime createdAt;
 
-  QuestionCard copyWith({bool? isStarred}) => QuestionCard(
+  /// "Testin 7. sorusu": kitap/deneme içindeki numara.
+  final int? questionNo;
+  final String? testLabel;
+  final String? sessionItemId;
+  final String? mockExamId;
+
+  bool get hasPhoto => questionImage != null;
+  bool get hasSolution => solutionImage != null || (solutionText?.trim().isNotEmpty ?? false);
+  bool get needsReason => status != QuestionStatus.correct && reason == null;
+
+  /// Yalnızca hızlı işaretlemeyle oluşmuş, üzerinde emek olmayan kart
+  /// (optikte işaret kaldırılınca silinebilir).
+  bool get isBare => !hasPhoto && !hasSolution && note == null;
+
+  /// [topicAvailable]: bu ders için müfredatta konu listesi var mı? Yoksa
+  /// konu "eksik" sayılmaz; kart sonsuza dek listede takılı kalmasın.
+  List<MissingPart> missingParts({required bool topicAvailable}) => [
+        if (!hasPhoto) MissingPart.photo,
+        if (!hasSolution) MissingPart.solution,
+        if (needsReason) MissingPart.reason,
+        if (topicAvailable && mebNodeId == null) MissingPart.topic,
+      ];
+
+  /// "Soru 7" ya da durum adı.
+  String get shortTitle => questionNo == null ? status.label : 'Soru $questionNo';
+
+  /// "Problemler › Yaş Problemleri, 7. soru"
+  String get locationText {
+    final where = testLabel ?? sourceName;
+    return questionNo == null ? where : '$where, $questionNo. soru';
+  }
+
+  QuestionCard copyWith({bool? isStarred, QuestionStatus? status}) => QuestionCard(
         id: id,
-        status: status,
+        status: status ?? this.status,
         origin: origin,
         questionImage: questionImage,
         solutionImage: solutionImage,
@@ -95,6 +142,10 @@ class QuestionCard {
         isStarred: isStarred ?? this.isStarred,
         note: note,
         createdAt: createdAt,
+        questionNo: questionNo,
+        testLabel: testLabel,
+        sessionItemId: sessionItemId,
+        mockExamId: mockExamId,
       );
 }
 
@@ -168,16 +219,15 @@ class QuestionFilter {
       );
 }
 
-// ───────────────────────── Yeni kayıt taslağı ─────────────────────────
+// ───────────────────────── Yeni kayıt / düzenleme taslağı ─────────────────────────
 
+/// v2: fotoğraf, çözüm ve neden isteğe bağlıdır. Eksik kart kaydedilir ve
+/// Eksikler listesinde tamamlanmayı bekler. Zorunlu olan yalnızca ders.
 enum DraftIssue {
-  missingQuestionImage('Sorunun fotoğrafını ekle.'),
-  missingSolution('Doğru çözümü ekle: fotoğraf ya da metin zorunlu.'),
-  missingSource('Kaynağı seç ya da yaz.'),
   missingSubject('Dersi seç.'),
-  missingReason('Yanlış ya da boş bırakma nedenini seç.'),
   invalidDifficulty('Zorluk 1 ile 10 arasında olmalı.'),
-  invalidTestSize('Testteki soru sayısı en az 1 olmalı.');
+  invalidTestSize('Testteki soru sayısı en az 1 olmalı.'),
+  invalidQuestionNo('Soru numarası en az 1 olmalı.');
 
   const DraftIssue(this.message);
   final String message;
@@ -202,11 +252,39 @@ class QuestionDraft {
     this.difficulty = 5,
     this.isStarred = false,
     this.note,
+    this.questionNo,
+    this.testLabel,
+    this.sessionItemId,
+    this.mockExamId,
   });
+
+  /// Mevcut kartın değerleriyle başlayan taslak (düzenleme için). Fotoğraf
+  /// yolları boştur: "yeni fotoğraf yok, eskisi kalsın" anlamına gelir.
+  factory QuestionDraft.fromCard(QuestionCard c) => QuestionDraft(
+        status: c.status,
+        origin: c.origin,
+        sourceName: c.sourceName,
+        solutionText: c.solutionText,
+        bookId: c.bookId,
+        contentNodeId: c.contentNodeId,
+        sessionId: c.sessionId,
+        mebNodeId: c.mebNodeId,
+        subject: c.subject,
+        testTotalQuestions: c.testTotalQuestions,
+        reason: c.reason,
+        avgSecondsPerQuestion: c.avgSecondsPerQuestion,
+        difficulty: c.difficulty,
+        isStarred: c.isStarred,
+        note: c.note,
+        questionNo: c.questionNo,
+        testLabel: c.testLabel,
+        sessionItemId: c.sessionItemId,
+        mockExamId: c.mockExamId,
+      );
 
   final QuestionStatus status;
   final QuestionOrigin origin;
-  final String? questionImagePath; // GEÇİCİ mutlak yol (sıkıştırılmış)
+  final String? questionImagePath; // GEÇİCİ mutlak yol (sıkıştırılmış); düzenlemede = yeni fotoğraf
   final String? solutionImagePath;
   final String? solutionText;
   final String sourceName;
@@ -221,17 +299,45 @@ class QuestionDraft {
   final int difficulty;
   final bool isStarred;
   final String? note;
+  final int? questionNo;
+  final String? testLabel;
+  final String? sessionItemId;
+  final String? mockExamId;
 
-  bool get hasSolution => solutionImagePath != null || (solutionText?.trim().isNotEmpty ?? false);
+  QuestionDraft copyWith({
+    Getter<MistakeReason?>? reason,
+    Getter<String?>? questionImagePath,
+    Getter<String?>? solutionImagePath,
+  }) =>
+      QuestionDraft(
+        status: status,
+        origin: origin,
+        sourceName: sourceName,
+        questionImagePath: questionImagePath != null ? questionImagePath() : this.questionImagePath,
+        solutionImagePath: solutionImagePath != null ? solutionImagePath() : this.solutionImagePath,
+        solutionText: solutionText,
+        bookId: bookId,
+        contentNodeId: contentNodeId,
+        sessionId: sessionId,
+        mebNodeId: mebNodeId,
+        subject: subject,
+        testTotalQuestions: testTotalQuestions,
+        reason: reason != null ? reason() : this.reason,
+        avgSecondsPerQuestion: avgSecondsPerQuestion,
+        difficulty: difficulty,
+        isStarred: isStarred,
+        note: note,
+        questionNo: questionNo,
+        testLabel: testLabel,
+        sessionItemId: sessionItemId,
+        mockExamId: mockExamId,
+      );
 
   List<DraftIssue> validate() => [
-        if (questionImagePath == null) DraftIssue.missingQuestionImage,
-        if (!hasSolution) DraftIssue.missingSolution,
-        if (sourceName.trim().isEmpty) DraftIssue.missingSource,
         if (subject == null || subject!.trim().isEmpty) DraftIssue.missingSubject,
-        if (status != QuestionStatus.correct && reason == null) DraftIssue.missingReason,
         if (difficulty < 1 || difficulty > 10) DraftIssue.invalidDifficulty,
         if (testTotalQuestions != null && testTotalQuestions! < 1) DraftIssue.invalidTestSize,
+        if (questionNo != null && questionNo! < 1) DraftIssue.invalidQuestionNo,
       ];
 }
 
@@ -241,3 +347,5 @@ class QuestionDraftInvalid implements Exception {
   @override
   String toString() => issues.map((i) => i.message).join(' ');
 }
+
+const unknownSourceName = 'Kaynak belirtilmemiş';
