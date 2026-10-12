@@ -1,6 +1,6 @@
 # Koçum
 
-YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi.
+YKS öğrencileri için tamamen çevrimdışı çalışma(ilk sürmler için), süre ve hata analizi takipçisi.
 Flutter, Clean Architecture, SQLite (Drift). Telefonda denemek için `NASIL_DENENIR.md`.
 
 ## Özellikler
@@ -68,4 +68,4 @@ flutter run --release
 
 - `assets/meb/kazanim_agaci.json` ve örnek kitap **örnek veridir**; yayından önce gerçek MEB/ÖSYM konu listesiyle doldurulmalı.
 - Düşük güvenli MEB eşleşmeleri için onay ekranı yok (şimdilik otomatik eşleşme ve "onay bekliyor" sayacı var).
-- Yedekleme / geri yükleme (JSON + medya zip) yok.
+- Yedekleme / geri yükleme (JSON + medya zip) yok.(claude codean yapıyo bu işi )
