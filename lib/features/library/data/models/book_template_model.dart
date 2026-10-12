@@ -121,6 +121,7 @@ class TemplateNodeModel {
     this.pageStart,
     this.pageEnd,
     this.mebCode,
+    this.questions,
     this.children = const [],
   });
 
@@ -130,6 +131,10 @@ class TemplateNodeModel {
 
   /// İsteğe bağlı açık MEB kimliği; varsa otomatik eşleştirmeyi geçersiz kılar.
   final String? mebCode;
+
+  /// İsteğe bağlı: testteki kesin soru sayısı (JSON'da "questions").
+  /// Eski uygulama sürümleri bu alanı yok sayar; şema sürümü değişmez.
+  final int? questions;
   final List<TemplateNodeModel> children;
 
   /// Bağımsız kullanım için (ör. tek bir üniteyi yapıştırma).
@@ -162,6 +167,7 @@ class TemplateNodeModel {
       pageStart: start,
       pageEnd: end,
       mebCode: r.optString('meb', maxLength: 120),
+      questions: r.optInt('questions', min: 1, max: 500),
       children: [
         for (final c in children)
           TemplateNodeModel._parse(c, depth: depth + 1, pageCount: pageCount, counter: counter),
@@ -174,6 +180,7 @@ class TemplateNodeModel {
         if (pageStart != null) 'pageStart': pageStart,
         if (pageEnd != null) 'pageEnd': pageEnd,
         if (mebCode != null) 'meb': mebCode,
+        if (questions != null) 'questions': questions,
         if (children.isNotEmpty) 'children': [for (final c in children) c.toJson()],
       };
 
@@ -184,6 +191,7 @@ class TemplateNodeModel {
         pageStart: pageStart,
         pageEnd: pageEnd,
         mebNodeId: mebCode,
+        questionCount: questions,
         children: [for (final c in children) c.toEntity(ids, depth: depth + 1)],
       );
 
@@ -194,6 +202,7 @@ class TemplateNodeModel {
         pageStart: n.pageStart,
         pageEnd: n.pageEnd,
         mebCode: (n.mebMatchScore ?? 0) >= TopicMatcher.autoAcceptThreshold ? n.mebNodeId : null,
+        questions: n.questionCount,
         children: [for (final c in n.children) TemplateNodeModel.fromEntity(c)],
       );
 }

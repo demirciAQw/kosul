@@ -9,6 +9,9 @@ import '../../study_session/presentation/widgets/topic_selection_view.dart';
 import '../domain/planning.dart';
 import '../planning_providers.dart';
 
+/// Yeni plan: tür (haftalık, aylık, yıllık, özel), ad, tarih aralığı, görevler.
+/// Görev eklemek zorunlu değil; plan kartından sonra da eklenebilir.
+/// Vazgeç ile ya da geri tuşuyla (onay sorularak) hiçbir şey kaydetmeden çıkılır.
 class CreatePlanScreen extends ConsumerStatefulWidget {
   const CreatePlanScreen({super.key});
 
@@ -19,21 +22,36 @@ class CreatePlanScreen extends ConsumerStatefulWidget {
 class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   final _title = TextEditingController();
   final _tasks = <NewPlanTaskDraft>[];
+  PlanKind _kind = PlanKind.weekly;
   late DateTimeRange _range;
   bool _saving = false;
+
+  bool get _dirty => _title.text.trim().isNotEmpty || _tasks.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    final now = ref.read(clockProvider)();
-    final today = DateTime(now.year, now.month, now.day);
-    _range = DateTimeRange(start: today, end: today.add(const Duration(days: 13)));
+    _applyKind(PlanKind.weekly);
   }
 
   @override
   void dispose() {
     _title.dispose();
     super.dispose();
+  }
+
+  void _applyKind(PlanKind kind) {
+    final r = kind.rangeFrom(ref.read(clockProvider)());
+    _kind = kind;
+    _range = DateTimeRange(start: r.start, end: r.end);
+  }
+
+  /// Ad boş bırakılırsa: "Haftalık plan (12 Eki – 18 Eki)" ya da "3. Plan".
+  String _suggestedTitle() {
+    final count = (ref.read(plansProvider).value?.length ?? 0) + 1;
+    return _kind == PlanKind.custom
+        ? '$count. Plan'
+        : '${_kind.label} plan (${formatDateRange(_range.start, _range.end)})';
   }
 
   Future<void> _pickRange() async {
@@ -45,44 +63,60 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
       initialDateRange: _range,
       helpText: 'Plan tarih aralığı',
     );
-    if (picked != null) setState(() => _range = picked);
+    if (picked != null) {
+      setState(() {
+        _range = picked;
+        _kind = PlanKind.custom;
+      });
+    }
   }
 
   Future<void> _addFromBooks() async {
-    final drafts = await Navigator.of(context).push<List<SessionItemDraft>>(
-      MaterialPageRoute(builder: (_) => const TopicPickerPage()),
-    );
+    final drafts = await pickPlanTasksFromBooks(context);
     if (drafts == null || !mounted) return;
-    setState(() {
-      for (final d in drafts) {
-        _tasks.add(NewPlanTaskDraft(
-          title: d.label,
-          bookId: d.bookId,
-          contentNodeId: d.contentNodeId,
-          targetQuestions: d.estimatedQuestions,
-        ));
-      }
-    });
+    setState(() => _tasks.addAll(drafts));
   }
 
   Future<void> _addCustom() async {
-    final text = await showDialog<String>(context: context, builder: (_) => const _TextPromptDialog());
+    final text = await showDialog<String>(context: context, builder: (_) => const TaskTextDialog());
     if (text == null || text.trim().isEmpty || !mounted) return;
     setState(() => _tasks.add(NewPlanTaskDraft(title: text.trim())));
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_dirty) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Plan oluşturmaktan vazgeç?'),
+        content: const Text('Yazdığın ad ve eklediğin görevler kaydedilmez.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Devam et')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Vazgeç')),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  Future<void> _cancel() async {
+    final router = GoRouter.of(context);
+    if (await _confirmDiscard()) router.pop();
   }
 
   Future<void> _save() async {
     setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
+    final title = _title.text.trim();
     try {
-      await ref.read(createPlanProvider).call(NewPlanDraft(
-            title: _title.text,
+      final plan = await ref.read(createPlanProvider).call(NewPlanDraft(
+            title: title.isEmpty ? _suggestedTitle() : title,
             startsOn: _range.start,
             endsOn: _range.end,
             tasks: _tasks,
           ));
-      messenger.showSnackBar(const SnackBar(content: Text('Plan kaydedildi.')));
+      messenger.showSnackBar(SnackBar(content: Text('${plan.title} oluşturuldu.')));
       router.pop();
     } on PlanException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
@@ -97,71 +131,128 @@ class _CreatePlanScreenState extends ConsumerState<CreatePlanScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final days = _range.end.difference(_range.start).inDays + 1;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Yeni plan')),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        children: [
-          TextField(
-            controller: _title,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(labelText: 'Plan adı', hintText: 'Örn. Ekim sonuna kadar problemler'),
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: _pickRange,
-            icon: const Icon(Icons.date_range_outlined),
-            label: Text('${formatDateRange(_range.start, _range.end)} ($days gün)'),
-          ),
-          const SizedBox(height: 24),
-          Text('Görev havuzu', style: theme.textTheme.titleSmall),
-          const SizedBox(height: 4),
-          Text(
-            'Görevleri aralık içinde istediğin gün yaparsın; sıra ve gün dayatılmaz.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-          ),
-          const SizedBox(height: 8),
-          for (var i = 0; i < _tasks.length; i++)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(_tasks[i].title),
-              subtitle: _tasks[i].targetQuestions == null ? null : Text('yaklaşık ${_tasks[i].targetQuestions} soru'),
-              trailing: IconButton(
-                tooltip: 'Kaldır',
-                icon: const Icon(Icons.close_rounded),
-                onPressed: () => setState(() => _tasks.removeAt(i)),
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final router = GoRouter.of(context);
+        if (await _confirmDiscard()) router.pop();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Yeni plan'),
+          leading: IconButton(tooltip: 'Vazgeç', icon: const Icon(Icons.close_rounded), onPressed: _cancel),
+        ),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<PlanKind>(
+                showSelectedIcon: false,
+                segments: [for (final k in PlanKind.values) ButtonSegment(value: k, label: Text(k.label))],
+                selected: {_kind},
+                onSelectionChanged: (s) => setState(() => _applyKind(s.first)),
               ),
             ),
-          Wrap(
-            spacing: 8,
-            children: [
-              ActionChip(
-                avatar: const Icon(Icons.menu_book_outlined, size: 18),
-                label: const Text('Kitaptan konu ekle'),
-                onPressed: _addFromBooks,
+            const SizedBox(height: 16),
+            TextField(
+              controller: _title,
+              textCapitalization: TextCapitalization.sentences,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: 'Plan adı',
+                hintText: _suggestedTitle(),
+                helperText: 'Boş bırakırsan bu ad verilir.',
               ),
-              ActionChip(
-                avatar: const Icon(Icons.edit_outlined, size: 18),
-                label: const Text('Kendi görevini yaz'),
-                onPressed: _addCustom,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: _pickRange,
+              icon: const Icon(Icons.date_range_outlined),
+              label: Text('${formatDateRange(_range.start, _range.end)} ($days gün)'),
+            ),
+            const SizedBox(height: 24),
+            Text('Görev havuzu', style: theme.textTheme.titleSmall),
+            const SizedBox(height: 4),
+            Text(
+              'Görevleri aralık içinde istediğin gün yaparsın; sıra ve gün dayatılmaz. '
+              'Görevsiz oluşturup sonra da ekleyebilirsin.',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 8),
+            for (var i = 0; i < _tasks.length; i++)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(_tasks[i].title),
+                subtitle: _tasks[i].targetQuestions == null ? null : Text('${_tasks[i].targetQuestions} soru'),
+                trailing: IconButton(
+                  tooltip: 'Kaldır',
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => setState(() => _tasks.removeAt(i)),
+                ),
               ),
-            ],
-          ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: FilledButton(
-            onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('Planı kaydet'),
+            Wrap(
+              spacing: 8,
+              children: [
+                ActionChip(
+                  avatar: const Icon(Icons.menu_book_outlined, size: 18),
+                  label: const Text('Kitaptan konu ekle'),
+                  onPressed: _addFromBooks,
+                ),
+                ActionChip(
+                  avatar: const Icon(Icons.edit_outlined, size: 18),
+                  label: const Text('Kendi görevini yaz'),
+                  onPressed: _addCustom,
+                ),
+              ],
+            ),
+          ],
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _saving ? null : _cancel,
+                    child: const Text('Vazgeç'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: _saving
+                        ? const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Text('Planı oluştur'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Kitap ağacından görev seçtirir (oluşturmada ve var olan plana eklemede).
+Future<List<NewPlanTaskDraft>?> pickPlanTasksFromBooks(BuildContext context) async {
+  final drafts = await Navigator.of(context).push<List<SessionItemDraft>>(
+    MaterialPageRoute(builder: (_) => const TopicPickerPage()),
+  );
+  if (drafts == null) return null;
+  return [
+    for (final d in drafts)
+      NewPlanTaskDraft(
+        title: d.label,
+        bookId: d.bookId,
+        contentNodeId: d.contentNodeId,
+        targetQuestions: d.estimatedQuestions,
+      ),
+  ];
 }
 
 class TopicPickerPage extends StatelessWidget {
@@ -180,14 +271,14 @@ class TopicPickerPage extends StatelessWidget {
   }
 }
 
-class _TextPromptDialog extends StatefulWidget {
-  const _TextPromptDialog();
+class TaskTextDialog extends StatefulWidget {
+  const TaskTextDialog({super.key});
 
   @override
-  State<_TextPromptDialog> createState() => _TextPromptDialogState();
+  State<TaskTextDialog> createState() => _TaskTextDialogState();
 }
 
-class _TextPromptDialogState extends State<_TextPromptDialog> {
+class _TaskTextDialogState extends State<TaskTextDialog> {
   final _controller = TextEditingController();
 
   @override

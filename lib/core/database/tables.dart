@@ -39,6 +39,9 @@ class ContentNodes extends Table {
       text().nullable().references(CurriculumNodes, #id, onDelete: KeyAction.setNull)();
   RealColumn get mebMatchScore => real().nullable()();
 
+  /// Şablonda verilmişse testteki kesin soru sayısı (v3). Optik form bununla açılır.
+  IntColumn get questionCount => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -70,6 +73,9 @@ class StudyPlans extends Table {
   DateTimeColumn get startsOn => dateTime()();
   DateTimeColumn get endsOn => dateTime()();
   DateTimeColumn get createdAt => dateTime()();
+
+  /// "Tamamladım" işareti (v3). Null = sürüyor.
+  DateTimeColumn get completedAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

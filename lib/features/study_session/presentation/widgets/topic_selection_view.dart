@@ -152,7 +152,7 @@ class _NodeTile extends StatelessWidget {
     final estimate = node.estimatedQuestions;
     final subtitle = [
       if (node.pages.isNotEmpty) 's. ${formatPages(node.pages)}',
-      if (estimate != null) 'yaklaşık $estimate soru',
+      if (estimate != null) node.exactQuestions != null ? '$estimate soru' : 'yaklaşık $estimate soru',
     ].join(', ');
 
     return InkWell(
@@ -316,8 +316,8 @@ class _EmptyLibrary extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () => importSampleBookFlow(context, ref),
-              child: const Text('Önce örnek kitapla dene'),
+              onPressed: () => showLibrarySheet(context),
+              child: const Text('Hazır kitaplardan seç'),
             ),
           ],
         ),

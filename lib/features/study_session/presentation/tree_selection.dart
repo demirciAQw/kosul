@@ -15,6 +15,7 @@ class SelectableNode {
     required this.children,
     this.contentNodeId,
     this.mebNodeId,
+    this.exactQuestions,
   });
 
   factory SelectableNode.fromBook(Book book) {
@@ -24,6 +25,7 @@ class SelectableNode {
       title: book.title,
       book: book,
       children: children,
+      exactQuestions: _sumExact(children),
       pages: children.isEmpty
           ? [for (var p = 1; p <= book.pageCount; p++) p]
           : _union(children),
@@ -39,6 +41,7 @@ class SelectableNode {
       contentNodeId: n.id,
       mebNodeId: n.mebNodeId,
       children: children,
+      exactQuestions: n.questionCount ?? _sumExact(children),
       pages: n.hasPages
           ? [for (var p = n.pageStart!; p <= n.pageEnd!; p++) p]
           : _union(children),
@@ -59,7 +62,24 @@ class SelectableNode {
   bool get isLeaf => children.isEmpty;
   bool get isPagePickable => isLeaf && pages.isNotEmpty && pages.length <= maxPickablePages;
   bool get isExpandable => !isLeaf || isPagePickable;
-  int? get estimatedQuestions => pages.isEmpty ? null : book.estimateQuestions(pages.length);
+
+  /// Şablondaki kesin soru sayısı (test ya da tüm testleri bilinen bölüm).
+  final int? exactQuestions;
+
+  /// Kesin sayı varsa o, yoksa sayfa × sayfa başına ortalama soru.
+  int? get estimatedQuestions =>
+      exactQuestions ?? (pages.isEmpty ? null : book.estimateQuestions(pages.length));
+
+  static int? _sumExact(List<SelectableNode> nodes) {
+    if (nodes.isEmpty) return null;
+    var sum = 0;
+    for (final n in nodes) {
+      final q = n.exactQuestions;
+      if (q == null) return null;
+      sum += q;
+    }
+    return sum;
+  }
 
   Iterable<SelectableNode> get leaves sync* {
     if (isLeaf) {
@@ -158,7 +178,9 @@ class TreeSelection {
           contentNodeId: n.contentNodeId,
           mebNodeId: n.mebNodeId,
           pages: pages,
-          estimatedQuestions: pages.isEmpty ? null : n.book.estimateQuestions(pages.length),
+          estimatedQuestions: state == CheckState.all
+              ? n.estimatedQuestions
+              : (pages.isEmpty ? null : n.book.estimateQuestions(pages.length)),
           subject: subjectKey(n.book.examType, n.book.subject),
         ));
         return;

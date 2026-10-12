@@ -36,6 +36,7 @@ class DriftPlanRepository implements PlanRepository {
             startsOn: p.startsOn,
             endsOn: p.endsOn,
             createdAt: p.createdAt,
+            completedAt: p.completedAt,
             tasks: [
               for (final t in taskRows[p.id] ?? const <PlanTaskRow>[])
                 PlanTask(
@@ -53,6 +54,17 @@ class DriftPlanRepository implements PlanRepository {
     });
   }
 
+  PlanTasksCompanion _task(String planId, PlanTask t, int sortOrder) => PlanTasksCompanion.insert(
+        id: t.id,
+        planId: planId,
+        title: t.title,
+        sortOrder: sortOrder,
+        bookId: Value(t.bookId),
+        contentNodeId: Value(t.contentNodeId),
+        targetQuestions: Value(t.targetQuestions),
+        isDone: Value(t.isDone),
+      );
+
   @override
   Future<void> create(StudyPlan plan) => _db.transaction(() async {
         await _db.into(_db.studyPlans).insert(StudyPlansCompanion.insert(
@@ -61,18 +73,24 @@ class DriftPlanRepository implements PlanRepository {
               startsOn: plan.startsOn,
               endsOn: plan.endsOn,
               createdAt: plan.createdAt,
+              completedAt: Value(plan.completedAt),
             ));
+        if (plan.tasks.isEmpty) return;
         await _db.batch((b) => b.insertAll(_db.planTasks, [
-              for (var i = 0; i < plan.tasks.length; i++)
-                PlanTasksCompanion.insert(
-                  id: plan.tasks[i].id,
-                  planId: plan.id,
-                  title: plan.tasks[i].title,
-                  sortOrder: i,
-                  bookId: Value(plan.tasks[i].bookId),
-                  contentNodeId: Value(plan.tasks[i].contentNodeId),
-                  targetQuestions: Value(plan.tasks[i].targetQuestions),
-                ),
+              for (var i = 0; i < plan.tasks.length; i++) _task(plan.id, plan.tasks[i], i),
+            ]));
+      });
+
+  @override
+  Future<void> addTasks(String planId, List<PlanTask> tasks) => _db.transaction(() async {
+        final maxOrder = _db.planTasks.sortOrder.max();
+        final row = await (_db.selectOnly(_db.planTasks)
+              ..addColumns([maxOrder])
+              ..where(_db.planTasks.planId.equals(planId)))
+            .getSingle();
+        final start = (row.read(maxOrder) ?? -1) + 1;
+        await _db.batch((b) => b.insertAll(_db.planTasks, [
+              for (var i = 0; i < tasks.length; i++) _task(planId, tasks[i], start + i),
             ]));
       });
 
@@ -80,6 +98,15 @@ class DriftPlanRepository implements PlanRepository {
   Future<void> setTaskDone(String taskId, bool done) =>
       (_db.update(_db.planTasks)..where((t) => t.id.equals(taskId)))
           .write(PlanTasksCompanion(isDone: Value(done)));
+
+  @override
+  Future<void> deleteTask(String taskId) =>
+      (_db.delete(_db.planTasks)..where((t) => t.id.equals(taskId))).go();
+
+  @override
+  Future<void> setCompleted(String planId, DateTime? completedAt) =>
+      (_db.update(_db.studyPlans)..where((p) => p.id.equals(planId)))
+          .write(StudyPlansCompanion(completedAt: Value(completedAt)));
 
   @override
   Future<void> delete(String planId) =>

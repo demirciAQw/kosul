@@ -1,0 +1,436 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Aydın 11. Sınıf Kimya Soru Bankası",
+  "publisher": "Aydın Yayınları",
+  "examType": "AYT",
+  "subject": "Kimya",
+  "pageCount": 256,
+  "avgQuestionsPerPage": 6
+ },
+ "units": [
+  {
+   "title": "1. Tema: Etkileşim",
+   "pageStart": 7,
+   "pageEnd": 94,
+   "children": [
+    {
+     "title": "Enerji",
+     "pageStart": 7,
+     "pageEnd": 48,
+     "children": [
+      {
+       "title": "Konu Özeti",
+       "pageStart": 7,
+       "pageEnd": 12
+      },
+      {
+       "title": "Fiziksel ve Kimyasal Olaylardaki Enerji Değişimi",
+       "pageStart": 13,
+       "pageEnd": 14
+      },
+      {
+       "title": "Maddelerin Enerji Kaynağı Olabilme Potansiyeli",
+       "pageStart": 15,
+       "pageEnd": 16
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 17,
+       "pageEnd": 18
+      },
+      {
+       "title": "Bağ Enerjileri ile Tepkime Entalpisinin Hesaplanması",
+       "pageStart": 19,
+       "pageEnd": 22
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 23,
+       "pageEnd": 24
+      },
+      {
+       "title": "Standart Oluşum Entalpisi",
+       "pageStart": 25,
+       "pageEnd": 28
+      },
+      {
+       "title": "Standart Tepkime Entalpisi (Meraklısına)",
+       "pageStart": 29,
+       "pageEnd": 30
+      },
+      {
+       "title": "Tepkime Entalpisini Etkileyen Faktörler",
+       "pageStart": 31,
+       "pageEnd": 32
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 33,
+       "pageEnd": 36
+      },
+      {
+       "title": "Fark Attıran Sorular",
+       "pageStart": 37,
+       "pageEnd": 44
+      },
+      {
+       "title": "Yazılıya Hazırlanalım",
+       "pageStart": 45,
+       "pageEnd": 48
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Tepkimelerde Hız",
+     "pageStart": 49,
+     "pageEnd": 94,
+     "children": [
+      {
+       "title": "Konu Özeti",
+       "pageStart": 49,
+       "pageEnd": 54
+      },
+      {
+       "title": "Kimyasal Tepkimelerin Gerçekleşmesi İçin Gerekli Şartlar",
+       "pageStart": 55,
+       "pageEnd": 58
+      },
+      {
+       "title": "Tepken ve Ürün Derişimleriyle Tepkime Hızının Hesaplanması",
+       "pageStart": 59,
+       "pageEnd": 60
+      },
+      {
+       "title": "Tepkime Hızının Zamanla Değişimi",
+       "pageStart": 61,
+       "pageEnd": 62
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 63,
+       "pageEnd": 64
+      },
+      {
+       "title": "Tepkime Hızına Madde Cinsi ve Fiziksel Hâlin Etkisi",
+       "pageStart": 65,
+       "pageEnd": 66
+      },
+      {
+       "title": "Tepkime Hızına Derişim ve Sıcaklığın Etkisi",
+       "pageStart": 67,
+       "pageEnd": 68
+      },
+      {
+       "title": "Tepkime Hızına Katalizör ve Temas Yüzeyinin Etkisi",
+       "pageStart": 69,
+       "pageEnd": 70
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 71,
+       "pageEnd": 72
+      },
+      {
+       "title": "Tek Basamaklı Tepkimelerin Hız Denklemi",
+       "pageStart": 73,
+       "pageEnd": 74
+      },
+      {
+       "title": "Çok Basamaklı Tepkimelerin Hız Denklemi",
+       "pageStart": 75,
+       "pageEnd": 76
+      },
+      {
+       "title": "Deneysel Yöntemlerle Hız İfadesinin Belirlenmesi",
+       "pageStart": 77,
+       "pageEnd": 78
+      },
+      {
+       "title": "Kimyasal Tepkimelerin Hız Denklemi",
+       "pageStart": 79,
+       "pageEnd": 80
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 81,
+       "pageEnd": 82
+      },
+      {
+       "title": "Fark Attıran Sorular",
+       "pageStart": 83,
+       "pageEnd": 90
+      },
+      {
+       "title": "Yazılıya Hazırlanalım",
+       "pageStart": 91,
+       "pageEnd": 94
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Çeşitlilik",
+   "pageStart": 95,
+   "pageEnd": 224,
+   "children": [
+    {
+     "title": "Denge",
+     "pageStart": 95,
+     "pageEnd": 140,
+     "children": [
+      {
+       "title": "Konu Özeti",
+       "pageStart": 95,
+       "pageEnd": 102
+      },
+      {
+       "title": "Tersinir Tepkimelerin Özellikleri",
+       "pageStart": 103,
+       "pageEnd": 106
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 107,
+       "pageEnd": 108
+      },
+      {
+       "title": "Fiziksel ve Kimyasal Değişimlerde Denge",
+       "pageStart": 109,
+       "pageEnd": 110
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 111,
+       "pageEnd": 112
+      },
+      {
+       "title": "Denge Sabiti İfadesinin Yazılması",
+       "pageStart": 113,
+       "pageEnd": 116
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 117,
+       "pageEnd": 118
+      },
+      {
+       "title": "Denge Sabiti İfadesinin Yazılması (Meraklısına)",
+       "pageStart": 119,
+       "pageEnd": 120
+      },
+      {
+       "title": "Tepkime Oranı",
+       "pageStart": 121,
+       "pageEnd": 124
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 125,
+       "pageEnd": 126
+      },
+      {
+       "title": "Dengeye Etki Eden Faktörler",
+       "pageStart": 127,
+       "pageEnd": 130
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 131,
+       "pageEnd": 132
+      },
+      {
+       "title": "Fark Attıran Sorular",
+       "pageStart": 133,
+       "pageEnd": 138
+      },
+      {
+       "title": "Yazılıya Hazırlanalım",
+       "pageStart": 139,
+       "pageEnd": 140
+      }
+     ]
+    },
+    {
+     "title": "Asit ve Baz Çözeltilerinde Denge",
+     "pageStart": 141,
+     "pageEnd": 198,
+     "children": [
+      {
+       "title": "Konu Özeti",
+       "pageStart": 141,
+       "pageEnd": 152
+      },
+      {
+       "title": "Asitler ve Bazlar / Hatırlayalım",
+       "pageStart": 153,
+       "pageEnd": 154
+      },
+      {
+       "title": "Suyun Otoiyonizasyonu",
+       "pageStart": 155,
+       "pageEnd": 156
+      },
+      {
+       "title": "Asit-Baz Tanımları",
+       "pageStart": 157,
+       "pageEnd": 158
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 159,
+       "pageEnd": 160
+      },
+      {
+       "title": "Asit ve Bazların Kuvveti",
+       "pageStart": 161,
+       "pageEnd": 162
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 163,
+       "pageEnd": 164
+      },
+      {
+       "title": "Kuvvetli Asit ve Bazlarda pH Hesabı",
+       "pageStart": 165,
+       "pageEnd": 166
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 167,
+       "pageEnd": 168
+      },
+      {
+       "title": "Zayıf Asit ve Bazlarda pH Hesabı",
+       "pageStart": 169,
+       "pageEnd": 170
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 171,
+       "pageEnd": 172
+      },
+      {
+       "title": "Nötralleşme",
+       "pageStart": 173,
+       "pageEnd": 176
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 177,
+       "pageEnd": 178
+      },
+      {
+       "title": "Titrasyon",
+       "pageStart": 179,
+       "pageEnd": 182
+      },
+      {
+       "title": "Asidik ve Bazik Ürünlerin Seçiminde Dikkat Edilmesi Gerekenler",
+       "pageStart": 183,
+       "pageEnd": 184
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 185,
+       "pageEnd": 186
+      },
+      {
+       "title": "Fark Attıran Sorular",
+       "pageStart": 187,
+       "pageEnd": 192
+      },
+      {
+       "title": "Yazılıya Hazırlanalım",
+       "pageStart": 193,
+       "pageEnd": 198
+      }
+     ]
+    },
+    {
+     "title": "Çözünürlük Dengesi",
+     "pageStart": 199,
+     "pageEnd": 224,
+     "children": [
+      {
+       "title": "Suda Az Çözünen Tuzların Molar Çözünürlükleri",
+       "pageStart": 199,
+       "pageEnd": 208
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 209,
+       "pageEnd": 210
+      },
+      {
+       "title": "Suda Az Çözünen Tuzların Çözünürlüğüne Etki Eden Faktörler",
+       "pageStart": 211,
+       "pageEnd": 216
+      },
+      {
+       "title": "Öğrendiğini Uygula",
+       "pageStart": 217,
+       "pageEnd": 218
+      },
+      {
+       "title": "Fark Attıran Sorular",
+       "pageStart": 219,
+       "pageEnd": 222
+      },
+      {
+       "title": "Yazılıya Hazırlanalım",
+       "pageStart": 223,
+       "pageEnd": 224
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Nanoteknoloji ve Sürdürülebilirlik",
+   "pageStart": 225,
+   "pageEnd": 244,
+   "children": [
+    {
+     "title": "Konu Özeti",
+     "pageStart": 225,
+     "pageEnd": 230
+    },
+    {
+     "title": "Yeşil Hidrojen Enerjisi",
+     "pageStart": 231,
+     "pageEnd": 232
+    },
+    {
+     "title": "Nanoteknolojik Ürünlerin Potansiyel Faydaları ve Olası Zararları",
+     "pageStart": 233,
+     "pageEnd": 234
+    },
+    {
+     "title": "Mikroplastikler ve Nanoplastikler",
+     "pageStart": 235,
+     "pageEnd": 236
+    },
+    {
+     "title": "Öğrendiğini Uygula",
+     "pageStart": 237,
+     "pageEnd": 238
+    },
+    {
+     "title": "Fark Attıran Sorular",
+     "pageStart": 239,
+     "pageEnd": 242
+    },
+    {
+     "title": "Yazılıya Hazırlanalım",
+     "pageStart": 243,
+     "pageEnd": 244
+    }
+   ]
+  }
+ ]
+}

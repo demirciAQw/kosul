@@ -25,8 +25,9 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'kocum'));
 
   /// v2: fotoğrafsız/çözümsüz kartlar, soru numarası, kitapsız oturum, denemeler.
+  /// v3: testlerin kesin soru sayısı, planların tamamlanma tarihi.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -56,6 +57,10 @@ class AppDatabase extends _$AppDatabase {
               questionCards.mockExamId,
             ]));
             await _createV2Indexes();
+          }
+          if (from < 3) {
+            await m.addColumn(contentNodes, contentNodes.questionCount);
+            await m.addColumn(studyPlans, studyPlans.completedAt);
           }
         },
         beforeOpen: (details) async {

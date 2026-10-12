@@ -1,0 +1,496 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "345 Sıfır Risk Paragraf",
+  "publisher": "3-4-5 Yayınları",
+  "examType": "TYT",
+  "subject": "Türkçe",
+  "pageCount": 368,
+  "avgQuestionsPerPage": 3
+ },
+ "units": [
+  {
+   "title": "01 Keşfet: Farklı Soru Türleri ile Tanış",
+   "pageStart": 3,
+   "pageEnd": 62,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Test 1",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 2",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 3",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 4",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 5",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 6",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 7",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 8",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 9",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "02 Ölç: Soruları Anla, Zamanı Yakala",
+   "pageStart": 63,
+   "pageEnd": 122,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Test 1",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 2",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 3",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 4",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 5",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 6",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 7",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 8",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 9",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "03 Planla: Soruları Anla, Zamanında Tamamla",
+   "pageStart": 123,
+   "pageEnd": 182,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Test 1",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 2",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 3",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 4",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 5",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 6",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 7",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 8",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Test 9",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "04 Odaklan: Sadece İhtiyacın Olana",
+   "pageStart": 183,
+   "pageEnd": 250,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Kondisyon 1",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Kondisyon 2",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Kondisyon 3",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 1",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 2",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 3",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 4",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 5",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 6",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Odaklanma 7",
+     "questions": 20,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Çıkmış Sorular Özel Denemesi",
+     "questions": 30,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "05 Zenginleştir: Farklı Temalarla Kendini Geliştir",
+   "pageStart": 251,
+   "pageEnd": 282,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Eğitim Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Sosyoloji Testi",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Spor Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Matematik Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Teknoloji Testi",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Psikoloji Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Turizm Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Astronomi Testi",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Hayvanlar Âlemi Testi",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Felsefe Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Sağlık-Tıp Testi",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Coğrafya Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Arkeoloji Testi",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "İletişim Testi",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Biyoloji Testi",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "06 Başar: Seviyeleri Adım Adım Aş",
+   "pageStart": 283,
+   "pageEnd": 328,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "ÖSYM Tadında Sorular 1",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 2",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 3",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 4",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 5",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 6",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 7",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 8",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 9",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 10",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 11",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 12",
+     "questions": 7,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 13",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 14",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 15",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 16",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 17",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 18",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 19",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 20",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 21",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "ÖSYM Tadında Sorular 22",
+     "questions": 6,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  },
+  {
+   "title": "07 Riskleri Sıfırla: Sorularda Takılma",
+   "pageStart": 329,
+   "pageEnd": 355,
+   "meb": "tyt.tur.paragraf",
+   "children": [
+    {
+     "title": "Enerji Dizayn Testi-1",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Enerji Dizayn Testi-2",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Enerji Dizayn Testi-3",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Puzzle Odaklanma Testi-1",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Puzzle Odaklanma Testi-2",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Algısal Bütünlük Testi-1",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Algısal Bütünlük Testi-2",
+     "questions": 8,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Mantık Muhakeme Testi",
+     "questions": 5,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Grafik Yorumlama ve Tablo Okuma Testi",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    },
+    {
+     "title": "Görsel Okuma Testi",
+     "questions": 4,
+     "meb": "tyt.tur.paragraf"
+    }
+   ]
+  }
+ ]
+}

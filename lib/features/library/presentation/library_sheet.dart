@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +9,55 @@ import '../domain/book_template_usecases.dart';
 import '../domain/library.dart';
 import '../library_providers.dart';
 
-const sampleTemplateAsset = 'assets/templates/345_TYT_Mat.json';
-const _sampleTitle = '345 TYT Matematik Soru Bankası';
+const _templateFolder = 'assets/templates/';
+
+/// Uygulamayla gelen hazır kitap şablonu.
+class BundledTemplate {
+  const BundledTemplate({
+    required this.asset,
+    required this.title,
+    required this.subtitle,
+    this.isSample = false,
+  });
+
+  final String asset;
+  final String title;
+  final String subtitle;
+
+  /// Yalnızca denemek için hazırlanmış örnek veri.
+  final bool isSample;
+}
+
+/// assets/templates/ altındaki tüm şablonlar; klasöre yeni JSON konunca kendiliğinden görünür.
+final bundledTemplatesProvider = FutureProvider<List<BundledTemplate>>((ref) async {
+  final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+  final assets = manifest.listAssets().where((a) => a.startsWith(_templateFolder) && a.endsWith('.json')).toList()
+    ..sort();
+  final out = <BundledTemplate>[];
+  for (final asset in assets) {
+    try {
+      final json = jsonDecode(await rootBundle.loadString(asset)) as Map<String, dynamic>;
+      final book = json['book'] as Map<String, dynamic>;
+      final sample = json['author'] == 'ornek_kullanici';
+      out.add(BundledTemplate(
+        asset: asset,
+        title: book['title'] as String,
+        subtitle: '${book['examType']} ${book['subject']}, ${book['pageCount']} sayfa'
+            '${sample ? ' (deneme amaçlı örnek)' : ''}',
+        isSample: sample,
+      ));
+    } catch (_) {
+      // Bozuk bir şablon listeyi düşürmesin.
+    }
+  }
+  out.sort((a, b) => a.isSample == b.isSample ? a.title.compareTo(b.title) : (a.isSample ? 1 : -1));
+  return out;
+});
 
 String _reportMessage(ImportReport report) {
   final review = report.needsReview > 0 ? ', ${report.needsReview} başlık onayını bekliyor' : '';
-  return '${report.book.title} eklendi. ${report.matched} başlık MEB konusuyla eşleşti$review.';
+  final matched = report.matched > 0 ? ' ${report.matched} başlık MEB konusuyla eşleşti$review.' : '';
+  return '${report.book.title} eklendi.$matched';
 }
 
 /// Dosya seç → doğrula → MEB'e normalize et → kaydet. Hata mesajı, JSON'daki
@@ -29,20 +74,20 @@ Future<void> importBookTemplateFlow(BuildContext context, WidgetRef ref) async {
   }
 }
 
-/// Uygulamayla gelen örnek kitabı tek dokunuşla ekler (denemek için).
-Future<void> importSampleBookFlow(BuildContext context, WidgetRef ref) async {
+/// Uygulamayla gelen bir şablonu tek dokunuşla ekler.
+Future<void> importBundledTemplateFlow(BuildContext context, WidgetRef ref, BundledTemplate template) async {
   final messenger = ScaffoldMessenger.of(context);
   final books = ref.read(libraryProvider).value ?? const <Book>[];
-  if (books.any((b) => b.title == _sampleTitle)) {
-    messenger.showSnackBar(const SnackBar(content: Text('Örnek kitap zaten ekli.')));
+  if (books.any((b) => b.title == template.title)) {
+    messenger.showSnackBar(SnackBar(content: Text('${template.title} zaten ekli.')));
     return;
   }
   try {
-    final raw = await rootBundle.loadString(sampleTemplateAsset);
+    final raw = await rootBundle.loadString(template.asset);
     final report = await ref.read(importBookTemplateProvider).call(raw);
     messenger.showSnackBar(SnackBar(content: Text(_reportMessage(report))));
   } on BookTemplateException catch (e) {
-    messenger.showSnackBar(SnackBar(content: Text('Örnek kitap eklenemedi: ${e.message}')));
+    messenger.showSnackBar(SnackBar(content: Text('Kitap eklenemedi: ${e.message}')));
   }
 }
 
@@ -72,11 +117,13 @@ class _LibrarySheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final books = ref.watch(libraryProvider).value ?? const <Book>[];
+    final templates = ref.watch(bundledTemplatesProvider).value ?? const <BundledTemplate>[];
+    final owned = {for (final b in books) b.title};
     final messenger = ScaffoldMessenger.of(context);
 
     return SafeArea(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.75),
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.85),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -88,47 +135,59 @@ class _LibrarySheet extends ConsumerWidget {
                 label: const Text('JSON içe aktar'),
               ),
             ),
-            if (books.isEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                child: Column(
-                  children: [
-                    const Text('Henüz kitap yok. Bir JSON şablonu içe aktararak başla.'),
-                    const SizedBox(height: 12),
-                    OutlinedButton(
-                      onPressed: () => importSampleBookFlow(context, ref),
-                      child: const Text('Örnek kitabı ekle'),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(bottom: 16),
+                children: [
+                  if (books.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(24, 0, 24, 8),
+                      child: Text('Henüz kitap yok. Aşağıdaki hazır kitaplardan ekle ya da bir JSON şablonu içe aktar.'),
                     ),
-                  ],
-                ),
-              )
-            else
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    for (final b in books)
-                      ListTile(
-                        title: Text(b.title),
-                        subtitle: Text('${b.examType} ${b.subject}, ${b.pageCount} sayfa, '
-                            '${b.allNodes.length} başlık'),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (action) async {
-                            if (action == 'share') {
-                              await exportBookTemplateFlow(ref, messenger, b);
-                            } else {
-                              await _confirmDelete(context, ref, b);
-                            }
-                          },
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(value: 'share', child: Text('Şablonu paylaş (JSON)')),
-                            PopupMenuItem(value: 'delete', child: Text('Kitabı sil')),
-                          ],
-                        ),
+                  for (final b in books)
+                    ListTile(
+                      title: Text(b.title),
+                      subtitle: Text('${b.examType} ${b.subject}, ${b.pageCount} sayfa, '
+                          '${b.allNodes.length} başlık'),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (action) async {
+                          if (action == 'share') {
+                            await exportBookTemplateFlow(ref, messenger, b);
+                          } else {
+                            await _confirmDelete(context, ref, b);
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(value: 'share', child: Text('Şablonu paylaş (JSON)')),
+                          PopupMenuItem(value: 'delete', child: Text('Kitabı sil')),
+                        ],
                       ),
-                  ],
-                ),
+                    ),
+                  if (templates.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      child: Text('Hazır kitaplar', style: theme.textTheme.titleMedium),
+                    ),
+                  for (final t in templates)
+                    ListTile(
+                      leading: Icon(
+                        owned.contains(t.title) ? Icons.check_circle_rounded : Icons.library_add_outlined,
+                        color: owned.contains(t.title) ? theme.colorScheme.primary : null,
+                      ),
+                      title: Text(t.title),
+                      subtitle: Text(t.subtitle),
+                      trailing: owned.contains(t.title)
+                          ? const Text('Ekli')
+                          : FilledButton.tonal(
+                              style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+                              onPressed: () => importBundledTemplateFlow(context, ref, t),
+                              child: const Text('Ekle'),
+                            ),
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),

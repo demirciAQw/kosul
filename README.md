@@ -7,10 +7,10 @@ Flutter, Clean Architecture, SQLite (Drift). Telefonda denemek için `NASIL_DENE
 
 | Modül | Ne yapar |
 |---|---|
-| Kitaplar | Manuel ya da JSON şablonla (içe/dışa aktarma, paylaşma). Konular MEB kazanım ağacıyla eşleşir. |
+| Kitaplar | Hazır kitaplar tek dokunuşla (345 Sıfır Risk Paragraf, Aydın 11. Sınıf Kimya) ya da JSON şablonla. Testlerin soru sayısı şablonda verilebilir; optik form o sayıyla açılır. |
 | Oturum | Kitaptan (ünite, konu, tek sayfa) ya da kitapsız (ders, konu, video/konu anlatımı/soru çözümü). Durdurulamaz sayaç, iptal tuşu, bildirimde canlı kronometre, "Eksiklerini doldur" rozeti. |
 | Optik form | Testin numaralarına dokunarak yanlış ve boş işaretleme. Doğru, yanlış, boş ve net kendiliğinden hesaplanır; sorular ders, konu ve süresiyle deftere düşer. |
-| Plan | Tarih aralıklı görev havuzu; günlük program dayatmaz. Görevden doğrudan oturum başlar. |
+| Plan | İstediğin kadar plan: haftalık, aylık, yıllık ya da özel. Görev ekle/sil, planı "tamamladım" diye işaretle, sil (geri alınabilir). Görevden doğrudan oturum başlar. |
 | Defter | Yanlış / Boş / Doğru kartları. Fotoğraf ve çözüm isteğe bağlı; uygulama içi kırpma, WebP. Yıldız ile Güzel Sorular. Arama, filtreler, ağaç görünümü. |
 | Eksikler | Fotoğrafı, çözümü, nedeni ya da konusu eksik kartlar. Neden ve fotoğraf satırdan tek dokunuşla eklenir. |
 | Tekrar | "Yanlışlarımı göster": SM-2 (Anki). Fotoğrafsız kartlarda kitap, test ve soru numarası gösterilir. |
@@ -58,6 +58,7 @@ Bağımlılık yönü içe doğrudur: domain, Flutter'ı ya da veritabanını bi
 | `units[].title` | evet | `children` ile en fazla 3 seviye |
 | `pageStart` / `pageEnd` | birlikte | 1..pageCount, başlangıç ≤ bitiş |
 | `meb` | hayır | açık MEB kimliği; otomatik eşleştirmeyi geçersiz kılar |
+| `questions` | hayır | testteki kesin soru sayısı (1–500); sayfasız test başlıkları için idealdir |
 
 Hatalar tam yolla bildirilir: `$.units[2].children[0].pageEnd`. Sınırlar: 2 MB, 5000 başlık.
 
@@ -75,5 +76,5 @@ flutter run --release
 - `assets/meb/kazanim_agaci.json` ve örnek kitap **örnek veridir**; yayından önce gerçek MEB/ÖSYM konu listesiyle doldurulmalı.
 - Düşük güvenli MEB eşleşmeleri için onay ekranı yok (şimdilik otomatik eşleşme ve "onay bekliyor" sayacı var).
 - Yedekleme / geri yükleme (JSON + medya zip) yok.(claude codean yapıyo bu işi )
-- Bir oturum bloğu birden fazla testi kapsıyorsa optik form numaraları blok boyunca sürer (1, 2, … 64). Kitap şablonları test yapısını içerdiğinde her test ayrı seçilebilecek.
+- Şablonda test yapısı yoksa (yalnızca sayfa aralığı) optik form numaraları seçilen blok boyunca sürer. Testleri `questions` alanıyla tanımlanmış kitaplarda her test ayrı seçilir ve numaralar teste göredir.
 - Konu listesi şimdilik yalnızca TYT Matematik ve TYT Türkçe için var; diğer derslerde örüntüler nedenlere göre çıkarılır.

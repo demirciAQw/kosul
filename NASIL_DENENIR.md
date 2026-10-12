@@ -38,14 +38,15 @@ Actions kaydında "Sabit imza kullaniliyor." satırını görürsen imza çalı�
 
 ## İlk açılışta ne denemeli? (5 dk)
 
-1. **Bugün** sekmesinde **Örnek kitabı ekle** (345 TYT Matematik hazır gelir).
+1. **Bugün → Hazır kitap ekle**: Sıfır Risk Paragraf ve Aydın 11. Sınıf Kimya'yı **Ekle** ile kitaplığına al.
 2. **Yeni oturum → Kitaptan**: birkaç konu ya da tek tek sayfa işaretle, **BAŞLA**. Uygulamayı kapatıp aç: süre işlemeye devam eder. Yanlışlıkla başlattıysan **İptal et**.
 3. Oturum sürerken bir bölümün yanındaki işaret simgesiyle **optik formu** aç: yanlış numaralarına dokun, **Kaydet**. Sonra **Bitir**.
 4. Sonuç ekranında sayılar dolu gelir. **Yanlışları işaretle** ile değiştirebilir, **Fotoğraflı** ile tam kayıt ekleyebilirsin.
 5. **Defter → Eksikler**: optikten gelen soruların satırından tek dokunuşla neden ve fotoğraf ekle. Fotoğrafta köşeleri sürükleyerek kırp, gerekirse döndür.
 6. **Yeni oturum → Kitapsız**: ders seç, "Video" ya da "Konu çalışması" de, başlat. Bitirince sonuç sorulmaz.
 7. **Deneme** sekmesi: **Deneme ekle**, ders ders doğru ve yanlışı yaz; boş ve net kendiliğinden çıkar. Deneme sayfasında bir dersin **Yanlışları işaretle** düğmesiyle soruları deftere at.
-8. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
+8. **Plan** sekmesi: **Yeni plan → Haftalık**, görev ekle ya da eklemeden oluştur; vazgeçmek için **Vazgeç**. Plan kartında **Tamamladım**, **Görev ekle** ve **Sil** (geri alınabilir); görevi silmek için sola kaydır.
+9. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
 
 Not: Yeni eklenen yanlışlar **ertesi gün** tekrar listesine (Yanlışlarımı göster) düşer. İlk gün "bugün tekrar yok" görmen normaldir.
 

@@ -19,6 +19,7 @@ class ContentNode {
     this.pageEnd,
     this.mebNodeId,
     this.mebMatchScore,
+    this.questionCount,
     this.children = const [],
   });
 
@@ -33,6 +34,9 @@ class ContentNode {
 
   /// Eşleştirme güveni (0–1). 1.0 = şablonda açıkça verilmiş ya da kullanıcı onaylamış.
   final double? mebMatchScore;
+
+  /// Şablonda verilmişse testteki kesin soru sayısı ("Test 5: 20 soru").
+  final int? questionCount;
   final List<ContentNode> children;
 
   bool get hasPages => pageStart != null && pageEnd != null;
@@ -57,6 +61,7 @@ class ContentNode {
         pageEnd: pageEnd,
         mebNodeId: mebNodeId,
         mebMatchScore: matchScore,
+        questionCount: questionCount,
         children: children,
       );
 }

@@ -120,6 +120,7 @@ class DriftLibraryRepository implements LibraryRepository {
           sortOrder: i,
           mebNodeId: Value(n.mebNodeId),
           mebMatchScore: Value(n.mebMatchScore),
+          questionCount: Value(n.questionCount),
         ));
         walk(n.children, n.id);
       }
@@ -147,6 +148,7 @@ class DriftLibraryRepository implements LibraryRepository {
               pageEnd: r.pageEnd,
               mebNodeId: r.mebNodeId,
               mebMatchScore: r.mebMatchScore,
+              questionCount: r.questionCount,
               children: build(r.id),
             ),
         ];

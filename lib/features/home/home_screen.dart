@@ -101,9 +101,9 @@ class HomeScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.auto_stories_outlined),
-            title: const Text('Örnek kitabı ekle'),
-            subtitle: const Text('345 TYT Matematik: uygulamayı denemek için'),
-            onTap: () => importSampleBookFlow(context, ref),
+            title: const Text('Hazır kitap ekle'),
+            subtitle: const Text('Sıfır Risk Paragraf, Aydın 11. Sınıf Kimya ve diğerleri'),
+            onTap: () => showLibrarySheet(context),
           ),
         ],
       ),
