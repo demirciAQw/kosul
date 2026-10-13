@@ -109,6 +109,7 @@ class SaveQuestionCard {
         reasonNote: draft.status != QuestionStatus.correct && draft.reason == MistakeReason.other
             ? _clean(draft.reasonNote)
             : null,
+        topicText: _clean(draft.topicText),
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,
@@ -205,6 +206,7 @@ class UpdateQuestionCard {
         reasonNote: draft.status != QuestionStatus.correct && draft.reason == MistakeReason.other
             ? _clean(draft.reasonNote)
             : null,
+        topicText: _clean(draft.topicText),
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,

@@ -35,3 +35,23 @@ double diceCoefficient(Set<String> a, Set<String> b) {
 
 /// Türkçe küçük harf: "İşlem hatası" → "işlem hatası" (noktasız/noktalı i doğru).
 String lowerTr(String input) => input.replaceAll('İ', 'i').replaceAll('I', 'ı').toLowerCase();
+
+/// "DOĞRUSAL FONKSİYONLARLA DENKLE..." → "Doğrusal Fonksiyonlarla Denkle..."
+/// Bağlaçlar ("ve", "ile") küçük kalır.
+String titleCaseTr(String input) {
+  const small = {'ve', 'ile', 'veya', 'ya', 'da', 'de'};
+  final words = lowerTr(input).split(' ');
+  return [
+    for (var i = 0; i < words.length; i++)
+      if (words[i].isEmpty || (i > 0 && small.contains(words[i])))
+        words[i]
+      else
+        _upperFirstTr(words[i]),
+  ].join(' ');
+}
+
+String _upperFirstTr(String w) {
+  final first = w[0];
+  final up = first == 'i' ? 'İ' : (first == 'ı' ? 'I' : first.toUpperCase());
+  return up + w.substring(1);
+}

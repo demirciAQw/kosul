@@ -28,8 +28,9 @@ class AppDatabase extends _$AppDatabase {
   /// v2: fotoğrafsız/çözümsüz kartlar, soru numarası, kitapsız oturum, denemeler.
   /// v3: testlerin kesin soru sayısı, planların tamamlanma tarihi.
   /// v4: test ilerlemesi (çözüldü/çözülmedi), "Diğer" nedeni için açıklama.
+  /// v5: kartlarda serbest konu/kazanım adı (karneden içe aktarma).
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +59,7 @@ class AppDatabase extends _$AppDatabase {
               questionCards.sessionItemId,
               questionCards.mockExamId,
               questionCards.reasonNote,
+              questionCards.topicText,
             ]));
             await _createV2Indexes();
           }
@@ -74,6 +76,12 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(questionCards, questionCards.reasonNote);
             }
             await _createV2Indexes();
+          }
+          if (from < 5) {
+            final cols = await customSelect('PRAGMA table_info(question_cards)').get();
+            if (!cols.any((c) => c.read<String>('name') == 'topic_text')) {
+              await m.addColumn(questionCards, questionCards.topicText);
+            }
           }
         },
         beforeOpen: (details) async {

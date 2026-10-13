@@ -14,12 +14,16 @@ class QuickMarkPart {
     required this.title,
     required this.total,
     required this.markContext,
+    this.start = 1,
     this.initiallyIncluded = true,
   });
 
   final String key;
   final String title;
   final int total;
+
+  /// İlk soru numarası (kitapçıkta testi paylaşan dersler için).
+  final int start;
   final QuickMarkContext markContext;
   final bool initiallyIncluded;
 }
@@ -47,7 +51,9 @@ Future<OpticFormResult?> openQuickMark(
     sections.add(OpticSection(
       key: part.key,
       title: part.title,
-      total: math.max(math.max(part.total, highest), 1),
+      start: part.start,
+      // Tek bölümde, aralığın ötesinde işaret varsa form onu da gösterecek kadar büyür.
+      total: part.start == 1 ? math.max(math.max(part.total, highest), 1) : part.total,
       initialMarks: existing,
       initiallyIncluded: part.initiallyIncluded,
     ));
@@ -69,7 +75,12 @@ Future<OpticFormResult?> openQuickMark(
     for (var i = 0; i < parts.length; i++) {
       final section = result.sections[i];
       if (!section.included) continue;
-      summary += await quick.call(parts[i].markContext, total: section.total, marks: section.marks);
+      summary += await quick.call(
+        parts[i].markContext,
+        total: section.total,
+        first: section.start,
+        marks: section.marks,
+      );
     }
     messenger.showSnackBar(SnackBar(content: Text(summary.message)));
     return result;

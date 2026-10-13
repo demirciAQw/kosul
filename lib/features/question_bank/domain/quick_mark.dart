@@ -113,7 +113,10 @@ class QuickMarkQuestions {
     QuickMarkContext ctx, {
     required int total,
     required Map<int, QuestionStatus> marks,
+    int first = 1,
   }) async {
+    final last = first + total - 1;
+    bool inRange(int no) => no >= first && no <= last;
     final byNo = <int, QuestionCard>{
       for (final c in await _linked(ctx))
         if (c.questionNo != null) c.questionNo!: c,
@@ -122,7 +125,7 @@ class QuickMarkQuestions {
     var created = 0, updated = 0, removed = 0, kept = 0;
 
     for (final entry in marks.entries) {
-      if (entry.value == QuestionStatus.correct || entry.key < 1 || entry.key > total) continue;
+      if (entry.value == QuestionStatus.correct || !inRange(entry.key)) continue;
       final existing = byNo[entry.key];
       if (existing == null) {
         await _repository.insert(
@@ -155,8 +158,10 @@ class QuickMarkQuestions {
     }
 
     for (final entry in byNo.entries) {
+      // Formun aralığı dışındaki kartlara dokunma (ör. eski sürümün numaraları).
+      if (!inRange(entry.key)) continue;
       final mark = marks[entry.key];
-      if (mark != null && mark != QuestionStatus.correct && entry.key <= total) continue;
+      if (mark != null && mark != QuestionStatus.correct) continue;
       final card = entry.value;
       if (card.status == QuestionStatus.correct) continue; // GK olarak eklenmiş doğru soru: dokunma
       if (card.isBare) {

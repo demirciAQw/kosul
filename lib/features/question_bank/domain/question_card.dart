@@ -62,6 +62,7 @@ class QuestionCard {
     this.testTotalQuestions,
     this.reason,
     this.reasonNote,
+    this.topicText,
     this.avgSecondsPerQuestion,
     this.isStarred = false,
     this.note,
@@ -88,6 +89,9 @@ class QuestionCard {
 
   /// "Diğer" seçildiğinde kullanıcının kendi açıklaması.
   final String? reasonNote;
+
+  /// Serbest konu/kazanım adı (karneden): MEB konusu yoksa analizde bu kullanılır.
+  final String? topicText;
   final double? avgSecondsPerQuestion;
   final int difficulty; // 1–10
   final bool isStarred; // GK (Güzel Soru)
@@ -122,7 +126,7 @@ class QuestionCard {
         if (!hasPhoto) MissingPart.photo,
         if (!hasSolution) MissingPart.solution,
         if (needsReason) MissingPart.reason,
-        if (topicAvailable && mebNodeId == null) MissingPart.topic,
+        if (topicAvailable && mebNodeId == null && (topicText?.trim().isEmpty ?? true)) MissingPart.topic,
       ];
 
   /// "Soru 7" ya da durum adı.
@@ -150,6 +154,7 @@ class QuestionCard {
         testTotalQuestions: testTotalQuestions,
         reason: reason,
         reasonNote: reasonNote,
+        topicText: topicText,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred ?? this.isStarred,
@@ -262,6 +267,7 @@ class QuestionDraft {
     this.testTotalQuestions,
     this.reason,
     this.reasonNote,
+    this.topicText,
     this.avgSecondsPerQuestion,
     this.difficulty = 5,
     this.isStarred = false,
@@ -287,6 +293,7 @@ class QuestionDraft {
         testTotalQuestions: c.testTotalQuestions,
         reason: c.reason,
         reasonNote: c.reasonNote,
+        topicText: c.topicText,
         avgSecondsPerQuestion: c.avgSecondsPerQuestion,
         difficulty: c.difficulty,
         isStarred: c.isStarred,
@@ -311,6 +318,7 @@ class QuestionDraft {
   final int? testTotalQuestions;
   final MistakeReason? reason;
   final String? reasonNote;
+  final String? topicText;
   final double? avgSecondsPerQuestion;
   final int difficulty;
   final bool isStarred;
@@ -341,6 +349,7 @@ class QuestionDraft {
         testTotalQuestions: testTotalQuestions,
         reason: reason != null ? reason() : this.reason,
         reasonNote: reasonNote != null ? reasonNote() : this.reasonNote,
+        topicText: topicText,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred,

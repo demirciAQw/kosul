@@ -10,6 +10,7 @@ import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/question_bank_providers.dart';
 import '../domain/mock_exam.dart';
 import '../mock_exam_providers.dart';
+import 'karne_import_screen.dart';
 import 'widgets/net_chart.dart';
 import 'widgets/topic_loss_list.dart';
 
@@ -31,7 +32,16 @@ class _MockExamsScreenState extends ConsumerState<MockExamsScreen> {
     final kind = ref.watch(mockKindFilterProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Denemeler')),
+      appBar: AppBar(
+        title: const Text('Denemeler'),
+        actions: [
+          IconButton(
+            tooltip: 'Karneden içe aktar (PDF)',
+            onPressed: () => importKarneFlow(context, ref),
+            icon: const Icon(Icons.upload_file_rounded),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'mock-add',
         onPressed: () => context.push(AppRoutes.newMockExam),
@@ -305,6 +315,17 @@ class _ExamTile extends StatelessWidget {
   }
 }
 
+class _ImportButton extends ConsumerWidget {
+  const _ImportButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => FilledButton.tonalIcon(
+        onPressed: () => importKarneFlow(context, ref),
+        icon: const Icon(Icons.upload_file_rounded),
+        label: const Text('Okul karnesinden içe aktar (PDF)'),
+      );
+}
+
 class _EmptyExams extends StatelessWidget {
   const _EmptyExams();
 
@@ -326,6 +347,8 @@ class _EmptyExams extends StatelessWidget {
               'kaybettirdiği burada görünür.',
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 20),
+            const _ImportButton(),
           ],
         ),
       ),

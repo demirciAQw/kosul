@@ -1,4 +1,5 @@
 import '../../../core/utils/id_generator.dart';
+import '../../../core/text/turkish_text.dart';
 import '../../curriculum/domain/curriculum.dart';
 import '../../curriculum/domain/yks.dart';
 import '../../question_bank/domain/question_card.dart';
@@ -279,15 +280,27 @@ class TopicLoss {
 const untaggedTopicLabel = 'Konusu girilmemiş';
 
 /// Kartlardan konu bazlı net kaybı; en çok kaybettirenden başlayarak.
-/// Konusu girilmemiş kartlar tek satırda, en sonda toplanır.
+/// Konu, MEB listesinden; yoksa karneden gelen kazanım adından alınır.
+/// Hiçbiri olmayan kartlar tek satırda, en sonda toplanır.
 List<TopicLoss> topicNetLoss(Iterable<QuestionCard> cards, Map<String, CurriculumNode> curriculum) {
   const untagged = '';
   final wrong = <String, int>{};
   final blank = <String, int>{};
+  final labels = <String, ({String label, String? sublabel, String? meb})>{};
   for (final c in cards) {
     if (c.status == QuestionStatus.correct) continue;
     final id = c.mebNodeId;
-    final key = (id != null && curriculum.containsKey(id)) ? id : untagged;
+    final text = c.topicText?.trim();
+    String key;
+    if (id != null && curriculum.containsKey(id)) {
+      key = id;
+      labels[key] = (label: curriculum[id]!.title, sublabel: curriculum[id]!.subjectLabel, meb: id);
+    } else if (text != null && text.isNotEmpty) {
+      key = 'txt:${c.subject}:${normalizeTr(text)}';
+      labels[key] = (label: titleCaseTr(text), sublabel: c.subject, meb: null);
+    } else {
+      key = untagged;
+    }
     if (c.status == QuestionStatus.wrong) {
       wrong[key] = (wrong[key] ?? 0) + 1;
     } else {
@@ -299,9 +312,10 @@ List<TopicLoss> topicNetLoss(Iterable<QuestionCard> cards, Map<String, Curriculu
     for (final k in keys)
       if (k != untagged)
         TopicLoss(
-          label: curriculum[k]!.title,
-          sublabel: curriculum[k]!.subjectLabel,
-          mebNodeId: k,
+          label: labels[k]!.label,
+          sublabel: labels[k]!.sublabel,
+          // Kazanım satırları da "konusu belli" sayılır; anahtar olarak kullanılır.
+          mebNodeId: labels[k]!.meb ?? k,
           wrong: wrong[k] ?? 0,
           blank: blank[k] ?? 0,
         ),

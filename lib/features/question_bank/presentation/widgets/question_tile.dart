@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes.dart';
+import '../../../../core/text/turkish_text.dart';
 import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import 'media_image.dart';
@@ -69,7 +70,7 @@ class QuestionTile extends ConsumerWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          card.reasonText ?? card.status.label,
+                          card.reasonText ?? (card.topicText != null ? titleCaseTr(card.topicText!) : card.status.label),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: onImage,

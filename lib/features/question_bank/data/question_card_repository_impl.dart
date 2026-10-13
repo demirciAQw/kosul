@@ -177,6 +177,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         c.note,
         c.reason?.label,
         c.reasonNote,
+        c.topicText,
       ].whereType<String>().join(' '));
 
   static QuestionCardsCompanion _toCompanion(QuestionCard c) => QuestionCardsCompanion.insert(
@@ -205,6 +206,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         sessionItemId: Value(c.sessionItemId),
         mockExamId: Value(c.mockExamId),
         reasonNote: Value(c.reasonNote),
+        topicText: Value(c.topicText),
       );
 
   static QuestionCard _toEntity(QuestionCardRow r) => QuestionCard(
@@ -232,5 +234,6 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         sessionItemId: r.sessionItemId,
         mockExamId: r.mockExamId,
         reasonNote: r.reasonNote,
+        topicText: r.topicText,
       );
 }

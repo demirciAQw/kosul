@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/core_providers.dart';
+import '../question_bank/question_bank_providers.dart';
 import 'data/mock_exam_repository_impl.dart';
+import 'domain/karne_import.dart';
 import 'domain/mock_exam.dart';
 
 final mockExamRepositoryProvider =
@@ -26,3 +28,11 @@ class MockKindNotifier extends Notifier<MockKind> {
 }
 
 final mockKindFilterProvider = NotifierProvider<MockKindNotifier, MockKind>(MockKindNotifier.new);
+
+final importKarneProvider = Provider((ref) => ImportKarne(
+      save: ref.watch(saveMockExamProvider),
+      exams: ref.watch(mockExamRepositoryProvider),
+      cards: ref.watch(questionCardRepositoryProvider),
+      ids: ref.watch(idGeneratorProvider),
+      clock: ref.watch(clockProvider),
+    ));

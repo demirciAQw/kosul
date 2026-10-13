@@ -1,3 +1,4 @@
+import '../../../core/text/turkish_text.dart';
 import 'curriculum.dart';
 
 /// YKS oturumlarındaki dersler ve soru sayıları (ÖSYM yapısı).
@@ -48,7 +49,54 @@ abstract final class Yks {
     ExamSubject('YDT', 'Yabancı Dil', 80),
   ];
 
-  static const all = <ExamSubject>[...tyt, ...ayt, ...ydt];
+  /// TYT Sosyal Bilimler testinde Din Kültürü yerine seçilebilen bölüm
+  /// (kitapçıkta 21–25). Hazır deneme listelerine girmez.
+  static const tytSelectiveFelsefe = ExamSubject('TYT', 'Seçmeli Felsefe', 5, group: 'Sosyal Bilimler');
+
+  static const all = <ExamSubject>[...tyt, tytSelectiveFelsefe, ...ayt, ...ydt];
+
+  /// Dersin kitapçıktaki ilk soru numarası. Aynı testte sorulan dersler
+  /// numarayı paylaşır: TYT Fen'de Fizik 1–7, Kimya 8–14, Biyoloji 15–20.
+  static int bookletStart(String key) {
+    final subject = byKey(key);
+    if (subject == null || subject.group == null) return 1;
+    final order = switch (subject.examType) {
+      'TYT' => [...tyt, tytSelectiveFelsefe],
+      'AYT' => ayt,
+      _ => ydt,
+    };
+    var start = 1;
+    for (final s in order) {
+      if (s.key == key) return start;
+      if (s.group == subject.group) start += s.questions;
+    }
+    return 1;
+  }
+
+  /// Karnedeki ders adını ("DİN KÜLTÜRÜ", "TÜRK DİLİ VE EDEBİYATI") ders
+  /// anahtarına çevirir. Tanınmazsa null.
+  static String? keyFromReportName(String examType, String raw) {
+    // "MATEMATİK" ile "MATEMATIK" aynı sayılsın: Türkçe katlama, boşluksuz.
+    String fold(String s) => normalizeTr(s).replaceAll(' ', '');
+    const aliases = {
+      'turkdiliveedebiyati': 'Edebiyat',
+      'edebiyat': 'Edebiyat',
+      'dinkulturuveahlakbilgisi': 'Din Kültürü',
+      'felsefegrubu': 'Felsefe Grubu',
+      'secmelifelsefe': 'Seçmeli Felsefe',
+      'tarih1': 'Tarih-1',
+      'tarih2': 'Tarih-2',
+      'cografya1': 'Coğrafya-1',
+      'cografya2': 'Coğrafya-2',
+    };
+    final folded = fold(raw);
+    final name = aliases[folded];
+    for (final s in all) {
+      if (s.examType != examType) continue;
+      if (name != null ? s.name == name : fold(s.name) == folded) return s.key;
+    }
+    return null;
+  }
 
   /// AYT puan türlerine göre girilen dersler (deneme formunu hazırlamak için).
   static const aytFields = <String, List<String>>{

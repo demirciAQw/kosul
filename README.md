@@ -15,6 +15,7 @@ Flutter, Clean Architecture, SQLite (Drift). Telefonda denemek için `NASIL_DENE
 | Eksikler | Fotoğrafı, çözümü, nedeni ya da konusu eksik kartlar. Neden ve fotoğraf satırdan tek dokunuşla eklenir. |
 | Tekrar | "Yanlışlarımı göster": SM-2 (Anki). Fotoğrafsız kartlarda kitap, test ve soru numarası gösterilir. |
 | Geçmiş oturumlar | Unutulan sayacın süresini düzelt, sonuçları sonradan düzenle, oturumu sil. |
+| Karneden içe aktarma | Okul karnesi PDF'ini seç: deneme adı, tarih, kitapçık, ders ders D/Y/B, puan ve sıralar okunur; yanlış ve boşlar kazanımı, kitapçık numarası, doğru cevap ve senin cevabınla deftere düşer. Birden çok karne aynı anda seçilebilir. Girilmemiş seçmeli bölüm (Seçmeli Felsefe) atlanır. |
 | Deneme | TYT / AYT (alan seçmeli) / YDT / branş. Ders bazlı net, net grafiği, son 5 ortalamasına göre fark, konu bazlı net kaybı (yanlış 1,25, boş 1 net). |
 | Analiz | Derslere göre örüntüler ("Problemler sorularında en sık neden işlem hatası"), en çok yanlış yapılan konu / neden / ders, tahmini kayıp süre, son 7 gün çalışma süresi. |
 
@@ -79,5 +80,7 @@ flutter run --release
 - Yedekleme / geri yükleme (JSON + medya zip) yok.(claude codean yapıyo bu işi )
 - Şablonda test yapısı yoksa (yalnızca sayfa aralığı) optik form numaraları seçilen blok boyunca sürer. Testleri `questions` alanıyla tanımlanmış kitaplarda her test ayrı seçilir ve numaralar teste göredir.
 - Konu listesi şimdilik yalnızca TYT Matematik ve TYT Türkçe için var; diğer derslerde örüntüler nedenlere göre çıkarılır.
+- Karne içe aktarma, "Bölüm Analizi" + soru soru kazanım tablosu olan karne biçimini tanır (ör. Maarif/Mikroorjinal karneleri). Birleştirilmiş karne tek bir denemeye karşılık gelmediği için içe aktarılmaz. PDF okuma `syncfusion_flutter_pdf` ile yapılır (Syncfusion topluluk lisansı: bireysel kullanım ücretsiz).
+- Deneme optiğinde aynı testi paylaşan dersler kitapçık numarasıyla gösterilir (TYT Fen: Fizik 1–7, Kimya 8–14, Biyoloji 15–20). v0.5 öncesi bu derslere elle işaretlenmiş soruların numaraları 1'den başlıyordu; bunlar defterde kalır ama optikte görünmez.
 - Kitap yapısı (ünite/test) uygulama içinde düzenlenemez; adı ve yayınevi düzenlenebilir. Yapı değişikliği için JSON şablonu güncellenip yeniden içe aktarılır.
 - Uygulama simgesi `tool/make_icon.py` ile üretilir; derlemede `tool/patch_android.dart` simgeleri Android klasörüne kopyalar.

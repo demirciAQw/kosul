@@ -11,6 +11,7 @@ class OpticSection {
     required this.key,
     required this.title,
     required this.total,
+    this.start = 1,
     this.initialMarks = const {},
     this.initiallyIncluded = true,
   });
@@ -18,6 +19,10 @@ class OpticSection {
   final String key; // test düğümü kimliği ya da "single"
   final String title;
   final int total;
+
+  /// İlk soru numarası: kitapçıkta aynı testi paylaşan derslerde 1 olmayabilir
+  /// (TYT Fen'de Kimya 8–14).
+  final int start;
   final Map<int, QuestionStatus> initialMarks;
   final bool initiallyIncluded;
 }
@@ -28,6 +33,7 @@ class OpticSectionResult {
     required this.included,
     required this.total,
     required this.marks,
+    this.start = 1,
   });
 
   final String key;
@@ -35,6 +41,7 @@ class OpticSectionResult {
   /// false = "bu testi çözmedim": sayılara katılmaz, kayıtlara dokunulmaz.
   final bool included;
   final int total;
+  final int start;
   final Map<int, QuestionStatus> marks; // yalnızca yanlış ve boşlar
 
   int get wrong => marks.values.where((s) => s == QuestionStatus.wrong).length;
@@ -70,25 +77,30 @@ class _SectionState {
       : key = s.key,
         title = s.title,
         total = s.total < 1 ? 1 : s.total,
+        start = s.start,
         included = s.initiallyIncluded,
         marks = {
           for (final e in s.initialMarks.entries)
-            if (e.value != QuestionStatus.correct && e.key >= 1) e.key: e.value,
+            if (e.value != QuestionStatus.correct && e.key >= s.start) e.key: e.value,
         };
 
   final String key;
   final String title;
   int total;
+  final int start;
   bool included;
   final Map<int, QuestionStatus> marks;
+
+  int get last => start + total - 1;
 
   OpticSectionResult toResult() => OpticSectionResult(
         key: key,
         included: included,
         total: total,
+        start: start,
         marks: {
           for (final e in marks.entries)
-            if (e.key <= total) e.key: e.value,
+            if (e.key >= start && e.key <= last) e.key: e.value,
         },
       );
 }
@@ -329,7 +341,7 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
                           ),
                           itemCount: section.total,
                           itemBuilder: (context, i) {
-                            final number = i + 1;
+                            final number = section.start + i;
                             return _Bubble(
                               number: number,
                               status: section.marks[number],
@@ -399,7 +411,8 @@ class _SectionHeader extends StatelessWidget {
                 Text(section.title, style: theme.textTheme.titleSmall),
                 Text(
                   section.included
-                      ? '${section.total} soru, ${r.correct} D, ${r.wrong} Y, ${r.blank} B'
+                      ? '${section.start == 1 ? '' : '${section.start}–${section.last}, '}'
+                          '${section.total} soru, ${r.correct} D, ${r.wrong} Y, ${r.blank} B'
                       : 'Çözülmedi; sayılara katılmıyor',
                   style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                 ),

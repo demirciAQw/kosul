@@ -6,7 +6,9 @@ import '../features/home/home_screen.dart';
 import '../features/library/presentation/book_detail_screen.dart';
 import '../features/library/presentation/books_screen.dart';
 import '../features/library/presentation/test_detail_screen.dart';
+import '../features/mock_exam/domain/karne_import.dart';
 import '../features/mock_exam/presentation/edit_mock_exam_screen.dart';
+import '../features/mock_exam/presentation/karne_import_screen.dart';
 import '../features/mock_exam/presentation/mock_exam_detail_screen.dart';
 import '../features/mock_exam/presentation/mock_exams_screen.dart';
 import '../features/planning/presentation/create_plan_screen.dart';
@@ -87,6 +89,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: AppRoutes.review, builder: (context, state) => const ReviewScreen()),
       GoRoute(path: AppRoutes.newMockExam, builder: (context, state) => const EditMockExamScreen()),
+      GoRoute(
+        path: AppRoutes.karneImport,
+        builder: (context, state) => KarneImportScreen(plan: state.extra! as KarneImportPlan),
+      ),
       GoRoute(
         path: '/mock/:id/edit',
         builder: (context, state) => EditMockExamScreen(examId: state.pathParameters['id']!),

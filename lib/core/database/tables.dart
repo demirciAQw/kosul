@@ -176,6 +176,10 @@ class QuestionCards extends Table {
 
   /// "Diğer" nedeni seçildiğinde kullanıcının kendi açıklaması (v4).
   TextColumn get reasonNote => text().nullable()();
+
+  /// Serbest konu/kazanım adı (v5): karneden gelen "ÖZDEŞLİKLER" gibi. MEB
+  /// listesinde karşılığı olmasa da analizde konu olarak sayılır.
+  TextColumn get topicText => text().nullable()();
   RealColumn get avgSecondsPerQuestion => real().nullable()();
   IntColumn get difficulty => integer()();
   BoolColumn get isStarred => boolean().withDefault(const Constant(false))();

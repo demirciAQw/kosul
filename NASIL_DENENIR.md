@@ -50,7 +50,8 @@ Actions kaydında "Sabit imza kullaniliyor." satırını görürsen imza çalı�
 10. **Defter → Soru ekle → Kitap**: sadece kitap, test ve soru no sorulmalı. **Diğer** nedenini seçince açıklama alanı çıkmalı. Defterde bir soruya uzun bas, birkaç tane seç, sil.
 11. **Bugün → Geçmiş oturumlar**: bir oturumun süresini düzelt, sonuçlarını düzenle, sil.
 12. **Bugün → Planlarım**: **Yeni plan → Haftalık**, görev ekle ya da eklemeden oluştur; vazgeçmek için **Vazgeç**. Plan kartında **Tamamladım**, **Görev ekle** ve **Sil** (geri alınabilir); görevi silmek için sola kaydır.
-13. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
+13. **Deneme → üstteki yükleme simgesi**: okul karnesi PDF'ini seç. Önizlemede netler, puan ve deftere eklenecek yanlışlar görünür; **Kaydet**. Deneme sayfasında Kimya'nın optiği 8–14 numaralarıyla açılmalı; defterde yanlışlar kazanım adıyla durmalı. Aynı karneyi tekrar yüklersen "zaten kayıtlı" diye sorar.
+14. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
 
 Not: Yeni eklenen yanlışlar **ertesi gün** tekrar listesine (Yanlışlarımı göster) düşer. İlk gün "bugün tekrar yok" görmen normaldir.
 

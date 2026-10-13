@@ -6,6 +6,7 @@ import '../../../app/routes.dart';
 import '../../../core/utils/formatters.dart';
 import '../../curriculum/curriculum_providers.dart';
 import '../../curriculum/domain/curriculum.dart';
+import '../../curriculum/domain/yks.dart';
 import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/domain/quick_mark.dart';
 import '../../question_bank/presentation/question_prefill.dart';
@@ -243,6 +244,7 @@ class _SectionCard extends ConsumerWidget {
           key: section.id,
           title: section.name,
           total: section.questionCount,
+          start: Yks.bookletStart(section.subject),
           markContext: QuickMarkContext(
             origin: QuestionOrigin.mockExam,
             subject: section.subject,

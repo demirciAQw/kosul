@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes.dart';
+import '../../../../core/text/turkish_text.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../curriculum/curriculum_providers.dart';
 import '../../../curriculum/domain/curriculum.dart';
@@ -94,6 +95,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
               meta(card.sourceName),
               if (card.testLabel != null) meta(card.testLabel!),
               if (card.questionNo != null) meta('${card.questionNo}. soru'),
+              if (card.topicText != null) meta(titleCaseTr(card.topicText!)),
               if (card.reasonText != null) meta(card.reasonText!),
               meta('Zorluk ${card.difficulty}/10'),
               if (card.avgSecondsPerQuestion != null) meta('${card.avgSecondsPerQuestion!.round()} sn/soru'),

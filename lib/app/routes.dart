@@ -21,6 +21,7 @@ abstract final class AppRoutes {
   static String bookTest(String bookId, String nodeId) => '/books/$bookId/tests/$nodeId';
   static const review = '/review';
   static const newMockExam = '/mock/new';
+  static const karneImport = '/mock/karne';
   static String mockExam(String id) => '/mock/$id';
   static String editMockExam(String id) => '/mock/$id/edit';
 }

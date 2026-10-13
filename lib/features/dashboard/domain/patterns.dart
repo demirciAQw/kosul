@@ -73,29 +73,34 @@ List<SubjectPattern> findSubjectPatterns(
     final reasonCount = <MistakeReason, int>{};
     final comboCount = <String, int>{}; // "kök|neden"
     final blankByRoot = <String, int>{};
+    final titles = <String, String>{}; // kök anahtarı → görünen ad
     var untagged = 0, reasoned = 0, blanks = 0;
 
     for (final c in list) {
       final node = c.mebNodeId == null ? null : curriculum[c.mebNodeId];
       final root = node == null ? null : _rootOf(node, curriculum);
-      if (root == null) {
+      // MEB konusu yoksa karneden gelen kazanım adı konu yerine geçer.
+      final text = c.topicText?.trim();
+      final String? rootKey = root?.id ?? ((text != null && text.isNotEmpty) ? 'txt:${normalizeTr(text)}' : null);
+      if (rootKey == null) {
         untagged++;
       } else {
-        rootCount[root.id] = (rootCount[root.id] ?? 0) + 1;
-        if (node!.id != root.id) leafCount[node.id] = (leafCount[node.id] ?? 0) + 1;
+        titles[rootKey] = root?.title ?? titleCaseTr(text!);
+        rootCount[rootKey] = (rootCount[rootKey] ?? 0) + 1;
+        if (root != null && node!.id != root.id) leafCount[node.id] = (leafCount[node.id] ?? 0) + 1;
       }
       final reason = c.reason;
       if (reason != null) {
         reasoned++;
         reasonCount[reason] = (reasonCount[reason] ?? 0) + 1;
-        if (root != null) {
-          final key = '${root.id}|${reason.name}';
+        if (rootKey != null) {
+          final key = '$rootKey|${reason.name}';
           comboCount[key] = (comboCount[key] ?? 0) + 1;
         }
       }
       if (c.status == QuestionStatus.blank) {
         blanks++;
-        if (root != null) blankByRoot[root.id] = (blankByRoot[root.id] ?? 0) + 1;
+        if (rootKey != null) blankByRoot[rootKey] = (blankByRoot[rootKey] ?? 0) + 1;
       }
     }
 
@@ -105,7 +110,7 @@ List<SubjectPattern> findSubjectPatterns(
     final topRootId = _maxKey(rootCount);
     if (topRootId != null && rootCount[topRootId]! >= 2) {
       final count = rootCount[topRootId]!;
-      final root = curriculum[topRootId]!;
+      final rootTitle = titles[topRootId]!;
       final leaves = {
         for (final e in leafCount.entries)
           if (curriculum[e.key] != null && _rootOf(curriculum[e.key]!, curriculum).id == topRootId) e.key: e.value,
@@ -114,17 +119,17 @@ List<SubjectPattern> findSubjectPatterns(
       final leafNote = topLeaf != null && leaves[topLeaf]! >= 2 && leaves[topLeaf]! * 2 >= count
           ? ' En çok da ${curriculum[topLeaf]!.title}.'
           : '';
-      insights.add('Yanlış ve boşlarının ${_percent(count, n)} kadarı ${root.title} konusunda ($count soru).$leafNote');
+      insights.add('Yanlış ve boşlarının ${_percent(count, n)} kadarı $rootTitle konusunda ($count soru).$leafNote');
     }
 
     // 2) Konu × neden: "bu konuda genelde şu sebepten kaçırıyorsun".
     final topCombo = _maxKey(comboCount);
     if (topCombo != null && comboCount[topCombo]! >= 2) {
-      final parts = topCombo.split('|');
-      final root = curriculum[parts[0]]!;
-      final reason = MistakeReason.values.byName(parts[1]);
+      final cut = topCombo.lastIndexOf('|');
+      final comboTitle = titles[topCombo.substring(0, cut)]!;
+      final reason = MistakeReason.values.byName(topCombo.substring(cut + 1));
       final advice = reasonAdvice(reason);
-      insights.add('${root.title} sorularında en sık neden ${lowerTr(reason.label)} '
+      insights.add('$comboTitle sorularında en sık neden ${lowerTr(reason.label)} '
           '(${comboCount[topCombo]} soru)${advice.isEmpty ? '.' : ': $advice.'}');
     }
 
@@ -142,7 +147,7 @@ List<SubjectPattern> findSubjectPatterns(
     // 4) Boş bırakma örüntüsü.
     final topBlankRoot = _maxKey(blankByRoot);
     if (blanks >= 3 && topBlankRoot != null && blankByRoot[topBlankRoot]! * 2 >= blanks) {
-      insights.add('Boş bıraktıklarının çoğu ${curriculum[topBlankRoot]!.title} konusundan '
+      insights.add('Boş bıraktıklarının çoğu ${titles[topBlankRoot]!} konusundan '
           '(${blankByRoot[topBlankRoot]}/$blanks).');
     }
 
