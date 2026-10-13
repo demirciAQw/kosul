@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../features/question_bank/question_bank_providers.dart';
 
-/// Alt gezinme çubuğu: Bugün, Plan, Defter, Deneme, Analiz.
+/// Alt gezinme çubuğu: Bugün, Kitaplar, Defter, Deneme, Analiz.
+/// Planlar ve oturum geçmişi Bugün ekranından açılır.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
   final StatefulNavigationShell shell;
@@ -25,9 +26,9 @@ class AppShell extends ConsumerWidget {
             label: 'Bugün',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.event_note_outlined),
-            selectedIcon: Icon(Icons.event_note_rounded),
-            label: 'Plan',
+            icon: Icon(Icons.menu_book_outlined),
+            selectedIcon: Icon(Icons.menu_book_rounded),
+            label: 'Kitaplar',
           ),
           NavigationDestination(
             icon: Badge.count(

@@ -34,7 +34,29 @@ void main() {
     exit(1);
   }
   _patchRootGradle();
+  _copyLauncherIcons();
   stdout.writeln('Android ayarları tamam.');
+}
+
+/// Koçum simgesi: tool/android_icon/res altındakiler (tool/make_icon.py ile
+/// üretilir) Flutter'ın varsayılan simgelerinin üzerine kopyalanır.
+void _copyLauncherIcons() {
+  final src = Directory('tool/android_icon/res');
+  final dst = Directory('android/app/src/main/res');
+  if (!src.existsSync() || !dst.existsSync()) {
+    stderr.writeln('Uyarı: uygulama simgesi kopyalanamadı (klasör yok).');
+    return;
+  }
+  var count = 0;
+  for (final entity in src.listSync(recursive: true)) {
+    if (entity is! File) continue;
+    final relative = entity.path.substring(src.path.length + 1);
+    final target = File('${dst.path}/$relative');
+    target.parent.createSync(recursive: true);
+    entity.copySync(target.path);
+    count++;
+  }
+  stdout.writeln('Uygulama simgesi: $count dosya kopyalandı.');
 }
 
 void _patchManifest(File file) {

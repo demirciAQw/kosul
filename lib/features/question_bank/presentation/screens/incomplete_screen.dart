@@ -145,11 +145,17 @@ class _IncompleteTileState extends ConsumerState<_IncompleteTile> {
     final messenger = ScaffoldMessenger.of(context);
     final reason = await showReasonSheet(context, status: _card.status);
     if (reason == null || !mounted) return;
+    String? note;
+    if (reason == MistakeReason.other) {
+      note = await showDialog<String>(context: context, builder: (_) => const _OtherReasonDialog());
+      if (!mounted) return;
+    }
     setState(() => _busy = true);
     try {
-      await ref
-          .read(updateQuestionCardProvider)
-          .call(_card, QuestionDraft.fromCard(_card).copyWith(reason: () => reason));
+      await ref.read(updateQuestionCardProvider).call(
+            _card,
+            QuestionDraft.fromCard(_card).copyWith(reason: () => reason, reasonNote: () => note),
+          );
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Neden kaydedilemedi: $e')));
     } finally {
@@ -242,6 +248,39 @@ Future<MistakeReason?> showReasonSheet(BuildContext context, {required QuestionS
         ),
       ),
     );
+
+class _OtherReasonDialog extends StatefulWidget {
+  const _OtherReasonDialog();
+
+  @override
+  State<_OtherReasonDialog> createState() => _OtherReasonDialogState();
+}
+
+class _OtherReasonDialogState extends State<_OtherReasonDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Neden?'),
+        content: TextField(
+          controller: _controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(hintText: 'Örn. Şekli yanlış çizdim'),
+          onSubmitted: (v) => Navigator.pop(context, v),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Yazmadan kaydet')),
+          FilledButton(onPressed: () => Navigator.pop(context, _controller.text), child: const Text('Kaydet')),
+        ],
+      );
+}
 
 class _AllDone extends StatelessWidget {
   const _AllDone();

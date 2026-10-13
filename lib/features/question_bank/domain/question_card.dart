@@ -61,6 +61,7 @@ class QuestionCard {
     this.mebNodeId,
     this.testTotalQuestions,
     this.reason,
+    this.reasonNote,
     this.avgSecondsPerQuestion,
     this.isStarred = false,
     this.note,
@@ -84,6 +85,9 @@ class QuestionCard {
   final String subject; // "TYT Matematik"
   final int? testTotalQuestions;
   final MistakeReason? reason;
+
+  /// "Diğer" seçildiğinde kullanıcının kendi açıklaması.
+  final String? reasonNote;
   final double? avgSecondsPerQuestion;
   final int difficulty; // 1–10
   final bool isStarred; // GK (Güzel Soru)
@@ -97,6 +101,14 @@ class QuestionCard {
   final String? mockExamId;
 
   bool get hasPhoto => questionImage != null;
+
+  /// Ekranda gösterilecek neden: "Diğer" için kullanıcının kendi cümlesi.
+  String? get reasonText {
+    final r = reason;
+    if (r == null) return null;
+    final custom = reasonNote?.trim();
+    return r == MistakeReason.other && custom != null && custom.isNotEmpty ? custom : r.label;
+  }
   bool get hasSolution => solutionImage != null || (solutionText?.trim().isNotEmpty ?? false);
   bool get needsReason => status != QuestionStatus.correct && reason == null;
 
@@ -137,6 +149,7 @@ class QuestionCard {
         subject: subject,
         testTotalQuestions: testTotalQuestions,
         reason: reason,
+        reasonNote: reasonNote,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred ?? this.isStarred,
@@ -248,6 +261,7 @@ class QuestionDraft {
     this.subject,
     this.testTotalQuestions,
     this.reason,
+    this.reasonNote,
     this.avgSecondsPerQuestion,
     this.difficulty = 5,
     this.isStarred = false,
@@ -272,6 +286,7 @@ class QuestionDraft {
         subject: c.subject,
         testTotalQuestions: c.testTotalQuestions,
         reason: c.reason,
+        reasonNote: c.reasonNote,
         avgSecondsPerQuestion: c.avgSecondsPerQuestion,
         difficulty: c.difficulty,
         isStarred: c.isStarred,
@@ -295,6 +310,7 @@ class QuestionDraft {
   final String? subject;
   final int? testTotalQuestions;
   final MistakeReason? reason;
+  final String? reasonNote;
   final double? avgSecondsPerQuestion;
   final int difficulty;
   final bool isStarred;
@@ -306,6 +322,7 @@ class QuestionDraft {
 
   QuestionDraft copyWith({
     Getter<MistakeReason?>? reason,
+    Getter<String?>? reasonNote,
     Getter<String?>? questionImagePath,
     Getter<String?>? solutionImagePath,
   }) =>
@@ -323,6 +340,7 @@ class QuestionDraft {
         subject: subject,
         testTotalQuestions: testTotalQuestions,
         reason: reason != null ? reason() : this.reason,
+        reasonNote: reasonNote != null ? reasonNote() : this.reasonNote,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred,

@@ -4,7 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes.dart';
+import '../../../../core/di/core_providers.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../library/domain/library.dart';
+import '../../../library/domain/progress.dart';
+import '../../../library/library_providers.dart';
 import '../../domain/study_session.dart';
 import '../../study_session_providers.dart';
 import '../session_quick_mark.dart';
@@ -24,6 +28,9 @@ class SessionResultsScreen extends ConsumerStatefulWidget {
 
 class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
   final _fields = <String, _ResultFields>{};
+
+  /// Optikte "çözmedim" denen testler: otomatik "çözüldü" işaretlenmez.
+  final _excluded = <String>{};
   bool _saving = false;
 
   _ResultFields _fieldsFor(SessionItem item) => _fields.putIfAbsent(item.id, () => _ResultFields(item));
@@ -112,6 +119,9 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
   Future<void> _mark(StudySession s, SessionItem item) async {
     final result = await markSessionItem(context, ref, s, item);
     if (result == null || !mounted) return;
+    for (final section in result.sections) {
+      section.included ? _excluded.remove(section.key) : _excluded.add(section.key);
+    }
     _fieldsFor(item).set(result.correct, result.wrong, result.blank);
   }
 
@@ -130,6 +140,30 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
     );
   }
 
+  /// Bu oturumda çalışılan testleri/başlıkları kitap haritasında "çözüldü" yapar.
+  /// Daha önce sonucu olanlara dokunmaz; optikte dışarıda bırakılanları atlar;
+  /// sayfalarının yalnızca bir kısmı seçilmiş başlıkları işaretlemez.
+  Future<void> _markCoverage(StudySession s) async {
+    final books = ref.read(libraryProvider).value ?? const <Book>[];
+    final now = ref.read(clockProvider)();
+    final marks = <TestResult>[];
+    for (final item in s.items) {
+      if (!item.hasQuestions || item.bookId == null || _fieldsFor(item).solved == 0) continue;
+      final book = books.where((b) => b.id == item.bookId).firstOrNull;
+      if (book == null) continue;
+      final node = findNode(book, item.contentNodeId);
+      final pages = item.pages.toSet();
+      for (final leaf in node == null ? progressLeaves(book) : leavesUnder(node)) {
+        if (_excluded.contains(leaf.id)) continue;
+        final covered = !leaf.hasPages ||
+            pages.isEmpty ||
+            [for (var p = leaf.pageStart!; p <= leaf.pageEnd!; p++) p].every(pages.contains);
+        if (covered) marks.add(TestResult(nodeId: leaf.id, bookId: book.id, solvedAt: now, sessionId: s.id));
+      }
+    }
+    await ref.read(testProgressRepositoryProvider).saveIfAbsent(marks);
+  }
+
   Future<void> _save(StudySession s) async {
     setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
@@ -139,6 +173,7 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
         for (final item in s.items)
           if (item.hasQuestions) _fieldsFor(item).toResult(item.id),
       ]);
+      await _markCoverage(s);
       messenger.showSnackBar(const SnackBar(content: Text('Sonuçlar kaydedildi.')));
       router.go(AppRoutes.home);
     } on Exception catch (e) {

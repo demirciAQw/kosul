@@ -101,6 +101,13 @@ class DriftLibraryRepository implements LibraryRepository {
       });
 
   @override
+  Future<void> rename(String bookId, {required String title, String? publisher}) =>
+      (_db.update(_db.books)..where((b) => b.id.equals(bookId))).write(BooksCompanion(
+        title: Value(title),
+        publisher: Value(publisher),
+      ));
+
+  @override
   Future<void> delete(String bookId) =>
       (_db.delete(_db.books)..where((b) => b.id.equals(bookId))).go();
 

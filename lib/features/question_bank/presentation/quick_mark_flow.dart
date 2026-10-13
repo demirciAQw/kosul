@@ -7,39 +7,70 @@ import '../domain/quick_mark.dart';
 import '../question_bank_providers.dart';
 import 'screens/optic_form_screen.dart';
 
-/// Önceki işaretlerle optik formu açar, sonucu defterle eşitler.
+/// Optik formun bir bölümü ve o bölümün işaretlerinin bağlanacağı yer.
+class QuickMarkPart {
+  const QuickMarkPart({
+    required this.key,
+    required this.title,
+    required this.total,
+    required this.markContext,
+    this.initiallyIncluded = true,
+  });
+
+  final String key;
+  final String title;
+  final int total;
+  final QuickMarkContext markContext;
+  final bool initiallyIncluded;
+}
+
+/// Önceki işaretlerle optik formu açar ve her bölümü defterle eşitler.
 ///
-/// Dönen sonuç (D/Y/B) çağıran tarafça oturum bloğuna ya da deneme dersine
-/// yazılır. Vazgeçilirse ya da kayıt başarısız olursa null.
+/// Dönen sonuçtaki sayılar (D/Y/B) çağıran tarafça oturum bloğuna, deneme
+/// dersine ya da test sonucuna yazılır. Vazgeçilirse ya da kayıt başarısız
+/// olursa null.
 Future<OpticFormResult?> openQuickMark(
   BuildContext context,
   WidgetRef ref, {
-  required QuickMarkContext markContext,
+  required List<QuickMarkPart> parts,
   required String title,
-  required int initialTotal,
   String? subtitle,
   bool totalEditable = true,
   bool showNet = false,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final quick = ref.read(quickMarkProvider);
-  final existing = await quick.existingMarks(markContext);
+  final sections = <OpticSection>[];
+  for (final part in parts) {
+    final existing = await quick.existingMarks(part.markContext);
+    final highest = existing.keys.fold<int>(0, math.max);
+    sections.add(OpticSection(
+      key: part.key,
+      title: part.title,
+      total: math.max(math.max(part.total, highest), 1),
+      initialMarks: existing,
+      initiallyIncluded: part.initiallyIncluded,
+    ));
+  }
   if (!context.mounted) return null;
 
-  final highestMarked = existing.keys.fold<int>(0, math.max);
   final result = await OpticFormScreen.open(
     context,
     title: title,
     subtitle: subtitle,
-    initialTotal: math.max(math.max(initialTotal, highestMarked), 1),
-    totalEditable: totalEditable,
-    initialMarks: existing,
+    sections: sections,
+    totalEditable: totalEditable && parts.length == 1,
     showNet: showNet,
   );
   if (result == null) return null;
 
   try {
-    final summary = await quick.call(markContext, total: result.total, marks: result.marks);
+    var summary = QuickMarkSummary.zero;
+    for (var i = 0; i < parts.length; i++) {
+      final section = result.sections[i];
+      if (!section.included) continue;
+      summary += await quick.call(parts[i].markContext, total: section.total, marks: section.marks);
+    }
     messenger.showSnackBar(SnackBar(content: Text(summary.message)));
     return result;
   } on Exception catch (e) {

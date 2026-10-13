@@ -82,10 +82,17 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
   }
 
   @override
-  Future<List<QuestionCard>> findLinked({String? sessionItemId, String? mockExamId, String? subject}) async {
-    if (sessionItemId == null && mockExamId == null) return const [];
+  Future<List<QuestionCard>> findLinked({
+    String? sessionItemId,
+    String? mockExamId,
+    String? subject,
+    String? contentNodeId,
+  }) async {
+    if (sessionItemId == null && mockExamId == null && contentNodeId == null) return const [];
     final q = _db.select(_db.questionCards)
       ..where((t) {
+        final node = contentNodeId;
+        if (node != null) return t.contentNodeId.equals(node);
         if (sessionItemId != null) return t.sessionItemId.equals(sessionItemId);
         Expression<bool> e = t.mockExamId.equals(mockExamId!);
         final s = subject;
@@ -93,6 +100,14 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         return e;
       });
     return (await q.get()).map(_toEntity).toList();
+  }
+
+  @override
+  Stream<List<QuestionCard>> watchForNode(String contentNodeId) {
+    final q = _db.select(_db.questionCards)
+      ..where((t) => t.contentNodeId.equals(contentNodeId))
+      ..orderBy([(t) => OrderingTerm.asc(t.questionNo), (t) => OrderingTerm.desc(t.createdAt)]);
+    return q.watch().map((rows) => rows.map(_toEntity).toList());
   }
 
   @override
@@ -161,6 +176,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         c.solutionText,
         c.note,
         c.reason?.label,
+        c.reasonNote,
       ].whereType<String>().join(' '));
 
   static QuestionCardsCompanion _toCompanion(QuestionCard c) => QuestionCardsCompanion.insert(
@@ -188,6 +204,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         testLabel: Value(c.testLabel),
         sessionItemId: Value(c.sessionItemId),
         mockExamId: Value(c.mockExamId),
+        reasonNote: Value(c.reasonNote),
       );
 
   static QuestionCard _toEntity(QuestionCardRow r) => QuestionCard(
@@ -214,5 +231,6 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         testLabel: r.testLabel,
         sessionItemId: r.sessionItemId,
         mockExamId: r.mockExamId,
+        reasonNote: r.reasonNote,
       );
 }

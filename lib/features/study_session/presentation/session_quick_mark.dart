@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../curriculum/domain/curriculum.dart';
 import '../../library/domain/library.dart';
+import '../../library/domain/progress.dart';
 import '../../library/library_providers.dart';
+import '../../library/presentation/test_mark_flow.dart';
 import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/domain/quick_mark.dart';
 import '../../question_bank/presentation/question_prefill.dart';
@@ -20,12 +22,9 @@ Book? _bookOf(WidgetRef ref, SessionItem item) {
 String? _subjectOf(SessionItem item, Book? book) =>
     item.subject ?? (book == null ? null : subjectKey(book.examType, book.subject));
 
-String _sourceOf(SessionItem item, Book? book) =>
-    book?.title ?? (item.isBookless ? item.label : item.label.split(' › ').first);
-
-/// "Testin şu sorusu": oturum bloğunun optik formunu açar. Ders, konu, kaynak
-/// ve süre bloktan gelir; kullanıcı yalnızca numaralara dokunur. Sonuç (D/Y/B)
-/// bloğa yazılır ve geri döndürülür.
+/// Oturum bloğunun optiği. Kitaptan seçilmiş ve testleri bilinen bloklarda form
+/// test test bölünür ("6. test, 5. soru"); çözülen testler kitap haritasına
+/// işlenir. Kitapsız bloklarda tek bölümdür. Toplam D/Y/B bloğa yazılır.
 Future<OpticFormResult?> markSessionItem(
   BuildContext context,
   WidgetRef ref,
@@ -34,35 +33,50 @@ Future<OpticFormResult?> markSessionItem(
 ) async {
   final messenger = ScaffoldMessenger.of(context);
   final book = _bookOf(ref, item);
-  final subject = _subjectOf(item, book);
-  if (subject == null) {
-    messenger.showSnackBar(const SnackBar(content: Text('Bu bölümün dersi bilinmiyor; soruyu Defter\'den ekle.')));
-    return null;
-  }
-  final where = [
-    if (book != null) book.title,
-    if (item.pages.isNotEmpty) 'sayfa ${item.pageSpec}',
-  ];
-  final result = await openQuickMark(
-    context,
-    ref,
-    markContext: QuickMarkContext(
-      origin: item.isBookless ? QuestionOrigin.independent : QuestionOrigin.book,
-      subject: subject,
-      sourceName: _sourceOf(item, book),
-      bookId: item.bookId,
-      contentNodeId: item.contentNodeId,
-      mebNodeId: item.mebNodeId,
+  final OpticFormResult? result;
+
+  if (book != null) {
+    result = await markBookScope(
+      context,
+      ref,
+      book: book,
+      node: findNode(book, item.contentNodeId),
       sessionId: session.id,
       sessionItemId: item.id,
-      testLabel: item.testLabel,
       avgSecondsPerQuestion: session.secondsPerQuestion,
-    ),
-    title: item.testLabel,
-    subtitle: where.isEmpty ? null : where.join(', '),
-    initialTotal: item.solved > 0 ? item.solved : (item.estimatedQuestions ?? 20),
-  );
+      fallbackTotal: item.solved > 0 ? item.solved : item.estimatedQuestions,
+    );
+  } else {
+    final subject = _subjectOf(item, book);
+    if (subject == null) {
+      messenger.showSnackBar(const SnackBar(content: Text('Bu bölümün dersi bilinmiyor; soruyu Defter\'den ekle.')));
+      return null;
+    }
+    result = await openQuickMark(
+      context,
+      ref,
+      parts: [
+        QuickMarkPart(
+          key: item.id,
+          title: item.testLabel,
+          total: item.solved > 0 ? item.solved : (item.estimatedQuestions ?? 20),
+          markContext: QuickMarkContext(
+            origin: QuestionOrigin.independent,
+            subject: subject,
+            sourceName: item.label,
+            mebNodeId: item.mebNodeId,
+            sessionId: session.id,
+            sessionItemId: item.id,
+            testLabel: item.testLabel,
+            avgSecondsPerQuestion: session.secondsPerQuestion,
+          ),
+        ),
+      ],
+      title: item.testLabel,
+    );
+  }
   if (result == null) return null;
+
   try {
     await ref.read(studySessionRepositoryProvider).saveItemResult(ItemResult(
           itemId: item.id,
@@ -76,7 +90,8 @@ Future<OpticFormResult?> markSessionItem(
   return result;
 }
 
-/// Fotoğraflı tam kayıt için ekleme ekranının ön dolgusu.
+/// Fotoğraflı tam kayıt için ekleme ekranının ön dolgusu. Blok tek bir test ya
+/// da yaprak başlıksa test de dolu gelir; kullanıcıdan yalnızca soru no istenir.
 QuestionPrefill sessionItemPrefill(
   WidgetRef ref,
   StudySession session,
@@ -85,17 +100,19 @@ QuestionPrefill sessionItemPrefill(
   int? testTotalQuestions,
 }) {
   final book = _bookOf(ref, item);
+  final node = book == null ? null : findNode(book, item.contentNodeId);
+  final isTest = node != null && node.children.isEmpty;
   return QuestionPrefill(
     origin: item.isBookless ? QuestionOrigin.independent : QuestionOrigin.book,
     sessionId: session.id,
     sessionItemId: item.id,
     bookId: item.bookId,
-    contentNodeId: item.contentNodeId,
-    mebNodeId: item.mebNodeId,
-    sourceName: _sourceOf(item, book),
+    contentNodeId: isTest ? node!.id : null,
+    mebNodeId: node == null ? item.mebNodeId : effectiveMeb(book!, node.id),
+    sourceName: book?.title ?? item.label,
     subject: _subjectOf(item, book),
-    testLabel: item.testLabel,
-    testTotalQuestions: testTotalQuestions ?? (item.solved > 0 ? item.solved : item.estimatedQuestions),
+    testLabel: isTest ? nodeLabel(book!, node!.id) : item.testLabel,
+    testTotalQuestions: isTest ? (node!.questionCount ?? testTotalQuestions) : testTotalQuestions,
     avgSecondsPerQuestion: avgSecondsPerQuestion ?? session.secondsPerQuestion,
   );
 }

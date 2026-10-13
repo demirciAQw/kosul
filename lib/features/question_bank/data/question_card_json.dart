@@ -28,6 +28,7 @@ extension QuestionCardJson on QuestionCard {
         if (questionNo != null) 'questionNo': questionNo,
         if (testLabel != null) 'testLabel': testLabel,
         if (mockExamId != null) 'mockExamId': mockExamId,
+        if (reasonNote != null) 'reasonNote': reasonNote,
       };
 }
 
@@ -73,5 +74,6 @@ QuestionCard questionCardFromJson(Map<String, dynamic> json, {String path = r'$'
     questionNo: r.optInt('questionNo', min: 1),
     testLabel: r.optString('testLabel'),
     mockExamId: r.optString('mockExamId'),
+    reasonNote: r.optString('reasonNote'),
   );
 }

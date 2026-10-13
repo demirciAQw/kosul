@@ -131,7 +131,24 @@ abstract interface class PlanRepository {
   Future<void> setTaskDone(String taskId, bool done);
   Future<void> deleteTask(String taskId);
   Future<void> setCompleted(String planId, DateTime? completedAt);
+  Future<void> update(String planId, {required String title, required DateTime startsOn, required DateTime endsOn});
+  Future<void> renameTask(String taskId, String title);
   Future<void> delete(String planId);
+}
+
+/// Planın adını ve tarih aralığını düzeltir.
+class EditPlan {
+  EditPlan(this._repository);
+  final PlanRepository _repository;
+
+  Future<void> call(String planId, {required String title, required DateTime startsOn, required DateTime endsOn}) {
+    final t = title.trim();
+    if (t.isEmpty) throw const PlanException('Plana bir ad ver.');
+    final start = _day(startsOn);
+    final end = _day(endsOn);
+    if (end.isBefore(start)) throw const PlanException('Bitiş tarihi başlangıçtan önce olamaz.');
+    return _repository.update(planId, title: t, startsOn: start, endsOn: end);
+  }
 }
 
 class CreatePlan {

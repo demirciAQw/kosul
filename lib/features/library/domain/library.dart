@@ -121,6 +121,7 @@ abstract interface class LibraryRepository {
   /// Kitabı ve tüm ağacını atomik olarak yazar (upsert; mevcut düğüm
   /// kimlikleri korunur, böylece oturum/kart referansları kopmaz).
   Future<void> save(Book book);
+  Future<void> rename(String bookId, {required String title, String? publisher});
   Future<void> delete(String bookId);
 }
 

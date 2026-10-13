@@ -238,17 +238,23 @@ class _SectionCard extends ConsumerWidget {
     final result = await openQuickMark(
       context,
       ref,
-      markContext: QuickMarkContext(
-        origin: QuestionOrigin.mockExam,
-        subject: section.subject,
-        sourceName: exam.title,
-        mockExamId: exam.id,
-        testLabel: '${exam.title}, ${section.name}',
-        avgSecondsPerQuestion: exam.secondsPerQuestion,
-      ),
+      parts: [
+        QuickMarkPart(
+          key: section.id,
+          title: section.name,
+          total: section.questionCount,
+          markContext: QuickMarkContext(
+            origin: QuestionOrigin.mockExam,
+            subject: section.subject,
+            sourceName: exam.title,
+            mockExamId: exam.id,
+            testLabel: '${exam.title}, ${section.name}',
+            avgSecondsPerQuestion: exam.secondsPerQuestion,
+          ),
+        ),
+      ],
       title: section.subject,
       subtitle: warn,
-      initialTotal: section.questionCount,
       totalEditable: false,
       showNet: true,
     );

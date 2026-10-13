@@ -173,6 +173,9 @@ class QuestionCards extends Table {
   TextColumn get subject => text()(); // "TYT Matematik" (hızlı filtre için denormalize)
   IntColumn get testTotalQuestions => integer().nullable()();
   TextColumn get reason => text().nullable()();
+
+  /// "Diğer" nedeni seçildiğinde kullanıcının kendi açıklaması (v4).
+  TextColumn get reasonNote => text().nullable()();
   RealColumn get avgSecondsPerQuestion => real().nullable()();
   IntColumn get difficulty => integer()();
   BoolColumn get isStarred => boolean().withDefault(const Constant(false))();
@@ -213,6 +216,25 @@ class ReviewStates extends Table {
 
   @override
   Set<Column> get primaryKey => {cardId};
+}
+
+// ───────────────────────── Kitap ilerlemesi (v4) ─────────────────────────
+
+/// Bir testin (ya da kitap ağacındaki bir yaprak başlığın) çözüldü kaydı.
+/// Satır yoksa çözülmedi. Sayılar optikten gelir; elle işaretlemede boş kalır.
+@DataClassName('TestResultRow')
+class TestResults extends Table {
+  TextColumn get contentNodeId => text().references(ContentNodes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get bookId => text().references(Books, #id, onDelete: KeyAction.cascade)();
+  IntColumn get correct => integer().nullable()();
+  IntColumn get wrong => integer().nullable()();
+  IntColumn get blank => integer().nullable()();
+  IntColumn get total => integer().nullable()();
+  DateTimeColumn get solvedAt => dateTime()();
+  TextColumn get sessionId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {contentNodeId};
 }
 
 // ───────────────────────── Deneme sınavları (v2) ─────────────────────────

@@ -21,7 +21,16 @@ abstract interface class QuestionCardRepository {
 
   /// Optik formun önceki işaretlerini bulmak için: bir oturum bloğunun ya da
   /// bir denemenin (isteğe bağlı olarak tek dersinin) kartları.
-  Future<List<QuestionCard>> findLinked({String? sessionItemId, String? mockExamId, String? subject});
+  Future<List<QuestionCard>> findLinked({
+    String? sessionItemId,
+    String? mockExamId,
+    String? subject,
+    String? contentNodeId,
+  });
+
+  /// Bir kitap testine (ya da yaprak başlığa) bağlı kartlar: test ekranı için.
+  Stream<List<QuestionCard>> watchForNode(String contentNodeId);
+
 
   /// Denemelerden gelen yanlış ve boşlar (konu bazlı net kaybı için).
   Stream<List<QuestionCard>> watchMockExamMistakes();
@@ -97,6 +106,9 @@ class SaveQuestionCard {
         subject: draft.subject!.trim(),
         testTotalQuestions: draft.testTotalQuestions,
         reason: draft.status == QuestionStatus.correct ? null : draft.reason,
+        reasonNote: draft.status != QuestionStatus.correct && draft.reason == MistakeReason.other
+            ? _clean(draft.reasonNote)
+            : null,
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,
@@ -190,6 +202,9 @@ class UpdateQuestionCard {
         subject: draft.subject!.trim(),
         testTotalQuestions: draft.testTotalQuestions,
         reason: draft.status == QuestionStatus.correct ? null : draft.reason,
+        reasonNote: draft.status != QuestionStatus.correct && draft.reason == MistakeReason.other
+            ? _clean(draft.reasonNote)
+            : null,
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,
@@ -238,6 +253,16 @@ class DeleteQuestionCard {
     if (question != null) await _media.delete(question);
     final solution = card.solutionImage;
     if (solution != null) await _media.delete(solution);
+  }
+
+  /// Çoklu silme (Defter'de seçim modu); silinen kart sayısını döner.
+  Future<int> many(Iterable<String> ids) async {
+    var count = 0;
+    for (final id in ids) {
+      await call(id);
+      count++;
+    }
+    return count;
   }
 }
 

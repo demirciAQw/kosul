@@ -140,6 +140,10 @@ final class EmptySelectionException extends StudySessionException {
   const EmptySelectionException() : super('En az bir konu ya da sayfa seç.');
 }
 
+final class InvalidTimesException extends StudySessionException {
+  const InvalidTimesException() : super('Bitiş, başlangıçtan sonra olmalı (en fazla 16 saat).');
+}
+
 final class InvalidResultException extends StudySessionException {
   const InvalidResultException() : super('Doğru, yanlış ve boş sayıları negatif olamaz.');
 }
@@ -163,6 +167,15 @@ abstract interface class StudySessionRepository {
 
   /// Tek bloğun sayılarını yazar (optik formdan); oturumun durumunu değiştirmez.
   Future<void> saveItemResult(ItemResult result);
+
+  /// Bitmiş ve sonuç bekleyen oturumlar, en yeni başta (geçmiş ekranı).
+  Stream<List<StudySession>> watchHistory({int limit = 200});
+
+  /// Unutulup açık kalan sayaç gibi hataları düzeltmek için.
+  Future<void> updateTimes(String sessionId, {required DateTime startedAt, required DateTime endedAt});
+
+  /// Bitmiş oturumu siler. Defterdeki sorular kalır (oturum bağı kopar).
+  Future<void> deleteFinished(String sessionId);
 }
 
 // ───────────────────────── Use case'ler ─────────────────────────

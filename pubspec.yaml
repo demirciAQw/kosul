@@ -1,7 +1,7 @@
 name: kocum
 description: "Koçum: YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi."
 publish_to: 'none'
-version: 0.2.0+2
+version: 0.4.0+4
 
 environment:
   sdk: ^3.8.0
@@ -52,3 +52,4 @@ flutter:
   assets:
     - assets/meb/
     - assets/templates/
+    - assets/icon/

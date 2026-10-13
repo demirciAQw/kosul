@@ -7,13 +7,14 @@ Flutter, Clean Architecture, SQLite (Drift). Telefonda denemek için `NASIL_DENE
 
 | Modül | Ne yapar |
 |---|---|
-| Kitaplar | Hazır kitaplar tek dokunuşla (345 Sıfır Risk Paragraf, Aydın 11. Sınıf Kimya) ya da JSON şablonla. Testlerin soru sayısı şablonda verilebilir; optik form o sayıyla açılır. |
+| Kitaplar (sekme) | Her kitabın ne kadarı bitti, ne kadarı duruyor: ilerleme halkası, kitap haritası (her test bir kare, rengi sonucuna göre), ünite ünite test listesi. Testi elle çözüldü/çözülmedi yap; teste dokununca sonucu, yanlışların optiği ve fotoğrafları. Hazır kitaplar tek dokunuşla ya da JSON şablonla. |
 | Oturum | Kitaptan (ünite, konu, tek sayfa) ya da kitapsız (ders, konu, video/konu anlatımı/soru çözümü). Durdurulamaz sayaç, iptal tuşu, bildirimde canlı kronometre, "Eksiklerini doldur" rozeti. |
-| Optik form | Testin numaralarına dokunarak yanlış ve boş işaretleme. Doğru, yanlış, boş ve net kendiliğinden hesaplanır; sorular ders, konu ve süresiyle deftere düşer. |
-| Plan | İstediğin kadar plan: haftalık, aylık, yıllık ya da özel. Görev ekle/sil, planı "tamamladım" diye işaretle, sil (geri alınabilir). Görevden doğrudan oturum başlar. |
-| Defter | Yanlış / Boş / Doğru kartları. Fotoğraf ve çözüm isteğe bağlı; uygulama içi kırpma, WebP. Yıldız ile Güzel Sorular. Arama, filtreler, ağaç görünümü. |
+| Optik form | Yanlış ve boşlara dokun; D/Y/B ve net kendiliğinden. Çok testli bir bölümde form test test bölünür: "6. test, 5. soru" (105. soru değil). Çözmediğin testi kapat. Sorular teste bağlanır, test kitap haritasında çözüldü olur. |
+| Plan (Bugün'den) | İstediğin kadar plan: haftalık, aylık, yıllık ya da özel. Görev ekle/sil, planı "tamamladım" diye işaretle, sil (geri alınabilir). Görevden doğrudan oturum başlar. |
+| Defter | Kitaptan eklerken yalnızca kitap, test ve soru no sorulur; konu testten gelir. Uzun basarak çoklu seçim ve toplu silme. "Diğer" nedenine kendi açıklaman. Yanlış / Boş / Doğru kartları. Fotoğraf ve çözüm isteğe bağlı; uygulama içi kırpma, WebP. Yıldız ile Güzel Sorular. Arama, filtreler, ağaç görünümü. |
 | Eksikler | Fotoğrafı, çözümü, nedeni ya da konusu eksik kartlar. Neden ve fotoğraf satırdan tek dokunuşla eklenir. |
 | Tekrar | "Yanlışlarımı göster": SM-2 (Anki). Fotoğrafsız kartlarda kitap, test ve soru numarası gösterilir. |
+| Geçmiş oturumlar | Unutulan sayacın süresini düzelt, sonuçları sonradan düzenle, oturumu sil. |
 | Deneme | TYT / AYT (alan seçmeli) / YDT / branş. Ders bazlı net, net grafiği, son 5 ortalamasına göre fark, konu bazlı net kaybı (yanlış 1,25, boş 1 net). |
 | Analiz | Derslere göre örüntüler ("Problemler sorularında en sık neden işlem hatası"), en çok yanlış yapılan konu / neden / ders, tahmini kayıp süre, son 7 gün çalışma süresi. |
 
@@ -78,3 +79,5 @@ flutter run --release
 - Yedekleme / geri yükleme (JSON + medya zip) yok.(claude codean yapıyo bu işi )
 - Şablonda test yapısı yoksa (yalnızca sayfa aralığı) optik form numaraları seçilen blok boyunca sürer. Testleri `questions` alanıyla tanımlanmış kitaplarda her test ayrı seçilir ve numaralar teste göredir.
 - Konu listesi şimdilik yalnızca TYT Matematik ve TYT Türkçe için var; diğer derslerde örüntüler nedenlere göre çıkarılır.
+- Kitap yapısı (ünite/test) uygulama içinde düzenlenemez; adı ve yayınevi düzenlenebilir. Yapı değişikliği için JSON şablonu güncellenip yeniden içe aktarılır.
+- Uygulama simgesi `tool/make_icon.py` ile üretilir; derlemede `tool/patch_android.dart` simgeleri Android klasörüne kopyalar.

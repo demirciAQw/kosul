@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/library/presentation/book_detail_screen.dart';
+import '../features/library/presentation/books_screen.dart';
+import '../features/library/presentation/test_detail_screen.dart';
 import '../features/mock_exam/presentation/edit_mock_exam_screen.dart';
 import '../features/mock_exam/presentation/mock_exam_detail_screen.dart';
 import '../features/mock_exam/presentation/mock_exams_screen.dart';
@@ -15,6 +18,7 @@ import '../features/question_bank/presentation/screens/notebook_screen.dart';
 import '../features/question_bank/presentation/screens/question_detail_screen.dart';
 import '../features/question_bank/presentation/screens/review_screen.dart';
 import '../features/study_session/presentation/screens/active_session_screen.dart';
+import '../features/study_session/presentation/screens/session_history_screen.dart';
 import '../features/study_session/presentation/screens/session_results_screen.dart';
 import '../features/study_session/presentation/screens/session_setup_screen.dart';
 import 'app_shell.dart';
@@ -30,7 +34,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             GoRoute(path: AppRoutes.home, builder: (context, state) => const HomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: AppRoutes.plan, builder: (context, state) => const PlanScreen()),
+            GoRoute(path: AppRoutes.books, builder: (context, state) => const BooksScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: AppRoutes.notebook, builder: (context, state) => const NotebookScreen()),
@@ -67,7 +71,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/questions/:id',
         builder: (context, state) => QuestionDetailScreen(cardId: state.pathParameters['id']!),
       ),
+      GoRoute(path: AppRoutes.plan, builder: (context, state) => const PlanScreen()),
       GoRoute(path: AppRoutes.newPlan, builder: (context, state) => const CreatePlanScreen()),
+      GoRoute(path: AppRoutes.sessions, builder: (context, state) => const SessionHistoryScreen()),
+      GoRoute(
+        path: '/books/:id/tests/:nodeId',
+        builder: (context, state) => TestDetailScreen(
+          bookId: state.pathParameters['id']!,
+          nodeId: state.pathParameters['nodeId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/books/:id',
+        builder: (context, state) => BookDetailScreen(bookId: state.pathParameters['id']!),
+      ),
       GoRoute(path: AppRoutes.review, builder: (context, state) => const ReviewScreen()),
       GoRoute(path: AppRoutes.newMockExam, builder: (context, state) => const EditMockExamScreen()),
       GoRoute(

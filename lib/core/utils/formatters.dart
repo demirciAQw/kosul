@@ -59,3 +59,14 @@ String formatDate(DateTime t) => '${t.day} ${_months[t.month - 1]} ${t.year}';
 
 /// 12 Eki
 String formatDayMonth(DateTime t) => '${t.day} ${_months[t.month - 1]}';
+
+/// "bugün", "dün", "3 gün önce", "12 Eki"
+String formatRelativeDay(DateTime t, DateTime now) {
+  final a = DateTime(t.year, t.month, t.day);
+  final b = DateTime(now.year, now.month, now.day);
+  final days = b.difference(a).inDays;
+  if (days <= 0) return 'bugün';
+  if (days == 1) return 'dün';
+  if (days < 7) return '$days gün önce';
+  return formatDayMonth(t);
+}

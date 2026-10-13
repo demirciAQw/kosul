@@ -109,6 +109,18 @@ class DriftPlanRepository implements PlanRepository {
           .write(StudyPlansCompanion(completedAt: Value(completedAt)));
 
   @override
+  Future<void> update(String planId, {required String title, required DateTime startsOn, required DateTime endsOn}) =>
+      (_db.update(_db.studyPlans)..where((p) => p.id.equals(planId))).write(StudyPlansCompanion(
+        title: Value(title),
+        startsOn: Value(startsOn),
+        endsOn: Value(endsOn),
+      ));
+
+  @override
+  Future<void> renameTask(String taskId, String title) =>
+      (_db.update(_db.planTasks)..where((t) => t.id.equals(taskId))).write(PlanTasksCompanion(title: Value(title)));
+
+  @override
   Future<void> delete(String planId) =>
       (_db.delete(_db.studyPlans)..where((p) => p.id.equals(planId))).go();
 }

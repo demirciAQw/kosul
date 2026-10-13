@@ -132,6 +132,38 @@ class DriftStudySessionRepository implements StudySessionRepository {
   @override
   Future<void> saveItemResult(ItemResult result) => _writeItem(result);
 
+  @override
+  Stream<List<StudySession>> watchHistory({int limit = 200}) {
+    final s = _db.studySessions;
+    final i = _db.sessionItems;
+    final q = _db.select(s).join([leftOuterJoin(i, i.sessionId.equalsExp(s.id))])
+      ..where(s.status.equals(_running).not())
+      ..orderBy([OrderingTerm.desc(s.startedAt)]);
+    return q.watch().asyncMap((rows) async {
+      final seen = <String>{};
+      final sessions = <StudySessionRow>[];
+      for (final row in rows) {
+        final r = row.readTable(s);
+        if (seen.add(r.id)) sessions.add(r);
+        if (sessions.length >= limit) break;
+      }
+      return Future.wait(sessions.map(_hydrate));
+    });
+  }
+
+  @override
+  Future<void> updateTimes(String sessionId, {required DateTime startedAt, required DateTime endedAt}) async {
+    final span = endedAt.difference(startedAt);
+    if (span.inMinutes < 1 || span.inHours > 16) throw const InvalidTimesException();
+    await (_db.update(_db.studySessions)
+          ..where((x) => x.id.equals(sessionId) & x.status.equals(_running).not()))
+        .write(StudySessionsCompanion(startedAt: Value(startedAt), endedAt: Value(endedAt)));
+  }
+
+  @override
+  Future<void> deleteFinished(String sessionId) =>
+      (_db.delete(_db.studySessions)..where((x) => x.id.equals(sessionId) & x.status.equals(_running).not())).go();
+
   Future<void> _writeItem(ItemResult r, {String? sessionId}) =>
       (_db.update(_db.sessionItems)
             ..where((i) {

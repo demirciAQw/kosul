@@ -1,7 +1,7 @@
 abstract final class AppRoutes {
   // Alt gezinme sekmeleri
   static const home = '/';
-  static const plan = '/plan';
+  static const books = '/books';
   static const notebook = '/notebook';
   static const mockExams = '/mock';
   static const insights = '/insights';
@@ -14,7 +14,11 @@ abstract final class AppRoutes {
   static const incompleteQuestions = '/questions/incomplete';
   static String question(String id) => '/questions/$id';
   static String editQuestion(String id) => '/questions/$id/edit';
+  static const plan = '/plan';
   static const newPlan = '/plan/new';
+  static const sessions = '/sessions';
+  static String book(String id) => '/books/$id';
+  static String bookTest(String bookId, String nodeId) => '/books/$bookId/tests/$nodeId';
   static const review = '/review';
   static const newMockExam = '/mock/new';
   static String mockExam(String id) => '/mock/$id';

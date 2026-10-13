@@ -272,14 +272,18 @@ class TopicPickerPage extends StatelessWidget {
 }
 
 class TaskTextDialog extends StatefulWidget {
-  const TaskTextDialog({super.key});
+  const TaskTextDialog({super.key, this.initial = '', this.title = 'Yeni görev', this.action = 'Ekle'});
+
+  final String initial;
+  final String title;
+  final String action;
 
   @override
   State<TaskTextDialog> createState() => _TaskTextDialogState();
 }
 
 class _TaskTextDialogState extends State<TaskTextDialog> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(text: widget.initial);
 
   @override
   void dispose() {
@@ -290,7 +294,7 @@ class _TaskTextDialogState extends State<TaskTextDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Yeni görev'),
+      title: Text(widget.title),
       content: TextField(
         controller: _controller,
         autofocus: true,
@@ -300,7 +304,7 @@ class _TaskTextDialogState extends State<TaskTextDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
-        FilledButton(onPressed: () => Navigator.pop(context, _controller.text), child: const Text('Ekle')),
+        FilledButton(onPressed: () => Navigator.pop(context, _controller.text), child: Text(widget.action)),
       ],
     );
   }

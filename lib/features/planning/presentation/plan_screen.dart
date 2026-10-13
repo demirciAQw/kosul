@@ -109,7 +109,7 @@ class _EmptyPlans extends StatelessWidget {
   }
 }
 
-enum _PlanAction { addTask, toggleComplete, delete }
+enum _PlanAction { edit, addTask, toggleComplete, delete }
 
 class _PlanCard extends ConsumerWidget {
   const _PlanCard({required this.plan, required this.now, this.initiallyExpanded = false});
@@ -154,11 +154,13 @@ class _PlanCard extends ConsumerWidget {
         trailing: PopupMenuButton<_PlanAction>(
           tooltip: 'Plan seçenekleri',
           onSelected: (a) => switch (a) {
+            _PlanAction.edit => _edit(context, ref),
             _PlanAction.addTask => _addTasks(context, ref),
             _PlanAction.toggleComplete => _toggleComplete(context, ref),
             _PlanAction.delete => _confirmDelete(context, ref),
           },
           itemBuilder: (context) => [
+            const PopupMenuItem(value: _PlanAction.edit, child: Text('Adını ve tarihlerini düzenle')),
             const PopupMenuItem(value: _PlanAction.addTask, child: Text('Görev ekle')),
             PopupMenuItem(
               value: _PlanAction.toggleComplete,
@@ -185,7 +187,9 @@ class _PlanCard extends ConsumerWidget {
                 action: 'Sil',
               ),
               onDismissed: (_) => ref.read(planRepositoryProvider).deleteTask(task.id),
-              child: CheckboxListTile(
+              child: GestureDetector(
+                onLongPress: () => _renameTask(context, ref, task),
+                child: CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 value: task.isDone,
                 onChanged: (v) => ref.read(planRepositoryProvider).setTaskDone(task.id, v ?? false),
@@ -201,6 +205,7 @@ class _PlanCard extends ConsumerWidget {
                         icon: const Icon(Icons.play_circle_outline_rounded),
                         onPressed: () => _startTask(context, ref, task),
                       ),
+                ),
               ),
             ),
           Padding(
@@ -238,7 +243,7 @@ class _PlanCard extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Text(
-                'Bir görevi silmek için sola kaydır.',
+                'Görevi silmek için sola kaydır, adını düzeltmek için basılı tut.',
                 style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
@@ -283,6 +288,34 @@ class _PlanCard extends ConsumerWidget {
     if (drafts == null || drafts.isEmpty) return;
     await add.call(plan.id, drafts);
     messenger.showSnackBar(SnackBar(content: Text('${drafts.length} görev eklendi.')));
+  }
+
+  Future<void> _edit(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final value = await showDialog<({String title, DateTimeRange range})>(
+      context: context,
+      builder: (_) => _EditPlanDialog(plan: plan),
+    );
+    if (value == null) return;
+    try {
+      await ref.read(editPlanProvider).call(
+            plan.id,
+            title: value.title,
+            startsOn: value.range.start,
+            endsOn: value.range.end,
+          );
+    } on PlanException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Future<void> _renameTask(BuildContext context, WidgetRef ref, PlanTask task) async {
+    final text = await showDialog<String>(
+      context: context,
+      builder: (_) => TaskTextDialog(initial: task.title, title: 'Görevi düzenle', action: 'Kaydet'),
+    );
+    if (text == null || text.trim().isEmpty) return;
+    await ref.read(planRepositoryProvider).renameTask(task.id, text.trim());
   }
 
   Future<void> _toggleComplete(BuildContext context, WidgetRef ref) async {
@@ -356,3 +389,55 @@ Future<bool?> _confirm(
         ],
       ),
     );
+
+class _EditPlanDialog extends StatefulWidget {
+  const _EditPlanDialog({required this.plan});
+  final StudyPlan plan;
+
+  @override
+  State<_EditPlanDialog> createState() => _EditPlanDialogState();
+}
+
+class _EditPlanDialogState extends State<_EditPlanDialog> {
+  late final _title = TextEditingController(text: widget.plan.title);
+  late DateTimeRange _range = DateTimeRange(start: widget.plan.startsOn, end: widget.plan.endsOn);
+
+  @override
+  void dispose() {
+    _title.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Planı düzenle'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: _title, decoration: const InputDecoration(labelText: 'Plan adı')),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final now = DateTime.now();
+                final picked = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(now.year - 2),
+                  lastDate: DateTime(now.year + 3),
+                  initialDateRange: _range,
+                );
+                if (picked != null) setState(() => _range = picked);
+              },
+              icon: const Icon(Icons.date_range_outlined),
+              label: Text(formatDateRange(_range.start, _range.end)),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, (title: _title.text, range: _range)),
+            child: const Text('Kaydet'),
+          ),
+        ],
+      );
+}

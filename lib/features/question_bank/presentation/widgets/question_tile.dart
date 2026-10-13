@@ -22,12 +22,22 @@ class QuestionTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     const onImage = TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600);
+    final selection = ref.watch(questionSelectionProvider);
+    final selected = selection.contains(card.id);
+    final selecting = selection.isNotEmpty;
     return Material(
       color: scheme.surfaceContainerHighest,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: selected ? BorderSide(color: scheme.primary, width: 3) : BorderSide.none,
+      ),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.question(card.id)),
+        // Seçim modundayken dokunmak seçer; değilken soruyu açar. Uzun bas: seçimi başlat.
+        onTap: selecting
+            ? () => ref.read(questionSelectionProvider.notifier).toggle(card.id)
+            : () => context.push(AppRoutes.question(card.id)),
+        onLongPress: () => ref.read(questionSelectionProvider.notifier).toggle(card.id),
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -59,7 +69,7 @@ class QuestionTile extends ConsumerWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          card.reason?.label ?? card.status.label,
+                          card.reasonText ?? card.status.label,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: onImage,
@@ -86,6 +96,16 @@ class QuestionTile extends ConsumerWidget {
                 ),
               ),
             ),
+            if (selecting)
+              Positioned(
+                top: 6,
+                left: 6,
+                child: Icon(
+                  selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                  color: selected ? scheme.primary : Colors.white,
+                  shadows: const [Shadow(blurRadius: 4, color: Colors.black54)],
+                ),
+              ),
           ],
         ),
       ),

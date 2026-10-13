@@ -15,7 +15,10 @@ import '../../../curriculum/curriculum_providers.dart';
 import '../../../curriculum/domain/curriculum.dart';
 import '../../../curriculum/domain/yks.dart';
 import '../../../library/domain/library.dart';
+import '../../../library/domain/progress.dart';
 import '../../../library/library_providers.dart';
+import '../../../library/presentation/library_sheet.dart';
+import '../../../library/presentation/test_picker_sheet.dart';
 import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import '../question_prefill.dart';
@@ -44,6 +47,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   final _avgSeconds = TextEditingController();
   final _note = TextEditingController();
   final _questionNo = TextEditingController();
+  final _reasonNote = TextEditingController();
 
   late final MediaStorage _media;
   late final PhotoCaptureService _capture;
@@ -72,6 +76,20 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   Set<DraftIssue> _issues = const {};
 
   bool get _editing => widget.editCardId != null;
+  bool get _bookMode => _origin == QuestionOrigin.book;
+
+  /// Kitaptan eklenen sorunun testi "çözüldü" olarak işaretlensin mi?
+  bool _markSolved = true;
+
+  /// Kaydedilmemiş emek var mı? (Çıkarken onay sormak için.)
+  bool get _dirty =>
+      _question != null ||
+      _solution != null ||
+      (!_editing &&
+          (_solutionText.text.trim().isNotEmpty ||
+              _note.text.trim().isNotEmpty ||
+              _reasonNote.text.trim().isNotEmpty ||
+              _reason != null));
 
   @override
   void initState() {
@@ -81,8 +99,12 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     if (_editing) {
       _loading = true;
       unawaited(_loadCard(widget.editCardId!));
-    } else {
+    } else if (widget.prefill != null) {
       _applyPrefill(widget.prefill);
+    } else {
+      // Kitabı olan biri için en sık yol: kitaptan, test ve soru no ile.
+      final hasBooks = ref.read(libraryProvider).value?.isNotEmpty ?? false;
+      _origin = hasBooks ? QuestionOrigin.book : QuestionOrigin.independent;
     }
   }
 
@@ -122,6 +144,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       _mebNodeId = card.mebNodeId;
       _testLabel = card.testLabel;
       _reason = card.reason;
+      _reasonNote.text = card.reasonNote ?? '';
       _difficulty = card.difficulty;
       _starred = card.isStarred;
       _source.text = card.sourceName == unknownSourceName ? '' : card.sourceName;
@@ -135,7 +158,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
 
   @override
   void dispose() {
-    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note, _questionNo]) {
+    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note, _questionNo, _reasonNote]) {
       c.dispose();
     }
     // Kaydedilmeden çıkıldıysa geçici dosyaları temizle (kaydedilenler zaten kalıcı depoda).
@@ -175,15 +198,33 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     final topics = _subject == null
         ? const <CurriculumNode>[]
         : depthFirst(curriculum.where((n) => n.subjectLabel == _subject));
+    final book = books.where((b) => b.id == _bookId).firstOrNull;
+    final test = book == null ? null : findNode(book, _contentNodeId);
+    final results = ref.watch(testResultsProvider).value ?? const <String, TestResult>{};
+    final testSolved = test != null && results.containsKey(test.id);
     final contextLine = [
-      if (_testLabel != null) _testLabel!,
+      if (_testLabel != null && !_bookMode) _testLabel!,
       if (_questionNo.text.trim().isNotEmpty) '${_questionNo.text.trim()}. soru',
     ].join(', ');
 
-    return Scaffold(
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final router = GoRouter.of(context);
+        if (await _confirmDiscard()) router.canPop() ? router.pop() : router.go(AppRoutes.home);
+      },
+      child: Scaffold(
       appBar: AppBar(
-        title: Text(_editing ? 'Soruyu tamamla' : 'Soru ekle'),
+        title: Text(_editing ? 'Soruyu düzenle' : 'Soru ekle'),
+        leading: IconButton(tooltip: 'Vazgeç', icon: const Icon(Icons.close_rounded), onPressed: _cancel),
         actions: [
+          if (_editing)
+            IconButton(
+              tooltip: 'Soruyu sil',
+              onPressed: _saving ? null : _delete,
+              icon: const Icon(Icons.delete_outline_rounded),
+            ),
           IconButton(
             tooltip: _starred ? 'Güzel Sorular klasöründen çıkar' : 'Güzel Sorular klasörüne ekle',
             onPressed: () => setState(() => _starred = !_starred),
@@ -218,6 +259,97 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
             selected: {_status},
             onSelectionChanged: (s) => setState(() => _status = s.first),
           ),
+          const _SectionTitle('Kaynak'),
+          SegmentedButton<QuestionOrigin>(
+            showSelectedIcon: false,
+            segments: [for (final o in QuestionOrigin.values) ButtonSegment(value: o, label: Text(o.label))],
+            selected: {_origin},
+            onSelectionChanged: (s) => setState(() {
+              final wasBook = _bookMode;
+              _origin = s.first;
+              if (wasBook && !_bookMode && _contentNodeId != null) {
+                // Kitaptan çıkınca testin bilgileri yanıltmasın.
+                _contentNodeId = null;
+                _testLabel = null;
+              }
+            }),
+          ),
+          if (_bookMode) ...[
+            const SizedBox(height: 12),
+            if (books.isEmpty)
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.library_add_outlined),
+                  title: const Text('Henüz kitap yok'),
+                  subtitle: const Text('Kitap ekleyince soruyu yalnızca test ve soru no ile eklersin.'),
+                  trailing: TextButton(onPressed: () => showLibrarySheet(context), child: const Text('Kitap ekle')),
+                ),
+              )
+            else ...[
+              DropdownMenu<String>(
+                key: ValueKey('book-$_bookId'),
+                initialSelection: _bookId,
+                expandedInsets: EdgeInsets.zero,
+                label: const Text('Kitap'),
+                dropdownMenuEntries: [for (final b in books) DropdownMenuEntry(value: b.id, label: b.title)],
+                onSelected: (id) => _selectBook(books.where((b) => b.id == id).firstOrNull),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 56),
+                        alignment: Alignment.centerLeft,
+                      ),
+                      onPressed: book == null ? null : () => _pickTest(book),
+                      icon: const Icon(Icons.format_list_numbered_rounded),
+                      label: Text(
+                        test?.title ?? 'Test seç',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: _NumberField(
+                      controller: _questionNo,
+                      label: 'Soru no',
+                      errorText: _issues.contains(DraftIssue.invalidQuestionNo) ? 'En az 1' : null,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                ],
+              ),
+              if (book != null && test != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    [
+                      nodeLabel(book, test.id),
+                      if (test.questionCount != null) '${test.questionCount} soru',
+                      if (testSolved) 'çözüldü',
+                    ].join(', '),
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ),
+                if (!testSolved && !_editing)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: _markSolved,
+                    onChanged: (v) => setState(() => _markSolved = v ?? false),
+                    title: const Text('Bu testi çözüldü olarak işaretle'),
+                  ),
+              ],
+            ],
+          ],
           const SizedBox(height: 16),
           Row(
             children: [
@@ -272,7 +404,20 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                   ),
               ],
             ),
+            if (_reason == MistakeReason.other)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: TextField(
+                  controller: _reasonNote,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    labelText: 'Nedenini kendi cümlenle yaz',
+                    hintText: 'Örn. Şekli yanlış çizdim',
+                  ),
+                ),
+              ),
           ],
+          if (!_bookMode) ...[
           const _SectionTitle('Ders ve konu'),
           DropdownMenu<String>(
             key: ValueKey('subject-$_subject'),
@@ -324,25 +469,8 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                   : 'Bu ders için konu listesi henüz yok; analizde nedenlere göre gruplanır.',
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
-          const _SectionTitle('Kaynak'),
-          SegmentedButton<QuestionOrigin>(
-            showSelectedIcon: false,
-            segments: [for (final o in QuestionOrigin.values) ButtonSegment(value: o, label: Text(o.label))],
-            selected: {_origin},
-            onSelectionChanged: (s) => setState(() => _origin = s.first),
-          ),
           const SizedBox(height: 12),
-          if (_origin == QuestionOrigin.book && books.isNotEmpty)
-            DropdownMenu<String>(
-              key: ValueKey('book-$_bookId'),
-              initialSelection: _bookId,
-              expandedInsets: EdgeInsets.zero,
-              label: const Text('Kitap'),
-              dropdownMenuEntries: [for (final b in books) DropdownMenuEntry(value: b.id, label: b.title)],
-              onSelected: (id) => _selectBook(books.where((b) => b.id == id).firstOrNull),
-            )
-          else
-            TextField(
+          TextField(
               controller: _source,
               decoration: InputDecoration(
                 labelText: _origin == QuestionOrigin.mockExam ? 'Deneme adı' : 'Kaynak',
@@ -364,6 +492,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               Expanded(child: _NumberField(controller: _testTotal, label: 'Testteki soru sayısı')),
             ],
           ),
+          ],
           const SizedBox(height: 8),
           Theme(
             data: theme.copyWith(dividerColor: Colors.transparent),
@@ -432,6 +561,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -440,11 +570,72 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     setState(() {
       final subject = subjectKey(book.examType, book.subject);
       if (subject != _subject) _mebNodeId = null;
-      if (book.id != _bookId) _contentNodeId = null;
+      if (book.id != _bookId) {
+        _contentNodeId = null;
+        _testLabel = null;
+      }
       _bookId = book.id;
       _source.text = book.title;
       _subject = subject;
     });
+  }
+
+  /// Test bilinince konu da bilinir: ders, konu ve test adı testten gelir.
+  Future<void> _pickTest(Book book) async {
+    final test = await pickBookTest(context, book);
+    if (test == null || !mounted) return;
+    setState(() {
+      _contentNodeId = test.id;
+      _mebNodeId = effectiveMeb(book, test.id);
+      _testLabel = nodeLabel(book, test.id);
+      _subject = subjectKey(book.examType, book.subject);
+      if (test.questionCount != null) _testTotal.text = '${test.questionCount}';
+    });
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_dirty) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Kaydetmeden çıkılsın mı?'),
+        content: const Text('Çektiğin fotoğraflar ve yazdıkların kaybolur.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Geri dön')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Çık')),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  Future<void> _cancel() async {
+    final router = GoRouter.of(context);
+    if (!await _confirmDiscard()) return;
+    router.canPop() ? router.pop() : router.go(AppRoutes.home);
+  }
+
+  Future<void> _delete() async {
+    final original = _original;
+    if (original == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Soruyu sil?'),
+        content: const Text('Soru, fotoğrafları ve tekrar geçmişi silinir. Bu geri alınamaz.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await ref.read(deleteQuestionCardProvider).call(original.id);
+    messenger.showSnackBar(const SnackBar(content: Text('Soru silindi.')));
+    // Düzenleme ekranı ve altındaki soru ayrıntısı birlikte kapanır.
+    router.go(AppRoutes.notebook);
   }
 
   Future<void> _pickPhoto({required bool solution}) async {
@@ -551,6 +742,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       testTotalQuestions: int.tryParse(_testTotal.text.trim()),
       avgSecondsPerQuestion: double.tryParse(_avgSeconds.text.trim()),
       reason: _status == QuestionStatus.correct ? null : _reason,
+      reasonNote: _reasonNote.text,
       difficulty: _difficulty,
       isStarred: _starred,
       note: _note.text,
@@ -558,6 +750,10 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   }
 
   Future<void> _save({required bool addAnother}) async {
+    if (_bookMode && _bookId == null && (ref.read(libraryProvider).value?.isNotEmpty ?? false)) {
+      _snack('Önce kitabı seç.');
+      return;
+    }
     final draft = _buildDraft();
     final issues = draft.validate();
     if (issues.isNotEmpty) {
@@ -585,6 +781,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       } else {
         saved = await ref.read(saveQuestionCardProvider).call(draft);
       }
+      // Kitaptan eklenen sorunun testi kitap haritasında "çözüldü" olur.
+      final bookId = _bookId;
+      final nodeId = _contentNodeId;
+      if (_bookMode && _markSolved && bookId != null && nodeId != null) {
+        await ref.read(testProgressRepositoryProvider).saveIfAbsent([
+          TestResult(nodeId: nodeId, bookId: bookId, solvedAt: saved.createdAt, sessionId: _sessionId),
+        ]);
+      }
       if (!mounted) return;
       final missing = saved.missingParts(topicAvailable: false);
       final hint = missing.isEmpty ? '' : ' Eksik: ${missing.map((m) => lowerTr(m.label)).join(', ')}.';
@@ -596,6 +800,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           _solutionText.clear();
           _note.clear();
           _questionNo.clear();
+          _reasonNote.clear();
           _reason = null;
           _starred = false;
           _difficulty = 5;

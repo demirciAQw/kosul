@@ -18,6 +18,7 @@ part 'app_database.g.dart';
   ReviewStates,
   MockExams,
   MockExamSections,
+  TestResults,
   AppMeta,
 ])
 class AppDatabase extends _$AppDatabase {
@@ -26,8 +27,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// v2: fotoğrafsız/çözümsüz kartlar, soru numarası, kitapsız oturum, denemeler.
   /// v3: testlerin kesin soru sayısı, planların tamamlanma tarihi.
+  /// v4: test ilerlemesi (çözüldü/çözülmedi), "Diğer" nedeni için açıklama.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -55,12 +57,23 @@ class AppDatabase extends _$AppDatabase {
               questionCards.testLabel,
               questionCards.sessionItemId,
               questionCards.mockExamId,
+              questionCards.reasonNote,
             ]));
             await _createV2Indexes();
           }
           if (from < 3) {
             await m.addColumn(contentNodes, contentNodes.questionCount);
             await m.addColumn(studyPlans, studyPlans.completedAt);
+          }
+          if (from < 4) {
+            await m.createTable(testResults);
+            // v2 geçişindeki alterTable güncel tanımı kurduğu için sütun zaten
+            // var olabilir; yalnızca eksikse ekle.
+            final cols = await customSelect('PRAGMA table_info(question_cards)').get();
+            if (!cols.any((c) => c.read<String>('name') == 'reason_note')) {
+              await m.addColumn(questionCards, questionCards.reasonNote);
+            }
+            await _createV2Indexes();
           }
         },
         beforeOpen: (details) async {
@@ -75,5 +88,6 @@ class AppDatabase extends _$AppDatabase {
     await customStatement('CREATE INDEX IF NOT EXISTS ix_cards_session ON question_cards(session_id)');
     await customStatement(
         'CREATE INDEX IF NOT EXISTS ix_mock_sections_exam ON mock_exam_sections(exam_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_cards_content_node ON question_cards(content_node_id)');
   }
 }

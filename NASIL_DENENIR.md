@@ -45,8 +45,12 @@ Actions kaydında "Sabit imza kullaniliyor." satırını görürsen imza çalı�
 5. **Defter → Eksikler**: optikten gelen soruların satırından tek dokunuşla neden ve fotoğraf ekle. Fotoğrafta köşeleri sürükleyerek kırp, gerekirse döndür.
 6. **Yeni oturum → Kitapsız**: ders seç, "Video" ya da "Konu çalışması" de, başlat. Bitirince sonuç sorulmaz.
 7. **Deneme** sekmesi: **Deneme ekle**, ders ders doğru ve yanlışı yaz; boş ve net kendiliğinden çıkar. Deneme sayfasında bir dersin **Yanlışları işaretle** düğmesiyle soruları deftere at.
-8. **Plan** sekmesi: **Yeni plan → Haftalık**, görev ekle ya da eklemeden oluştur; vazgeçmek için **Vazgeç**. Plan kartında **Tamamladım**, **Görev ekle** ve **Sil** (geri alınabilir); görevi silmek için sola kaydır.
-9. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
+8. **Kitaplar** sekmesi: kitaba dokun, kitap haritasını gör; bir testi kutucukla çözüldü yap; teste dokun → **Optikle işaretle**, işaretli numaraya dokununca soru açılır.
+9. Paragraf kitabından bir **ünitenin tamamını** seçip oturum başlat, bitince **Yanlışları işaretle**: form test test bölünmüş olmalı. Bir testi "Çözdüm" anahtarıyla kapat; kaydedince kitap haritasında yalnızca çözdüklerin işaretli olmalı.
+10. **Defter → Soru ekle → Kitap**: sadece kitap, test ve soru no sorulmalı. **Diğer** nedenini seçince açıklama alanı çıkmalı. Defterde bir soruya uzun bas, birkaç tane seç, sil.
+11. **Bugün → Geçmiş oturumlar**: bir oturumun süresini düzelt, sonuçlarını düzenle, sil.
+12. **Bugün → Planlarım**: **Yeni plan → Haftalık**, görev ekle ya da eklemeden oluştur; vazgeçmek için **Vazgeç**. Plan kartında **Tamamladım**, **Görev ekle** ve **Sil** (geri alınabilir); görevi silmek için sola kaydır.
+13. **Analiz** sekmesi: derslere göre örüntüler (en az 3 yanlış biriktiğinde), en çok yanlış yaptığın konu / neden ve tahmini kayıp süre.
 
 Not: Yeni eklenen yanlışlar **ertesi gün** tekrar listesine (Yanlışlarımı göster) düşer. İlk gün "bugün tekrar yok" görmen normaldir.
 

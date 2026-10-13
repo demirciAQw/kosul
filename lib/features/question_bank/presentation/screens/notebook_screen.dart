@@ -46,14 +46,36 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
     final groups = ref.watch(questionGroupsProvider);
     final due = ref.watch(dueCountProvider).value ?? 0;
     final incomplete = ref.watch(incompleteCountProvider);
+    final selection = ref.watch(questionSelectionProvider);
 
     // Filtre menüsünden "Temizle" ile metin de sıfırlandıysa arama kutusunu boşalt.
     ref.listen(questionFilterProvider, (prev, next) {
       if (next.text == null && prev?.text != null && _search.text.isNotEmpty) _search.clear();
     });
 
-    return Scaffold(
-      appBar: AppBar(
+    return PopScope(
+      canPop: selection.isEmpty,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) ref.read(questionSelectionProvider.notifier).clear();
+      },
+      child: Scaffold(
+      appBar: selection.isNotEmpty
+          ? AppBar(
+              leading: IconButton(
+                tooltip: 'Seçimi bırak',
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () => ref.read(questionSelectionProvider.notifier).clear(),
+              ),
+              title: Text('${selection.length} soru seçildi'),
+              actions: [
+                IconButton(
+                  tooltip: 'Seçilenleri sil',
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  onPressed: () => _deleteSelected(selection),
+                ),
+              ],
+            )
+          : AppBar(
         title: const Text('Defterim'),
         actions: [
           IconButton(
@@ -67,7 +89,7 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: selection.isNotEmpty ? null : FloatingActionButton.extended(
         heroTag: 'notebook-add',
         onPressed: () => context.push(AppRoutes.newQuestion),
         icon: const Icon(Icons.add_a_photo_outlined),
@@ -178,7 +200,27 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
           ),
         ],
       ),
+    ),
     );
+  }
+
+  Future<void> _deleteSelected(Set<String> ids) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text('${ids.length} soruyu sil?'),
+        content: const Text('Sorular, fotoğrafları ve tekrar geçmişleri silinir. Bu geri alınamaz.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final count = await ref.read(deleteQuestionCardProvider).many(ids);
+    ref.read(questionSelectionProvider.notifier).clear();
+    messenger.showSnackBar(SnackBar(content: Text('$count soru silindi.')));
   }
 }
 

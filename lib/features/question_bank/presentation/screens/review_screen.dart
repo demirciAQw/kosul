@@ -143,7 +143,7 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Neden yanlış yapmıştın: ${card.reason!.label}',
+                'Neden yanlış yapmıştın: ${card.reasonText}',
                 style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
             ),

@@ -18,6 +18,7 @@ class QuickMarkContext {
     this.mockExamId,
     this.testLabel,
     this.avgSecondsPerQuestion,
+    this.linkByTest = false,
   });
 
   final QuestionOrigin origin;
@@ -31,6 +32,11 @@ class QuickMarkContext {
   final String? mockExamId;
   final String? testLabel;
   final double? avgSecondsPerQuestion;
+
+  /// [contentNodeId] kitaptaki bir TEST ise true: kartlar oturumdan bağımsız
+  /// olarak "bu testin n. sorusu" diye eşlenir. Aynı test başka gün yeniden
+  /// işaretlenirse çift kart açılmaz, var olan güncellenir.
+  final bool linkByTest;
 }
 
 class QuickMarkSummary {
@@ -47,6 +53,15 @@ class QuickMarkSummary {
 
   /// İşareti kaldırıldığı hâlde fotoğraf/çözüm eklendiği için silinmeyen kartlar.
   final int kept;
+
+  QuickMarkSummary operator +(QuickMarkSummary o) => QuickMarkSummary(
+        created: created + o.created,
+        updated: updated + o.updated,
+        removed: removed + o.removed,
+        kept: kept + o.kept,
+      );
+
+  static const zero = QuickMarkSummary(created: 0, updated: 0, removed: 0, kept: 0);
 
   String get message {
     final parts = [
@@ -78,6 +93,9 @@ class QuickMarkQuestions {
   final Clock _clock;
 
   Future<List<QuestionCard>> _linked(QuickMarkContext ctx) {
+    if (ctx.linkByTest && ctx.contentNodeId != null) {
+      return _repository.findLinked(contentNodeId: ctx.contentNodeId);
+    }
     if (ctx.sessionItemId != null) return _repository.findLinked(sessionItemId: ctx.sessionItemId);
     if (ctx.mockExamId != null) {
       return _repository.findLinked(mockExamId: ctx.mockExamId, subject: ctx.subject);

@@ -127,3 +127,18 @@ final incompleteCountProvider =
 /// Denemelerden gelen yanlış ve boşlar (deneme analizinde konu bazlı net kaybı).
 final mockExamMistakesProvider = StreamProvider<List<QuestionCard>>(
     (ref) => ref.watch(questionCardRepositoryProvider).watchMockExamMistakes());
+
+/// Bir kitap testine bağlı kartlar (test ekranı).
+final cardsForNodeProvider = StreamProvider.family<List<QuestionCard>, String>(
+    (ref, nodeId) => ref.watch(questionCardRepositoryProvider).watchForNode(nodeId));
+
+/// Defter'de çoklu seçim (uzun bas → seç → sil).
+class QuestionSelection extends Notifier<Set<String>> {
+  @override
+  Set<String> build() => const {};
+
+  void toggle(String id) => state = state.contains(id) ? ({...state}..remove(id)) : {...state, id};
+  void clear() => state = const {};
+}
+
+final questionSelectionProvider = NotifierProvider<QuestionSelection, Set<String>>(QuestionSelection.new);

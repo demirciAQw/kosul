@@ -17,3 +17,5 @@ final createPlanProvider = Provider((ref) => CreatePlan(
 
 final addPlanTasksProvider =
     Provider((ref) => AddPlanTasks(ref.watch(planRepositoryProvider), ref.watch(idGeneratorProvider)));
+
+final editPlanProvider = Provider((ref) => EditPlan(ref.watch(planRepositoryProvider)));

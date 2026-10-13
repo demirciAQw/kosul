@@ -73,7 +73,7 @@ void main() {
     });
 
     test('optik sonucu sayıları kendiliğinden hesaplar', () {
-      const r = OpticFormResult(total: 16, marks: {3: QuestionStatus.wrong, 7: QuestionStatus.wrong, 9: QuestionStatus.blank});
+      final r = OpticFormResult.single(total: 16, marks: const {3: QuestionStatus.wrong, 7: QuestionStatus.wrong, 9: QuestionStatus.blank});
       expect(r.correct, 13);
       expect(r.wrong, 2);
       expect(r.blank, 1);

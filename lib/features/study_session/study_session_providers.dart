@@ -25,3 +25,7 @@ final pendingSessionsProvider = StreamProvider<List<StudySession>>(
 
 final sessionByIdProvider = StreamProvider.family<StudySession?, String>(
     (ref, id) => ref.watch(studySessionRepositoryProvider).watchById(id));
+
+/// Geçmiş oturumlar (bitmiş ve sonuç bekleyenler).
+final sessionHistoryProvider = StreamProvider<List<StudySession>>(
+    (ref) => ref.watch(studySessionRepositoryProvider).watchHistory());

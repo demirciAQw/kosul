@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/routes.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/di/core_providers.dart';
 import '../library/presentation/library_sheet.dart';
+import '../planning/domain/planning.dart';
+import '../planning/planning_providers.dart';
 import '../question_bank/question_bank_providers.dart';
 import '../study_session/domain/study_session.dart';
 import '../study_session/presentation/widgets/elapsed_clock.dart';
@@ -20,10 +23,23 @@ class HomeScreen extends ConsumerWidget {
     final pending = ref.watch(pendingSessionsProvider).value ?? const <StudySession>[];
     final due = ref.watch(dueCountProvider).value ?? 0;
     final incomplete = ref.watch(incompleteCountProvider);
+    final now = ref.watch(clockProvider)();
+    final plans = ref.watch(plansProvider).value ?? const <StudyPlan>[];
+    final activePlans = [for (final p in plans) if (!p.isCompleted && !p.isExpired(now)) p];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Koçum'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset('assets/icon/logo.png', width: 30, height: 30),
+            ),
+            const SizedBox(width: 10),
+            const Text('Koçum'),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Eksiklerini doldur',
@@ -35,9 +51,9 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Kitaplarım',
-            onPressed: () => showLibrarySheet(context),
-            icon: const Icon(Icons.menu_book_outlined),
+            tooltip: 'Geçmiş oturumlar',
+            onPressed: () => context.push(AppRoutes.sessions),
+            icon: const Icon(Icons.history_rounded),
           ),
         ],
       ),
@@ -81,11 +97,34 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.event_note_outlined, color: theme.colorScheme.primary),
+              title: const Text('Planlarım'),
+              subtitle: Text(
+                activePlans.isEmpty
+                    ? 'Süren plan yok; haftalık, aylık ya da yıllık plan oluştur'
+                    : activePlans
+                        .take(2)
+                        .map((p) => '${p.title}: ${p.doneCount}/${p.tasks.length} görev')
+                        .join('\n'),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => context.push(AppRoutes.plan),
+            ),
+          ),
+          const SizedBox(height: 8),
           ListTile(
             leading: const Icon(Icons.add_a_photo_outlined),
             title: const Text('Soru ekle'),
-            subtitle: const Text('Kitap dışı, deneme ya da Telegram sorusu'),
+            subtitle: const Text('Kitaptan test ve soru no ile ya da kitap dışı bir soru'),
             onTap: () => context.push(AppRoutes.newQuestion),
+          ),
+          ListTile(
+            leading: const Icon(Icons.history_rounded),
+            title: const Text('Geçmiş oturumlar'),
+            subtitle: const Text('Süreyi düzelt, sonuçları düzenle ya da sil'),
+            onTap: () => context.push(AppRoutes.sessions),
           ),
           ListTile(
             leading: const Icon(Icons.assignment_outlined),
