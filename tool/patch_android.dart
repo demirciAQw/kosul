@@ -96,13 +96,15 @@ void _patchGroovy(File file) {
 
 const _signingMarker = 'kocum-release-signing';
 
-void _patchSigningKts(File file) {
-  var s = file.readAsStringSync();
-  if (s.contains(_signingMarker)) return;
+   void _patchSigningKts(File file) {
+     var s = file.readAsStringSync();
+     if (s.contains(_signingMarker)) return;
+     // Kotlin DSL'de import dosyanın en başında olmalı.
+     s = 'import java.util.Properties\n\n$s';
 
   const header = '''
 // $_signingMarker: android/key.properties varsa sabit anahtarla imzala.
-val kocumKeystoreProperties = java.util.Properties()
+val kocumKeystoreProperties = Properties()
 val kocumKeystoreFile = rootProject.file("key.properties")
 if (kocumKeystoreFile.exists()) {
     kocumKeystoreFile.inputStream().use { kocumKeystoreProperties.load(it) }
