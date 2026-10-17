@@ -1,0 +1,46 @@
+#BOOK|MEB 11. Sınıf Fizik|AYT|Fizik|416
+U|1. Ünite: Kuvvet ve Hareket|12|149
+K|1.1 Serbest Düşme|16
+A|1.1.1 Serbest Düşen Cisimler|16
+A|1.1.2 Serbest Düşme Hareketi ile İlgili Veriler|20
+K|1.2 İki Boyutta Sabit İvmeli Hareket|30
+K|1.3 Newton'ın Hareket Yasaları|40
+A|1.3.1 Bileşke Kuvvet ve Hareket Arasındaki İlişki|40
+A|1.3.2 Serbest Cisim Diyagramı|53
+K|1.4 Sürtünme Kuvveti|65
+A|1.4.1 Statik ve Kinetik Sürtünme Kuvvetleri|65
+A|1.4.2 Sürtünme Kuvvetinin Bağlı Olduğu Değişkenler|70
+K|1.5 Limit Hız|86
+K|1.6 Düzgün Çembersel Hareket|95
+A|1.6.1 Çembersel Harekette Yörünge ve Hız Kavramları|95
+A|1.6.2 Çembersel Hareketin Değişkenleri|101
+U|2. Ünite: Elektrik ve Manyetizma|150|297
+K|2.1 Elektriksel Kuvvet ve Elektriksel Alan|155
+A|2.1.1 Elektriksel Kuvvet|155
+A|2.1.2 Elektriksel Alan|166
+A|2.1.3 Faraday Kafesi|178
+K|2.2 Manyetik Alan ve Manyetik Kuvvet|186
+A|2.2.1 Manyetik Alan|186
+A|2.2.2 Üzerinden Akım Geçen Düz İletken Telin Manyetik Alanı|198
+A|2.2.3 Akım Makarasının Manyetik Alanı|207
+A|2.2.4 Elektromıknatısların Kullanım Alanları|213
+A|2.2.5 Manyetik Alanda Üzerinden Akım Geçen Düz Bir Tele Etki Eden Kuvvet|218
+A|2.2.6 Manyetik Alanda Üzerinden Akım Geçen Dikdörtgen Tele Bir Eksen Etrafında Dönmesi|229
+K|2.3 İndüksiyon Akımı|236
+A|2.3.1 Manyetik Akı|236
+A|2.3.2 İndüksiyon Gerilimi|242
+A|2.3.3 Alternatif Akım|253
+K|2.4 Transformatörler|263
+U|3. Ünite: Optik|298|407
+K|3.1 Işık Şiddeti, Işık Akısı ve Aydınlanma|302
+K|3.2 Düzlem Aynalar|312
+K|3.3 Küresel Aynalar|323
+A|3.3.1 Küresel Ayna Çeşitleri ve Özellikleri|323
+A|3.3.2 Küresel Aynalarda Görüntü Oluşumu|333
+K|3.4 Kırılma|343
+K|3.5 Görünür Derinlik|354
+K|3.6 Fiber Optik|361
+K|3.7 Prizmalar|367
+K|3.8 Mercekler|373
+A|3.8.1 Merceklerin Özellikleri|373
+A|3.8.2 Merceklerde Görüntü Oluşumu|381

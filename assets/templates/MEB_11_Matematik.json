@@ -1,0 +1,175 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "MEB 11. Sınıf Matematik",
+  "publisher": "MEB",
+  "examType": "AYT",
+  "subject": "Matematik",
+  "pageCount": 378,
+  "avgQuestionsPerPage": 3
+ },
+ "units": [
+  {
+   "title": "1. Tema: İstatistiksel Araştırma Süreci",
+   "pageStart": 12,
+   "pageEnd": 71,
+   "children": [
+    {
+     "title": "Ön Değerlendirme",
+     "pageStart": 14,
+     "pageEnd": 16
+    },
+    {
+     "title": "1.1 İki Nicel Değişkenli Veriler",
+     "pageStart": 17,
+     "pageEnd": 55
+    },
+    {
+     "title": "1.2 Başkaları Tarafından Oluşturulan İki Nicel Değişkenli Verileri İnceleme",
+     "pageStart": 56,
+     "pageEnd": 63
+    },
+    {
+     "title": "1. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 64,
+     "pageEnd": 71
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Geometrik Şekiller",
+   "pageStart": 72,
+   "pageEnd": 171,
+   "children": [
+    {
+     "title": "Ön Değerlendirme",
+     "pageStart": 74,
+     "pageEnd": 76
+    },
+    {
+     "title": "2.1 Dörtgenlerin Özellikleri",
+     "pageStart": 77,
+     "pageEnd": 121
+    },
+    {
+     "title": "2.2 Özel Dörtgenler Arasındaki İlişkiler",
+     "pageStart": 122,
+     "pageEnd": 127
+    },
+    {
+     "title": "2.3 Çokgenlerin Sınıflandırılması",
+     "pageStart": 128,
+     "pageEnd": 132
+    },
+    {
+     "title": "2.4 Dışbükey Çokgenlerin Özellikleri",
+     "pageStart": 133,
+     "pageEnd": 153
+    },
+    {
+     "title": "2.5 Çokgenlerle İlgili Problemler",
+     "pageStart": 154,
+     "pageEnd": 163
+    },
+    {
+     "title": "2. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 164,
+     "pageEnd": 171
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Niceliker ve Değişimler (1)",
+   "pageStart": 172,
+   "pageEnd": 243,
+   "children": [
+    {
+     "title": "Ön Değerlendirme",
+     "pageStart": 174,
+     "pageEnd": 176
+    },
+    {
+     "title": "3.1 Trigonometrik Fonksiyonlar ve Nitel Özellikleri",
+     "pageStart": 177,
+     "pageEnd": 227
+    },
+    {
+     "title": "3.2 Trigonometrik Fonksiyonlarla İfade Edilebilen Denklemler İçeren Problemler",
+     "pageStart": 228,
+     "pageEnd": 237
+    },
+    {
+     "title": "3. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 238,
+     "pageEnd": 243
+    }
+   ]
+  },
+  {
+   "title": "4. Tema: Niceliker ve Değişimler (2)",
+   "pageStart": 244,
+   "pageEnd": 321,
+   "children": [
+    {
+     "title": "Ön Değerlendirme",
+     "pageStart": 246,
+     "pageEnd": 247
+    },
+    {
+     "title": "4.1 Üstel Fonksiyonlar ve Nitel Özellikleri",
+     "pageStart": 248,
+     "pageEnd": 266
+    },
+    {
+     "title": "4.2 Üstel Fonksiyonların Ters Fonksiyonları",
+     "pageStart": 267,
+     "pageEnd": 278
+    },
+    {
+     "title": "4.3 Logaritmik Fonksiyonlar ve Nitel Özellikleri",
+     "pageStart": 279,
+     "pageEnd": 302
+    },
+    {
+     "title": "4.4 Üstel ve Logaritmik Fonksiyonlarla İfade Edilebilen Denklem ve Eşitsizlikler İçeren Problemler",
+     "pageStart": 303,
+     "pageEnd": 315
+    },
+    {
+     "title": "4. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 316,
+     "pageEnd": 321
+    }
+   ]
+  },
+  {
+   "title": "5. Tema: Niceliker ve Değişimler (3)",
+   "pageStart": 322,
+   "pageEnd": 372,
+   "children": [
+    {
+     "title": "Ön Değerlendirme",
+     "pageStart": 324,
+     "pageEnd": 326
+    },
+    {
+     "title": "5.1 Fonksiyonların Bileşkesi",
+     "pageStart": 327,
+     "pageEnd": 352
+    },
+    {
+     "title": "5.2 Fonksiyonlarda Dört İşlem",
+     "pageStart": 353,
+     "pageEnd": 364
+    },
+    {
+     "title": "5. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 365,
+     "pageEnd": 372
+    }
+   ]
+  }
+ ]
+}

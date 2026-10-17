@@ -1,0 +1,343 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "MEB 11. Sınıf Kimya",
+  "publisher": "MEB",
+  "examType": "AYT",
+  "subject": "Kimya",
+  "pageCount": 326,
+  "avgQuestionsPerPage": 3
+ },
+ "units": [
+  {
+   "title": "1. Tema: Etkileşim",
+   "pageStart": 12,
+   "pageEnd": 117,
+   "children": [
+    {
+     "title": "1.1 Enerji",
+     "pageStart": 15,
+     "pageEnd": 47,
+     "children": [
+      {
+       "title": "1.1.1 Tepkimelerde Meydana Gelen Enerji Değişimi",
+       "pageStart": 15,
+       "pageEnd": 22
+      },
+      {
+       "title": "1.1.2 Maddelerin Enerji Kaynağı Olma Potansiyeli",
+       "pageStart": 23,
+       "pageEnd": 27
+      },
+      {
+       "title": "1.1.3 Bağ Enerjileriyle Tepkime Entalpisinin Hesaplanması",
+       "pageStart": 28,
+       "pageEnd": 37
+      },
+      {
+       "title": "1.1.4 Standart Oluşum Entalpisi",
+       "pageStart": 38,
+       "pageEnd": 42
+      },
+      {
+       "title": "1.1.5 Standart Tepkime Entalpisi",
+       "pageStart": 43,
+       "pageEnd": 47
+      }
+     ]
+    },
+    {
+     "title": "1.2 Kimyasal Tepkimelerde Hız",
+     "pageStart": 48,
+     "pageEnd": 117,
+     "children": [
+      {
+       "title": "1.2.1 Kimyasal Tepkimelerin Gerçekleşmesi İçin Gerekli Şartlar",
+       "pageStart": 48,
+       "pageEnd": 53
+      },
+      {
+       "title": "1.2.1.a Çarpışma Teorisi",
+       "pageStart": 54,
+       "pageEnd": 54
+      },
+      {
+       "title": "1.2.1.b Aktivasyon Enerjisi",
+       "pageStart": 55,
+       "pageEnd": 59
+      },
+      {
+       "title": "1.2.2 Tepken ve Ürün Derişimleriyle Ortalama Tepkime Hızlarının Hesaplanması",
+       "pageStart": 60,
+       "pageEnd": 63
+      },
+      {
+       "title": "1.2.2.a Ortalama Tepkime Hızı",
+       "pageStart": 64,
+       "pageEnd": 69
+      },
+      {
+       "title": "1.2.3 Tepkime Hızına Etki Eden Faktörler",
+       "pageStart": 70,
+       "pageEnd": 71
+      },
+      {
+       "title": "1.2.3.a Tepkime Hızına Madde Cinsinin Etkisi",
+       "pageStart": 72,
+       "pageEnd": 73
+      },
+      {
+       "title": "1.2.3.b Tepkime Hızına Maddenin Fiziksel Hâlinin Etkisi",
+       "pageStart": 74,
+       "pageEnd": 75
+      },
+      {
+       "title": "1.2.3.c Tepkime Hızına Derişimin Etkisi",
+       "pageStart": 76,
+       "pageEnd": 78
+      },
+      {
+       "title": "1.2.3.ç Tepkime Hızına Sıcaklığın Etkisi",
+       "pageStart": 79,
+       "pageEnd": 81
+      },
+      {
+       "title": "1.2.3.d Tepkime Hızına Katalizörün Etkisi",
+       "pageStart": 82,
+       "pageEnd": 84
+      },
+      {
+       "title": "1.2.3.e Tepkime Hızına Temas Yüzeyinin Etkisi",
+       "pageStart": 85,
+       "pageEnd": 88
+      },
+      {
+       "title": "1.2.4 Kimyasal Tepkimelerin Hız Denklemi",
+       "pageStart": 89,
+       "pageEnd": 95
+      },
+      {
+       "title": "1.2.4.a Çok Basamaklı Tepkimeler",
+       "pageStart": 96,
+       "pageEnd": 117
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Çeşitlilik",
+   "pageStart": 118,
+   "pageEnd": 281,
+   "children": [
+    {
+     "title": "2.1 Denge",
+     "pageStart": 121,
+     "pageEnd": 178,
+     "children": [
+      {
+       "title": "2.1.1 Tersinir Tepkimelerin Özellikleri",
+       "pageStart": 121,
+       "pageEnd": 129
+      },
+      {
+       "title": "2.1.2 Fiziksel ve Kimyasal Değişimlerde Denge",
+       "pageStart": 130,
+       "pageEnd": 134
+      },
+      {
+       "title": "2.1.2.a Dengeye Gelme Sürecinde İleri ve Geri Tepkime Hızları",
+       "pageStart": 135,
+       "pageEnd": 138
+      },
+      {
+       "title": "2.1.3 Denge Sabiti İfadesinin Yazılması",
+       "pageStart": 139,
+       "pageEnd": 148
+      },
+      {
+       "title": "2.1.4 Tepkime Oranı",
+       "pageStart": 149,
+       "pageEnd": 156
+      },
+      {
+       "title": "2.1.5 Dengeyi Etkileyen Faktörler",
+       "pageStart": 157,
+       "pageEnd": 163
+      },
+      {
+       "title": "2.1.5.a Le Chatelier İlkesi",
+       "pageStart": 164,
+       "pageEnd": 164
+      },
+      {
+       "title": "2.1.5.b Derişimin Dengeye Etkisi",
+       "pageStart": 164,
+       "pageEnd": 167
+      },
+      {
+       "title": "2.1.5.c Hacmin Dengeye Etkisi",
+       "pageStart": 168,
+       "pageEnd": 170
+      },
+      {
+       "title": "2.1.5.ç Basıncın Dengeye Etkisi",
+       "pageStart": 171,
+       "pageEnd": 173
+      },
+      {
+       "title": "2.1.5.d Sıcaklığın Dengeye Etkisi",
+       "pageStart": 174,
+       "pageEnd": 176
+      },
+      {
+       "title": "2.1.5.e Katalizörün Dengeye Etkisi",
+       "pageStart": 177,
+       "pageEnd": 178
+      }
+     ]
+    },
+    {
+     "title": "2.2 Asit ve Baz Çözeltilerinde Denge",
+     "pageStart": 179,
+     "pageEnd": 245,
+     "children": [
+      {
+       "title": "2.2.1 Saf Suyun Otoiyonizasyonu",
+       "pageStart": 179,
+       "pageEnd": 183
+      },
+      {
+       "title": "2.2.2 Asit-Baz Teorilerinin Karşılaştırılması",
+       "pageStart": 184,
+       "pageEnd": 191
+      },
+      {
+       "title": "2.2.2.a Amfoter Oksitlerin Asidik Özelliği",
+       "pageStart": 192,
+       "pageEnd": 194
+      },
+      {
+       "title": "2.2.3 Asitlerin ve Bazların Kuvveti",
+       "pageStart": 195,
+       "pageEnd": 206
+      },
+      {
+       "title": "2.2.4 Kuvvetli Asit-Zayıf Asit ve Kuvvetli Baz-Zayıf Baz Sulu Çözeltilerindeki pH Hesaplamaları",
+       "pageStart": 207,
+       "pageEnd": 218
+      },
+      {
+       "title": "2.2.5 Kuvvetli Asit ve Kuvvetli Bazların Nötralleşme Tepkimeleri",
+       "pageStart": 219,
+       "pageEnd": 232
+      },
+      {
+       "title": "2.2.6 Kuvvetli Asit-Kuvvetli Baz Titrasyonları",
+       "pageStart": 233,
+       "pageEnd": 235
+      },
+      {
+       "title": "2.2.6.a Kuvvetli Asit-Kuvvetli Baz Titrasyon Eğrisi",
+       "pageStart": 236,
+       "pageEnd": 238
+      },
+      {
+       "title": "2.2.7 Asidik ve Bazik Ürünlerin Seçiminde Dikkat Edilmesi Gerekenler",
+       "pageStart": 239,
+       "pageEnd": 241
+      },
+      {
+       "title": "2.2.7.a Mide Sağlığı için Uygun Ürünlerin Seçimi",
+       "pageStart": 242,
+       "pageEnd": 242
+      },
+      {
+       "title": "2.2.7.b Ağız ve Diş Sağlığı için Uygun Ürünlerin Seçimi",
+       "pageStart": 242,
+       "pageEnd": 242
+      },
+      {
+       "title": "2.2.7.c Cilt Sağlığı için Uygun Ürünlerin Seçimi",
+       "pageStart": 243,
+       "pageEnd": 245
+      }
+     ]
+    },
+    {
+     "title": "2.3 Çözünürlük Dengesi",
+     "pageStart": 246,
+     "pageEnd": 281,
+     "children": [
+      {
+       "title": "2.3.1 Suda Az Çözünen Tuzların Molar Çözünürlükleri",
+       "pageStart": 246,
+       "pageEnd": 252
+      },
+      {
+       "title": "2.3.2 Suda Az Çözünen Tuzların Çözünürlüğüne Etki Eden Faktörler",
+       "pageStart": 253,
+       "pageEnd": 255
+      },
+      {
+       "title": "2.3.2.a Sıcaklığın Etkisi",
+       "pageStart": 256,
+       "pageEnd": 256
+      },
+      {
+       "title": "2.3.2.b Ortak İyon Etkisi",
+       "pageStart": 257,
+       "pageEnd": 281
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Nanoteknoloji ve Sürdürülebilirlik",
+   "pageStart": 282,
+   "pageEnd": 325,
+   "children": [
+    {
+     "title": "3.1 Nanoteknoloji ve Sürdürülebilirlik",
+     "pageStart": 285,
+     "pageEnd": 325,
+     "children": [
+      {
+       "title": "3.1.1 Yeşil Hidrojen Enerjisi",
+       "pageStart": 285,
+       "pageEnd": 290
+      },
+      {
+       "title": "3.1.1.a Evsel Atıklardan Fermantasyonla Hidrojen Gazı Üretiminde Hidrojen Gazı Miktarına Etki Eden Faktörler",
+       "pageStart": 291,
+       "pageEnd": 295
+      },
+      {
+       "title": "3.1.2 Nanoteknolojik Ürünlerin Potansiyel Faydaları ve Olası Zararları",
+       "pageStart": 296,
+       "pageEnd": 303
+      },
+      {
+       "title": "3.1.3 Mikroplastikler ve Nanoplastikler",
+       "pageStart": 304,
+       "pageEnd": 306
+      },
+      {
+       "title": "3.1.3.a Mikroplastik ve Nanoplastiklerin Oluşumu",
+       "pageStart": 307,
+       "pageEnd": 307
+      },
+      {
+       "title": "3.1.3.b Mikroplastik ve Nanoplastiklerin Etkileri",
+       "pageStart": 307,
+       "pageEnd": 325
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

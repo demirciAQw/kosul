@@ -1,0 +1,59 @@
+#BOOK|MEB 11. Sınıf Biyoloji|AYT|Biyoloji|241
+U|1. Tema: Tepki|12|141
+K|1.1 Farklı Canlıların Uyarılara Karşı Oluşturduğu Tepki Mekanizmaları|14
+A|1.1.1 Farklı Canlıların Uyarılara Karşı Oluşturduğu Tepkiler|18
+K|1.2 Bitkisel Hormonların Etkileri|20
+A|1.2.1 Bitkisel Hormonlar|24
+K|1.3 Bitkilerdeki Tepki Mekanizmaları|28
+A|1.3.1 Bitkilerde Tropizma ve Nasti Hareketleri|32
+A|1.3.1.a Tropizma (Yönelim) Hareketleri|32
+A|1.3.1.b Nasti (Irgınlık, İrkilme) Hareketleri|32
+K|1.4 Bitkilerde Yönelme Hareketleri|34
+A|1.4.1 Bitkilerde Yönelme Hareketleri|39
+K|1.5 Duyu Reseptörleri ve Duyu Organları|42
+A|1.5.1 Uyarıların Alınması|49
+A|1.5.2 Nöronların Yapısı|49
+A|1.5.2.a Nöronlarda Sinyal İletimi ve Sinaps|50
+A|1.5.3 Duyu Organları|52
+K|1.6 Hayvanlarda Sinir Sistemi Farklılıkları|64
+A|1.6.1 Hayvanlarda Sinir Sistemi Farklılıkları|70
+K|1.7 İnsanda Sinir Sistemi|72
+A|1.7.1 İnsan Sinir Sisteminin Yapısı|76
+K|1.8 Refleks Mekanizması|84
+A|1.8.1 Refleksler|86
+K|1.9 Harekete Dayalı Tepki|88
+A|1.9.1 Kemik, Eklem ve Kasların Hareketlerindeki Rolü|90
+A|1.9.2 Kemik ve Kasların Birlikte Çalışma İlişkisi|96
+K|1.10 İskelet Kaslarının Kasılma ve Gevşeme Mekanizması|100
+A|1.10.1 Kaslarda Kasılmanın Kontrolü|103
+A|1.10.2 Kaslarda Kasılma Mekanizması|104
+K|1.11 Bağışıklık Sistemi|106
+A|1.11.1 Bağışıklık|110
+A|1.11.1.a Doğal Bağışıklık|110
+A|1.11.1.b Kazanılmış Bağışıklık|112
+K|1.12 Alerjik Tepkiler|116
+A|1.12.1 Alerji|118
+U|2. Tema: Homeostazi|142|236
+K|2.1 Homeostazinin Canlılar İçin Önemi|144
+A|2.1.1 Farklı Canlı Türlerindeki Homeostatik Yapı ve Sistemler|147
+K|2.2 Homeostatik Süreçler|150
+A|2.2.1 Homeostatik Süreçler|152
+K|2.3 Pozitif ve Negatif Geri Bildirim|156
+A|2.3.1 Pozitif ve Negatif Geri Bildirim|159
+K|2.4 Homeostazinin Sağlanmasında Sinir Sisteminin Etkileri|162
+A|2.4.1 Sinir Sistemi ve Homeostazi|165
+K|2.5 Endokrin Sisteminin Homeostazi İşlevi|168
+A|2.5.1 Endokrin Sistem ve Homeostazi|172
+K|2.6 Dolaşım Sistemi ve Homeostazi Arasındaki İlişki|182
+A|2.6.1 Dolaşım Sistemi ve Homeostazi|186
+K|2.7 Solunum Sisteminin Homeostazinin Sağlanmasındaki Rolü|190
+A|2.7.1 Solunum Sistemi ve Homeostazi|193
+K|2.8 Boşaltım Sisteminin Homeostazi İşlevi|198
+A|2.8.1 Boşaltım Sistemi ve Homeostazi|200
+K|2.9 Homeostazinin Sağlanmasında Sistemlerin Eş Güdümlü Çalışması|204
+A|2.9.1 Sistemlerin Eş Güdümlü Çalışması|207
+K|2.10 Homeostazinin Sağlanamadığı Durumlarda Oluşabilecek Sağlık Problemleri|213
+A|2.10.1.a Diabetes Mellitus (Şeker Hastalığı)|213
+A|2.10.1.b Diabetes İnsipidus (Ozmotik Denge Bozukluğu)|214
+A|2.10.1.c Kan Basıncı Anormallikleri|214
+A|2.10.1.ç Obezite|215

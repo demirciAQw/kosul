@@ -1,0 +1,283 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "MEB 11. Sınıf Türk Dili ve Edebiyatı",
+  "publisher": "MEB",
+  "examType": "AYT",
+  "subject": "Edebiyat",
+  "pageCount": 312,
+  "avgQuestionsPerPage": 3
+ },
+ "units": [
+  {
+   "title": "1. Tema: Bir Diyeceğim Var!",
+   "pageStart": 12,
+   "pageEnd": 83,
+   "children": [
+    {
+     "title": "Metin Tahlili-1 (Anlama): Okuma",
+     "pageStart": 15,
+     "pageEnd": 17
+    },
+    {
+     "title": "Karagöz Oyunu (Yazıcı)",
+     "pageStart": 18,
+     "pageEnd": 35
+    },
+    {
+     "title": "Metin Tahlili-2 (Anlama): Okuma",
+     "pageStart": 36,
+     "pageEnd": 36
+    },
+    {
+     "title": "Mektup (Ali'ye Mektuplar)",
+     "pageStart": 37,
+     "pageEnd": 50
+    },
+    {
+     "title": "Dilekçe",
+     "pageStart": 51,
+     "pageEnd": 52
+    },
+    {
+     "title": "Edebiyat Atölyesi-1 (Anlatma): Konuşma",
+     "pageStart": 53,
+     "pageEnd": 53
+    },
+    {
+     "title": "Sözlü İletişim Engellerini Konu Alan Bir Drama Sergileyebilme",
+     "pageStart": 53,
+     "pageEnd": 58
+    },
+    {
+     "title": "Metin Tahlili-3 (Anlama): Dinleme / İzleme",
+     "pageStart": 59,
+     "pageEnd": 63
+    },
+    {
+     "title": "Değişen İletişim Araçlarının Hayatımızdaki Yeri",
+     "pageStart": 64,
+     "pageEnd": 73
+    },
+    {
+     "title": "Edebiyat Atölyesi-2 (Anlatma): Yazma",
+     "pageStart": 74,
+     "pageEnd": 74
+    },
+    {
+     "title": "E-Posta Yazabilme",
+     "pageStart": 75,
+     "pageEnd": 78
+    },
+    {
+     "title": "1. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 79,
+     "pageEnd": 83
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Kültür Yolculuğu",
+   "pageStart": 84,
+   "pageEnd": 159,
+   "children": [
+    {
+     "title": "Metin Tahlili-1 (Anlama): Okuma",
+     "pageStart": 88,
+     "pageEnd": 89
+    },
+    {
+     "title": "Hikâye (Oğulla Buluşma)",
+     "pageStart": 90,
+     "pageEnd": 107
+    },
+    {
+     "title": "Anı (Eski İstanbul'dan Çizgiler)",
+     "pageStart": 108,
+     "pageEnd": 112
+    },
+    {
+     "title": "Metin Tahlili-2 (Anlama): Okuma",
+     "pageStart": 113,
+     "pageEnd": 113
+    },
+    {
+     "title": "Orhun Abideleri",
+     "pageStart": 114,
+     "pageEnd": 124
+    },
+    {
+     "title": "Divânu Lügâti't-Türk",
+     "pageStart": 125,
+     "pageEnd": 128
+    },
+    {
+     "title": "Edebiyat Atölyesi-1 (Anlatma): Konuşma",
+     "pageStart": 129,
+     "pageEnd": 129
+    },
+    {
+     "title": "Türk Kültürünün Özelliklerini Yansıtan Bir Konuşma Yapabilme",
+     "pageStart": 130,
+     "pageEnd": 135
+    },
+    {
+     "title": "Metin Tahlili-3 (Anlama): Dinleme / İzleme",
+     "pageStart": 136,
+     "pageEnd": 139
+    },
+    {
+     "title": "Âşık Atışması (Murat Çobanoğlu - Şeref Taşlıova Atışması)",
+     "pageStart": 140,
+     "pageEnd": 147
+    },
+    {
+     "title": "Edebiyat Atölyesi-2 (Anlatma): Yazma",
+     "pageStart": 148,
+     "pageEnd": 149
+    },
+    {
+     "title": "Çevrim İçi Müze Gezisiyle İlgili İzlenimleri Yazabilme",
+     "pageStart": 150,
+     "pageEnd": 154
+    },
+    {
+     "title": "2. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 155,
+     "pageEnd": 159
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Yaşamın İzinde",
+   "pageStart": 160,
+   "pageEnd": 235,
+   "children": [
+    {
+     "title": "Metin Tahlili-1 (Anlama): Okuma",
+     "pageStart": 164,
+     "pageEnd": 166
+    },
+    {
+     "title": "Roman (Huzur)",
+     "pageStart": 167,
+     "pageEnd": 193
+    },
+    {
+     "title": "Metin Tahlili-2 (Anlama): Okuma",
+     "pageStart": 194,
+     "pageEnd": 194
+    },
+    {
+     "title": "Biyografi (Mehmet Akif Ersoy)",
+     "pageStart": 195,
+     "pageEnd": 205
+    },
+    {
+     "title": "Tezkire (Usülü)",
+     "pageStart": 206,
+     "pageEnd": 209
+    },
+    {
+     "title": "Edebiyat Atölyesi-1 (Anlatma): Konuşma",
+     "pageStart": 210,
+     "pageEnd": 210
+    },
+    {
+     "title": "Mülakat (Seçilen Roman Kişisiyle Romanın Bağlamına Uygun Hayal Bir Mülakat Yapabilme)",
+     "pageStart": 211,
+     "pageEnd": 214
+    },
+    {
+     "title": "Metin Tahlili-3 (Anlama): Dinleme / İzleme",
+     "pageStart": 215,
+     "pageEnd": 215
+    },
+    {
+     "title": "Radyo Tiyatrosu (Direnişin Ustaları)",
+     "pageStart": 216,
+     "pageEnd": 224
+    },
+    {
+     "title": "Edebiyat Atölyesi-2 (Anlatma): Yazma",
+     "pageStart": 225,
+     "pageEnd": 225
+    },
+    {
+     "title": "Dinlenen / İzlenen Metinden Seçilen Bir Diyaloğu Bağlama Uygun Olarak Başka Bir Türe Dönüştürebilme",
+     "pageStart": 226,
+     "pageEnd": 229
+    },
+    {
+     "title": "3. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 230,
+     "pageEnd": 235
+    }
+   ]
+  },
+  {
+   "title": "4. Tema: Hayatın Aynası",
+   "pageStart": 236,
+   "pageEnd": 307,
+   "children": [
+    {
+     "title": "Metin Tahlili-1 (Anlama): Okuma",
+     "pageStart": 240,
+     "pageEnd": 242
+    },
+    {
+     "title": "Tiyatro (Ben, Mimar Sinan)",
+     "pageStart": 243,
+     "pageEnd": 262
+    },
+    {
+     "title": "Metin Tahlili-2 (Anlama): Okuma",
+     "pageStart": 263,
+     "pageEnd": 264
+    },
+    {
+     "title": "Küçük Hikâye (Merdiven)",
+     "pageStart": 265,
+     "pageEnd": 279
+    },
+    {
+     "title": "Edebiyat Atölyesi-1 (Anlatma): Konuşma",
+     "pageStart": 280,
+     "pageEnd": 280
+    },
+    {
+     "title": "Tiyatro Metnini Canlandırarak Konuşma Becerisini Geliştirebilme",
+     "pageStart": 281,
+     "pageEnd": 283
+    },
+    {
+     "title": "Metin Tahlili-3 (Anlama): Dinleme / İzleme",
+     "pageStart": 284,
+     "pageEnd": 284
+    },
+    {
+     "title": "Belgesel (Anadolu İnsanı / Fedakârlık)",
+     "pageStart": 285,
+     "pageEnd": 297
+    },
+    {
+     "title": "Edebiyat Atölyesi-2 (Anlatma): Yazma",
+     "pageStart": 298,
+     "pageEnd": 298
+    },
+    {
+     "title": "Dinlenen / İzlenen Belgesele Yönelik Özgün Bir Afiş Hazırlayabilme",
+     "pageStart": 299,
+     "pageEnd": 302
+    },
+    {
+     "title": "4. Tema Ölçme ve Değerlendirme Soruları",
+     "pageStart": 303,
+     "pageEnd": 307
+    }
+   ]
+  }
+ ]
+}

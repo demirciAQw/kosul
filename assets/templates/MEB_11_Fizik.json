@@ -1,0 +1,264 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "MEB 11. Sınıf Fizik",
+  "publisher": "MEB",
+  "examType": "AYT",
+  "subject": "Fizik",
+  "pageCount": 416,
+  "avgQuestionsPerPage": 3
+ },
+ "units": [
+  {
+   "title": "1. Ünite: Kuvvet ve Hareket",
+   "pageStart": 12,
+   "pageEnd": 149,
+   "children": [
+    {
+     "title": "1.1 Serbest Düşme",
+     "pageStart": 16,
+     "pageEnd": 29,
+     "children": [
+      {
+       "title": "1.1.1 Serbest Düşen Cisimler",
+       "pageStart": 16,
+       "pageEnd": 19
+      },
+      {
+       "title": "1.1.2 Serbest Düşme Hareketi ile İlgili Veriler",
+       "pageStart": 20,
+       "pageEnd": 29
+      }
+     ]
+    },
+    {
+     "title": "1.2 İki Boyutta Sabit İvmeli Hareket",
+     "pageStart": 30,
+     "pageEnd": 39
+    },
+    {
+     "title": "1.3 Newton'ın Hareket Yasaları",
+     "pageStart": 40,
+     "pageEnd": 64,
+     "children": [
+      {
+       "title": "1.3.1 Bileşke Kuvvet ve Hareket Arasındaki İlişki",
+       "pageStart": 40,
+       "pageEnd": 52
+      },
+      {
+       "title": "1.3.2 Serbest Cisim Diyagramı",
+       "pageStart": 53,
+       "pageEnd": 64
+      }
+     ]
+    },
+    {
+     "title": "1.4 Sürtünme Kuvveti",
+     "pageStart": 65,
+     "pageEnd": 85,
+     "children": [
+      {
+       "title": "1.4.1 Statik ve Kinetik Sürtünme Kuvvetleri",
+       "pageStart": 65,
+       "pageEnd": 69
+      },
+      {
+       "title": "1.4.2 Sürtünme Kuvvetinin Bağlı Olduğu Değişkenler",
+       "pageStart": 70,
+       "pageEnd": 85
+      }
+     ]
+    },
+    {
+     "title": "1.5 Limit Hız",
+     "pageStart": 86,
+     "pageEnd": 94
+    },
+    {
+     "title": "1.6 Düzgün Çembersel Hareket",
+     "pageStart": 95,
+     "pageEnd": 149,
+     "children": [
+      {
+       "title": "1.6.1 Çembersel Harekette Yörünge ve Hız Kavramları",
+       "pageStart": 95,
+       "pageEnd": 100
+      },
+      {
+       "title": "1.6.2 Çembersel Hareketin Değişkenleri",
+       "pageStart": 101,
+       "pageEnd": 149
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Ünite: Elektrik ve Manyetizma",
+   "pageStart": 150,
+   "pageEnd": 297,
+   "children": [
+    {
+     "title": "2.1 Elektriksel Kuvvet ve Elektriksel Alan",
+     "pageStart": 155,
+     "pageEnd": 185,
+     "children": [
+      {
+       "title": "2.1.1 Elektriksel Kuvvet",
+       "pageStart": 155,
+       "pageEnd": 165
+      },
+      {
+       "title": "2.1.2 Elektriksel Alan",
+       "pageStart": 166,
+       "pageEnd": 177
+      },
+      {
+       "title": "2.1.3 Faraday Kafesi",
+       "pageStart": 178,
+       "pageEnd": 185
+      }
+     ]
+    },
+    {
+     "title": "2.2 Manyetik Alan ve Manyetik Kuvvet",
+     "pageStart": 186,
+     "pageEnd": 235,
+     "children": [
+      {
+       "title": "2.2.1 Manyetik Alan",
+       "pageStart": 186,
+       "pageEnd": 197
+      },
+      {
+       "title": "2.2.2 Üzerinden Akım Geçen Düz İletken Telin Manyetik Alanı",
+       "pageStart": 198,
+       "pageEnd": 206
+      },
+      {
+       "title": "2.2.3 Akım Makarasının Manyetik Alanı",
+       "pageStart": 207,
+       "pageEnd": 212
+      },
+      {
+       "title": "2.2.4 Elektromıknatısların Kullanım Alanları",
+       "pageStart": 213,
+       "pageEnd": 217
+      },
+      {
+       "title": "2.2.5 Manyetik Alanda Üzerinden Akım Geçen Düz Bir Tele Etki Eden Kuvvet",
+       "pageStart": 218,
+       "pageEnd": 228
+      },
+      {
+       "title": "2.2.6 Manyetik Alanda Üzerinden Akım Geçen Dikdörtgen Tele Bir Eksen Etrafında Dönmesi",
+       "pageStart": 229,
+       "pageEnd": 235
+      }
+     ]
+    },
+    {
+     "title": "2.3 İndüksiyon Akımı",
+     "pageStart": 236,
+     "pageEnd": 262,
+     "children": [
+      {
+       "title": "2.3.1 Manyetik Akı",
+       "pageStart": 236,
+       "pageEnd": 241
+      },
+      {
+       "title": "2.3.2 İndüksiyon Gerilimi",
+       "pageStart": 242,
+       "pageEnd": 252
+      },
+      {
+       "title": "2.3.3 Alternatif Akım",
+       "pageStart": 253,
+       "pageEnd": 262
+      }
+     ]
+    },
+    {
+     "title": "2.4 Transformatörler",
+     "pageStart": 263,
+     "pageEnd": 297
+    }
+   ]
+  },
+  {
+   "title": "3. Ünite: Optik",
+   "pageStart": 298,
+   "pageEnd": 407,
+   "children": [
+    {
+     "title": "3.1 Işık Şiddeti, Işık Akısı ve Aydınlanma",
+     "pageStart": 302,
+     "pageEnd": 311
+    },
+    {
+     "title": "3.2 Düzlem Aynalar",
+     "pageStart": 312,
+     "pageEnd": 322
+    },
+    {
+     "title": "3.3 Küresel Aynalar",
+     "pageStart": 323,
+     "pageEnd": 342,
+     "children": [
+      {
+       "title": "3.3.1 Küresel Ayna Çeşitleri ve Özellikleri",
+       "pageStart": 323,
+       "pageEnd": 332
+      },
+      {
+       "title": "3.3.2 Küresel Aynalarda Görüntü Oluşumu",
+       "pageStart": 333,
+       "pageEnd": 342
+      }
+     ]
+    },
+    {
+     "title": "3.4 Kırılma",
+     "pageStart": 343,
+     "pageEnd": 353
+    },
+    {
+     "title": "3.5 Görünür Derinlik",
+     "pageStart": 354,
+     "pageEnd": 360
+    },
+    {
+     "title": "3.6 Fiber Optik",
+     "pageStart": 361,
+     "pageEnd": 366
+    },
+    {
+     "title": "3.7 Prizmalar",
+     "pageStart": 367,
+     "pageEnd": 372
+    },
+    {
+     "title": "3.8 Mercekler",
+     "pageStart": 373,
+     "pageEnd": 407,
+     "children": [
+      {
+       "title": "3.8.1 Merceklerin Özellikleri",
+       "pageStart": 373,
+       "pageEnd": 380
+      },
+      {
+       "title": "3.8.2 Merceklerde Görüntü Oluşumu",
+       "pageStart": 381,
+       "pageEnd": 407
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
