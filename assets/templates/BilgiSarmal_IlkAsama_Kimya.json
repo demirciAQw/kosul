@@ -1,0 +1,1051 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Bilgi Sarmal İlk Aşama Kimya Soru Bankası",
+  "publisher": "Bilgi Sarmal Yayınları",
+  "examType": "TYT",
+  "subject": "Kimya",
+  "pageCount": 272,
+  "avgQuestionsPerPage": 6
+ },
+ "units": [
+  {
+   "title": "1. Tema (1. Kısım): Kimya Hayattır",
+   "pageStart": 8,
+   "pageEnd": 33,
+   "children": [
+    {
+     "title": "Günlük Hayatta Kimya",
+     "pageStart": 8,
+     "pageEnd": 13,
+     "children": [
+      {
+       "title": "Test 1: Günlük Hayatta Kimya - 1",
+       "pageStart": 8,
+       "pageEnd": 9
+      },
+      {
+       "title": "Test 2: Günlük Hayatta Kimya - 2",
+       "pageStart": 10,
+       "pageEnd": 11
+      },
+      {
+       "title": "Test 3: Günlük Hayatta Kimya - 3",
+       "pageStart": 12,
+       "pageEnd": 13
+      }
+     ]
+    },
+    {
+     "title": "Kimyanın Alt Disiplinleri",
+     "pageStart": 14,
+     "pageEnd": 17,
+     "children": [
+      {
+       "title": "Test 4: Kimyanın Alt Disiplinleri - 1",
+       "pageStart": 14,
+       "pageEnd": 15
+      },
+      {
+       "title": "Test 5: Kimyanın Alt Disiplinleri - 2",
+       "pageStart": 16,
+       "pageEnd": 17
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Maddelerin Kullanımı ve Güvenlik",
+     "pageStart": 18,
+     "pageEnd": 27,
+     "children": [
+      {
+       "title": "Test 6: Kimyasal Maddelerin Kullanımı ve Güvenlik - 1",
+       "pageStart": 18,
+       "pageEnd": 19
+      },
+      {
+       "title": "Test 7: Kimyasal Maddelerin Kullanımı ve Güvenlik - 2",
+       "pageStart": 20,
+       "pageEnd": 21
+      },
+      {
+       "title": "Test 8: Kimyasal Maddelerin Kullanımı ve Güvenlik - 3",
+       "pageStart": 22,
+       "pageEnd": 23
+      },
+      {
+       "title": "Test 9: Kimyasal Maddelerin Kullanımı ve Güvenlik - 4",
+       "pageStart": 24,
+       "pageEnd": 25
+      },
+      {
+       "title": "Test 10: Kimyasal Maddelerin Kullanımı ve Güvenlik - 5",
+       "pageStart": 26,
+       "pageEnd": 27
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 28,
+     "pageEnd": 33,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 28,
+       "pageEnd": 29
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 30,
+       "pageEnd": 31
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 32,
+       "pageEnd": 33
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "1. Tema (2. Kısım): Atomdan Periyodik Tabloya",
+   "pageStart": 36,
+   "pageEnd": 71,
+   "children": [
+    {
+     "title": "Atom Teorileri ve Atomun Yapısı",
+     "pageStart": 36,
+     "pageEnd": 39,
+     "children": [
+      {
+       "title": "Test 1: Atom Teorileri ve Atomun Yapısı - 1",
+       "pageStart": 36,
+       "pageEnd": 37
+      },
+      {
+       "title": "Test 2: Atom Teorileri ve Atomun Yapısı - 2",
+       "pageStart": 38,
+       "pageEnd": 39
+      }
+     ]
+    },
+    {
+     "title": "Atom Orbitalleri ve Elektron Dizilimi",
+     "pageStart": 40,
+     "pageEnd": 41,
+     "children": [
+      {
+       "title": "Test 3: Atom Orbitalleri ve Elektron Dizilimi",
+       "pageStart": 40,
+       "pageEnd": 41
+      }
+     ]
+    },
+    {
+     "title": "Atom Orbital Türleri ve Elektron Dağılımı",
+     "pageStart": 42,
+     "pageEnd": 47,
+     "children": [
+      {
+       "title": "Test 4: Atom Orbital Türleri ve Elektron Dağılımı - 1",
+       "pageStart": 42,
+       "pageEnd": 43
+      },
+      {
+       "title": "Test 5: Atom Orbital Türleri ve Elektron Dağılımı - 2",
+       "pageStart": 44,
+       "pageEnd": 45
+      },
+      {
+       "title": "Test 6: Atom Orbital Türleri ve Elektron Dağılımı - 3",
+       "pageStart": 46,
+       "pageEnd": 47
+      }
+     ]
+    },
+    {
+     "title": "Periyodik Tabloda Yer Bulma, Bazı Gruplar ve Özellikleri",
+     "pageStart": 48,
+     "pageEnd": 53,
+     "children": [
+      {
+       "title": "Test 7: Periyodik Tabloda Yer Bulma, Bazı Gruplar ve Özellikleri - 1",
+       "pageStart": 48,
+       "pageEnd": 49
+      },
+      {
+       "title": "Test 8: Periyodik Tabloda Yer Bulma, Bazı Gruplar ve Özellikleri - 2",
+       "pageStart": 50,
+       "pageEnd": 51
+      },
+      {
+       "title": "Test 9: Periyodik Tabloda Yer Bulma, Bazı Gruplar ve Özellikleri - 3",
+       "pageStart": 52,
+       "pageEnd": 53
+      }
+     ]
+    },
+    {
+     "title": "Atomdan İyona",
+     "pageStart": 54,
+     "pageEnd": 57,
+     "children": [
+      {
+       "title": "Test 10: Atomdan İyona - 1",
+       "pageStart": 54,
+       "pageEnd": 55
+      },
+      {
+       "title": "Test 11: Atomdan İyona - 2",
+       "pageStart": 56,
+       "pageEnd": 57
+      }
+     ]
+    },
+    {
+     "title": "Periyodik Özellikler",
+     "pageStart": 58,
+     "pageEnd": 63,
+     "children": [
+      {
+       "title": "Test 12: Periyodik Özellikler - 1",
+       "pageStart": 58,
+       "pageEnd": 59
+      },
+      {
+       "title": "Test 13: Periyodik Özellikler - 2",
+       "pageStart": 60,
+       "pageEnd": 61
+      },
+      {
+       "title": "Test 14: Periyodik Özellikler - 3",
+       "pageStart": 62,
+       "pageEnd": 63
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 64,
+     "pageEnd": 71,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 64,
+       "pageEnd": 65
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 66,
+       "pageEnd": 67
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 68,
+       "pageEnd": 69
+      },
+      {
+       "title": "Sarmal Test - 1",
+       "pageStart": 70,
+       "pageEnd": 71
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Etkileşimler - Etkileşimlerden Maddeye",
+   "pageStart": 74,
+   "pageEnd": 131,
+   "children": [
+    {
+     "title": "Metalik Bağ",
+     "pageStart": 74,
+     "pageEnd": 75,
+     "children": [
+      {
+       "title": "Test 1: Metalik Bağ",
+       "pageStart": 74,
+       "pageEnd": 75
+      }
+     ]
+    },
+    {
+     "title": "İyonik Bağ",
+     "pageStart": 76,
+     "pageEnd": 77,
+     "children": [
+      {
+       "title": "Test 2: İyonik Bağ",
+       "pageStart": 76,
+       "pageEnd": 77
+      }
+     ]
+    },
+    {
+     "title": "Kovalent Bağ",
+     "pageStart": 78,
+     "pageEnd": 79,
+     "children": [
+      {
+       "title": "Test 3: Kovalent Bağ",
+       "pageStart": 78,
+       "pageEnd": 79
+      }
+     ]
+    },
+    {
+     "title": "Lewis Nokta Yapısı",
+     "pageStart": 80,
+     "pageEnd": 85,
+     "children": [
+      {
+       "title": "Test 4: Lewis Nokta Yapısı - 1",
+       "pageStart": 80,
+       "pageEnd": 81
+      },
+      {
+       "title": "Test 5: Lewis Nokta Yapısı - 2",
+       "pageStart": 82,
+       "pageEnd": 83
+      },
+      {
+       "title": "Test 6: Lewis Nokta Yapısı - 3",
+       "pageStart": 84,
+       "pageEnd": 85
+      }
+     ]
+    },
+    {
+     "title": "Molekül Polarlığı ve Apolarlığı",
+     "pageStart": 86,
+     "pageEnd": 91,
+     "children": [
+      {
+       "title": "Test 7: Molekül Polarlığı ve Apolarlığı - 1",
+       "pageStart": 86,
+       "pageEnd": 87
+      },
+      {
+       "title": "Test 8: Molekül Polarlığı ve Apolarlığı - 2",
+       "pageStart": 88,
+       "pageEnd": 89
+      },
+      {
+       "title": "Test 9: Molekül Polarlığı ve Apolarlığı - 3",
+       "pageStart": 90,
+       "pageEnd": 91
+      }
+     ]
+    },
+    {
+     "title": "İyonik Bağlı Bileşiklerin Adlandırılması",
+     "pageStart": 92,
+     "pageEnd": 93,
+     "children": [
+      {
+       "title": "Test 10: İyonik Bağlı Bileşiklerin Adlandırılması",
+       "pageStart": 92,
+       "pageEnd": 93
+      }
+     ]
+    },
+    {
+     "title": "Kovalent Bağlı Bileşiklerin Adlandırılması",
+     "pageStart": 94,
+     "pageEnd": 95,
+     "children": [
+      {
+       "title": "Test 11: Kovalent Bağlı Bileşiklerin Adlandırılması",
+       "pageStart": 94,
+       "pageEnd": 95
+      }
+     ]
+    },
+    {
+     "title": "Moleküller Arası Etkileşimler",
+     "pageStart": 96,
+     "pageEnd": 103,
+     "children": [
+      {
+       "title": "Test 12: Moleküller Arası Etkileşimler - 1",
+       "pageStart": 96,
+       "pageEnd": 97
+      },
+      {
+       "title": "Test 13: Moleküller Arası Etkileşimler - 2",
+       "pageStart": 98,
+       "pageEnd": 99
+      },
+      {
+       "title": "Test 14: Moleküller Arası Etkileşimler - 3",
+       "pageStart": 100,
+       "pageEnd": 101
+      },
+      {
+       "title": "Test 15: Moleküller Arası Etkileşimler - 4",
+       "pageStart": 102,
+       "pageEnd": 103
+      }
+     ]
+    },
+    {
+     "title": "Katılar",
+     "pageStart": 104,
+     "pageEnd": 105,
+     "children": [
+      {
+       "title": "Test 16: Katılar",
+       "pageStart": 104,
+       "pageEnd": 105
+      }
+     ]
+    },
+    {
+     "title": "Buharlaşma - Denge Buhar Basıncı",
+     "pageStart": 106,
+     "pageEnd": 109,
+     "children": [
+      {
+       "title": "Test 17: Buharlaşma - Denge Buhar Basıncı - 1",
+       "pageStart": 106,
+       "pageEnd": 107
+      },
+      {
+       "title": "Test 18: Buharlaşma - Denge Buhar Basıncı - 2",
+       "pageStart": 108,
+       "pageEnd": 109
+      }
+     ]
+    },
+    {
+     "title": "Denge Buhar Basıncı - Kaynama Sıcaklığı",
+     "pageStart": 110,
+     "pageEnd": 113,
+     "children": [
+      {
+       "title": "Test 19: Denge Buhar Basıncı - Kaynama Sıcaklığı - 1",
+       "pageStart": 110,
+       "pageEnd": 111
+      },
+      {
+       "title": "Test 20: Denge Buhar Basıncı - Kaynama Sıcaklığı - 2",
+       "pageStart": 112,
+       "pageEnd": 113
+      }
+     ]
+    },
+    {
+     "title": "Viskozite",
+     "pageStart": 114,
+     "pageEnd": 117,
+     "children": [
+      {
+       "title": "Test 21: Viskozite - 1",
+       "pageStart": 114,
+       "pageEnd": 115
+      },
+      {
+       "title": "Test 22: Viskozite - 2",
+       "pageStart": 116,
+       "pageEnd": 117
+      }
+     ]
+    },
+    {
+     "title": "Adezyon ve Kohezyon Kuvvetleri",
+     "pageStart": 118,
+     "pageEnd": 119,
+     "children": [
+      {
+       "title": "Test 23: Adezyon ve Kohezyon Kuvvetleri",
+       "pageStart": 118,
+       "pageEnd": 119
+      }
+     ]
+    },
+    {
+     "title": "Sıvıların Yüzey Gerilimi",
+     "pageStart": 120,
+     "pageEnd": 121,
+     "children": [
+      {
+       "title": "Test 24: Sıvıların Yüzey Gerilimi",
+       "pageStart": 120,
+       "pageEnd": 121
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 122,
+     "pageEnd": 131,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 122,
+       "pageEnd": 123
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 124,
+       "pageEnd": 125
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 126,
+       "pageEnd": 127
+      },
+      {
+       "title": "Tema Testi - 4",
+       "pageStart": 128,
+       "pageEnd": 129
+      },
+      {
+       "title": "Sarmal Test - 2",
+       "pageStart": 130,
+       "pageEnd": 131
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Nanoparçacıklar ve Ekolojik Sürdürülebilirlik",
+   "pageStart": 134,
+   "pageEnd": 139,
+   "children": [
+    {
+     "title": "Nanoparçacıklar ve Ekolojik Sürdürülebilirlik",
+     "pageStart": 134,
+     "pageEnd": 137,
+     "children": [
+      {
+       "title": "Test 1: Nanoparçacıklar ve Ekolojik Sürdürülebilirlik - 1",
+       "pageStart": 134,
+       "pageEnd": 135
+      },
+      {
+       "title": "Test 2: Nanoparçacıklar ve Ekolojik Sürdürülebilirlik - 2",
+       "pageStart": 136,
+       "pageEnd": 137
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 138,
+     "pageEnd": 139,
+     "children": [
+      {
+       "title": "Sarmal Test - 3",
+       "pageStart": 138,
+       "pageEnd": 139
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "4. Tema: Kimyasal Tepkimeler - Gazlar",
+   "pageStart": 142,
+   "pageEnd": 213,
+   "children": [
+    {
+     "title": "Kimyasal Değişim Kanıtları",
+     "pageStart": 142,
+     "pageEnd": 145,
+     "children": [
+      {
+       "title": "Test 1: Kimyasal Değişim Kanıtları - 1",
+       "pageStart": 142,
+       "pageEnd": 143
+      },
+      {
+       "title": "Test 2: Kimyasal Değişim Kanıtları - 2",
+       "pageStart": 144,
+       "pageEnd": 145
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Tepkimelerin Oluşumu",
+     "pageStart": 146,
+     "pageEnd": 149,
+     "children": [
+      {
+       "title": "Test 3: Kimyasal Tepkimelerin Oluşumu - 1",
+       "pageStart": 146,
+       "pageEnd": 147
+      },
+      {
+       "title": "Test 4: Kimyasal Tepkimelerin Oluşumu - 2",
+       "pageStart": 148,
+       "pageEnd": 149
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Tepkime Türleri",
+     "pageStart": 150,
+     "pageEnd": 157,
+     "children": [
+      {
+       "title": "Test 5: Kimyasal Tepkime Türleri - 1",
+       "pageStart": 150,
+       "pageEnd": 151
+      },
+      {
+       "title": "Test 6: Kimyasal Tepkime Türleri - 2",
+       "pageStart": 152,
+       "pageEnd": 153
+      },
+      {
+       "title": "Test 7: Kimyasal Tepkime Türleri - 3",
+       "pageStart": 154,
+       "pageEnd": 155
+      },
+      {
+       "title": "Test 8: Kimyasal Tepkime Türleri - 4",
+       "pageStart": 156,
+       "pageEnd": 157
+      }
+     ]
+    },
+    {
+     "title": "Mol Kavramı",
+     "pageStart": 158,
+     "pageEnd": 169,
+     "children": [
+      {
+       "title": "Test 9: Mol Kavramı - 1",
+       "pageStart": 158,
+       "pageEnd": 159
+      },
+      {
+       "title": "Test 10: Mol Kavramı - 2",
+       "pageStart": 160,
+       "pageEnd": 161
+      },
+      {
+       "title": "Test 11: Mol Kavramı - 3",
+       "pageStart": 162,
+       "pageEnd": 163
+      },
+      {
+       "title": "Test 12: Mol Kavramı - 4",
+       "pageStart": 164,
+       "pageEnd": 165
+      },
+      {
+       "title": "Test 13: Mol Kavramı - 5",
+       "pageStart": 166,
+       "pageEnd": 167
+      },
+      {
+       "title": "Test 14: Mol Kavramı - 6",
+       "pageStart": 168,
+       "pageEnd": 169
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Tepkime Denklemlerinin Denkleştirilmesi",
+     "pageStart": 170,
+     "pageEnd": 173,
+     "children": [
+      {
+       "title": "Test 15: Kimyasal Tepkime Denklemlerinin Denkleştirilmesi - 1",
+       "pageStart": 170,
+       "pageEnd": 171
+      },
+      {
+       "title": "Test 16: Kimyasal Tepkime Denklemlerinin Denkleştirilmesi - 2",
+       "pageStart": 172,
+       "pageEnd": 173
+      }
+     ]
+    },
+    {
+     "title": "Kimyasal Hesaplamalar",
+     "pageStart": 174,
+     "pageEnd": 185,
+     "children": [
+      {
+       "title": "Test 17: Kimyasal Hesaplamalar - 1 (Denklemli Mol Hesaplamaları - 1)",
+       "pageStart": 174,
+       "pageEnd": 175
+      },
+      {
+       "title": "Test 18: Kimyasal Hesaplamalar - 2 (Denklemli Mol Hesaplamaları - 2)",
+       "pageStart": 176,
+       "pageEnd": 177
+      },
+      {
+       "title": "Test 19: Kimyasal Hesaplamalar - 3 (Sınırlayıcı Bileşen Hesaplamaları - 1)",
+       "pageStart": 178,
+       "pageEnd": 179
+      },
+      {
+       "title": "Test 20: Kimyasal Hesaplamalar - 4 (Sınırlayıcı Bileşen Hesaplamaları - 2)",
+       "pageStart": 180,
+       "pageEnd": 181
+      },
+      {
+       "title": "Test 21: Kimyasal Hesaplamalar - 5 (Verim Hesaplamaları - 1)",
+       "pageStart": 182,
+       "pageEnd": 183
+      },
+      {
+       "title": "Test 22: Kimyasal Hesaplamalar - 6 (Verim Hesaplamaları - 2)",
+       "pageStart": 184,
+       "pageEnd": 185
+      }
+     ]
+    },
+    {
+     "title": "Gazların Genel Özellikleri",
+     "pageStart": 186,
+     "pageEnd": 189,
+     "children": [
+      {
+       "title": "Test 23: Gazların Genel Özellikleri - 1",
+       "pageStart": 186,
+       "pageEnd": 187
+      },
+      {
+       "title": "Test 24: Gazların Genel Özellikleri - 2",
+       "pageStart": 188,
+       "pageEnd": 189
+      }
+     ]
+    },
+    {
+     "title": "Gaz Yasaları",
+     "pageStart": 190,
+     "pageEnd": 195,
+     "children": [
+      {
+       "title": "Test 25: Gaz Yasaları - 1 (Boyle Yasası)",
+       "pageStart": 190,
+       "pageEnd": 191
+      },
+      {
+       "title": "Test 26: Gaz Yasaları - 2 (Charles Yasası)",
+       "pageStart": 192,
+       "pageEnd": 193
+      },
+      {
+       "title": "Test 27: Gaz Yasaları - 3 (Gay Lussac Yasası - Avogadro Yasası)",
+       "pageStart": 194,
+       "pageEnd": 195
+      }
+     ]
+    },
+    {
+     "title": "İdeal Gaz Yasası",
+     "pageStart": 196,
+     "pageEnd": 201,
+     "children": [
+      {
+       "title": "Test 28: İdeal Gaz Yasası - 1",
+       "pageStart": 196,
+       "pageEnd": 197
+      },
+      {
+       "title": "Test 29: İdeal Gaz Yasası - 2",
+       "pageStart": 198,
+       "pageEnd": 199
+      },
+      {
+       "title": "Test 30: İdeal Gaz Yasası - 3",
+       "pageStart": 200,
+       "pageEnd": 201
+      }
+     ]
+    },
+    {
+     "title": "Graham Difüzyon ve Efüzyon Yasası",
+     "pageStart": 202,
+     "pageEnd": 205,
+     "children": [
+      {
+       "title": "Test 31: Graham Difüzyon ve Efüzyon Yasası - 1",
+       "pageStart": 202,
+       "pageEnd": 203
+      },
+      {
+       "title": "Test 32: Graham Difüzyon ve Efüzyon Yasası - 2",
+       "pageStart": 204,
+       "pageEnd": 205
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 206,
+     "pageEnd": 213,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 206,
+       "pageEnd": 207
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 208,
+       "pageEnd": 209
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 210,
+       "pageEnd": 211
+      },
+      {
+       "title": "Sarmal Test - 4",
+       "pageStart": 212,
+       "pageEnd": 213
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "5. Tema: Çözeltiler",
+   "pageStart": 216,
+   "pageEnd": 261,
+   "children": [
+    {
+     "title": "Çözünme Süreci",
+     "pageStart": 216,
+     "pageEnd": 219,
+     "children": [
+      {
+       "title": "Test 1: Çözünme Süreci - 1",
+       "pageStart": 216,
+       "pageEnd": 217
+      },
+      {
+       "title": "Test 2: Çözünme Süreci - 2",
+       "pageStart": 218,
+       "pageEnd": 219
+      }
+     ]
+    },
+    {
+     "title": "Maddelerin Birbiri İçerisinde Çözünebilirliği",
+     "pageStart": 220,
+     "pageEnd": 223,
+     "children": [
+      {
+       "title": "Test 3: Maddelerin Birbiri İçerisinde Çözünebilirliği - 1",
+       "pageStart": 220,
+       "pageEnd": 221
+      },
+      {
+       "title": "Test 4: Maddelerin Birbiri İçerisinde Çözünebilirliği - 2",
+       "pageStart": 222,
+       "pageEnd": 223
+      }
+     ]
+    },
+    {
+     "title": "Çözünme Olayının Sınıflandırılması",
+     "pageStart": 224,
+     "pageEnd": 227,
+     "children": [
+      {
+       "title": "Test 5: Çözünme Olayının Sınıflandırılması - 1",
+       "pageStart": 224,
+       "pageEnd": 225
+      },
+      {
+       "title": "Test 6: Çözünme Olayının Sınıflandırılması - 2",
+       "pageStart": 226,
+       "pageEnd": 227
+      }
+     ]
+    },
+    {
+     "title": "Çözünürlük",
+     "pageStart": 228,
+     "pageEnd": 233,
+     "children": [
+      {
+       "title": "Test 7: Çözünürlük - 1",
+       "pageStart": 228,
+       "pageEnd": 229
+      },
+      {
+       "title": "Test 8: Çözünürlük - 2",
+       "pageStart": 230,
+       "pageEnd": 231
+      },
+      {
+       "title": "Test 9: Çözünürlük - 3",
+       "pageStart": 232,
+       "pageEnd": 233
+      }
+     ]
+    },
+    {
+     "title": "Çözünürlüğe Etki Eden Faktörler",
+     "pageStart": 234,
+     "pageEnd": 237,
+     "children": [
+      {
+       "title": "Test 10: Çözünürlüğe Etki Eden Faktörler - 1",
+       "pageStart": 234,
+       "pageEnd": 235
+      },
+      {
+       "title": "Test 11: Çözünürlüğe Etki Eden Faktörler - 2",
+       "pageStart": 236,
+       "pageEnd": 237
+      }
+     ]
+    },
+    {
+     "title": "Çözeltilerin Sınıflandırılması",
+     "pageStart": 238,
+     "pageEnd": 243,
+     "children": [
+      {
+       "title": "Test 12: Çözeltilerin Sınıflandırılması - 1",
+       "pageStart": 238,
+       "pageEnd": 239
+      },
+      {
+       "title": "Test 13: Çözeltilerin Sınıflandırılması - 2",
+       "pageStart": 240,
+       "pageEnd": 241
+      },
+      {
+       "title": "Test 14: Çözeltilerin Sınıflandırılması - 3",
+       "pageStart": 242,
+       "pageEnd": 243
+      }
+     ]
+    },
+    {
+     "title": "Derişim Birimleri",
+     "pageStart": 244,
+     "pageEnd": 247,
+     "children": [
+      {
+       "title": "Test 15: Derişim Birimleri - 1",
+       "pageStart": 244,
+       "pageEnd": 245
+      },
+      {
+       "title": "Test 16: Derişim Birimleri - 2",
+       "pageStart": 246,
+       "pageEnd": 247
+      }
+     ]
+    },
+    {
+     "title": "Koligatif Özellikler",
+     "pageStart": 248,
+     "pageEnd": 253,
+     "children": [
+      {
+       "title": "Test 17: Koligatif Özellikler - 1",
+       "pageStart": 248,
+       "pageEnd": 249
+      },
+      {
+       "title": "Test 18: Koligatif Özellikler - 2",
+       "pageStart": 250,
+       "pageEnd": 251
+      },
+      {
+       "title": "Test 19: Koligatif Özellikler - 3",
+       "pageStart": 252,
+       "pageEnd": 253
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 254,
+     "pageEnd": 261,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 254,
+       "pageEnd": 255
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 256,
+       "pageEnd": 257
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 258,
+       "pageEnd": 259
+      },
+      {
+       "title": "Sarmal Test - 5",
+       "pageStart": 260,
+       "pageEnd": 261
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "6. Tema: Yeşil Kimya, Çevresel ve Ekolojik Sürdürülebilirlik",
+   "pageStart": 264,
+   "pageEnd": 271,
+   "children": [
+    {
+     "title": "Makro ve Mikro Ölçekli Deneyler",
+     "pageStart": 264,
+     "pageEnd": 267,
+     "children": [
+      {
+       "title": "Test 1: Makro ve Mikro Ölçekli Deneyler - 1",
+       "pageStart": 264,
+       "pageEnd": 265
+      },
+      {
+       "title": "Test 2: Makro ve Mikro Ölçekli Deneyler - 2",
+       "pageStart": 266,
+       "pageEnd": 267
+      }
+     ]
+    },
+    {
+     "title": "Atmosferdeki Tepkimeler ve Küresel Sorunlar",
+     "pageStart": 268,
+     "pageEnd": 269,
+     "children": [
+      {
+       "title": "Test 3: Atmosferdeki Tepkimeler ve Küresel Sorunlar",
+       "pageStart": 268,
+       "pageEnd": 269
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 270,
+     "pageEnd": 271,
+     "children": [
+      {
+       "title": "Sarmal Test - 6",
+       "pageStart": 270,
+       "pageEnd": 271
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

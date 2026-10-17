@@ -1,0 +1,537 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Dil Bilgisi Saati Soru Bankası",
+  "publisher": "Saat Yayınları",
+  "examType": "TYT",
+  "subject": "Türkçe",
+  "pageCount": 168,
+  "avgQuestionsPerPage": 5
+ },
+ "units": [
+  {
+   "title": "Bölüm 1: Ses Bilgisi, Yazım Kuralları, Noktalama İşaretleri ve Sözcükte Yapı",
+   "pageStart": 6,
+   "pageEnd": 38,
+   "children": [
+    {
+     "title": "Ses Bilgisi",
+     "pageStart": 6,
+     "pageEnd": 13,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 6,
+       "pageEnd": 7
+      },
+      {
+       "title": "Test II",
+       "pageStart": 8,
+       "pageEnd": 10
+      },
+      {
+       "title": "Test III",
+       "pageStart": 11,
+       "pageEnd": 13
+      }
+     ]
+    },
+    {
+     "title": "Yazım Kuralları",
+     "pageStart": 14,
+     "pageEnd": 19,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 14,
+       "pageEnd": 15
+      },
+      {
+       "title": "Test II",
+       "pageStart": 16,
+       "pageEnd": 17
+      },
+      {
+       "title": "Test III",
+       "pageStart": 18,
+       "pageEnd": 19
+      }
+     ]
+    },
+    {
+     "title": "Noktalama İşaretleri",
+     "pageStart": 20,
+     "pageEnd": 26,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 20,
+       "pageEnd": 21
+      },
+      {
+       "title": "Test II",
+       "pageStart": 22,
+       "pageEnd": 23
+      },
+      {
+       "title": "Test III",
+       "pageStart": 24,
+       "pageEnd": 26
+      }
+     ]
+    },
+    {
+     "title": "Sözcükte Yapı",
+     "pageStart": 27,
+     "pageEnd": 32,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 27,
+       "pageEnd": 28
+      },
+      {
+       "title": "Test II",
+       "pageStart": 29,
+       "pageEnd": 30
+      },
+      {
+       "title": "Test III",
+       "pageStart": 31,
+       "pageEnd": 32
+      }
+     ]
+    },
+    {
+     "title": "Bölüm 1 Karma Test",
+     "pageStart": 33,
+     "pageEnd": 38,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 33,
+       "pageEnd": 34
+      },
+      {
+       "title": "Test II",
+       "pageStart": 35,
+       "pageEnd": 36
+      },
+      {
+       "title": "Test III",
+       "pageStart": 37,
+       "pageEnd": 38
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Bölüm 2: Sözcük Türleri",
+   "pageStart": 40,
+   "pageEnd": 106,
+   "children": [
+    {
+     "title": "İsim (Ad)",
+     "pageStart": 40,
+     "pageEnd": 46,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 40,
+       "pageEnd": 41
+      },
+      {
+       "title": "Test II",
+       "pageStart": 42,
+       "pageEnd": 43
+      },
+      {
+       "title": "Test III",
+       "pageStart": 44,
+       "pageEnd": 46
+      }
+     ]
+    },
+    {
+     "title": "Sıfat (Ön Ad)",
+     "pageStart": 47,
+     "pageEnd": 53,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 47,
+       "pageEnd": 48
+      },
+      {
+       "title": "Test II",
+       "pageStart": 49,
+       "pageEnd": 50
+      },
+      {
+       "title": "Test III",
+       "pageStart": 51,
+       "pageEnd": 53
+      }
+     ]
+    },
+    {
+     "title": "Zamir (Adıl)",
+     "pageStart": 54,
+     "pageEnd": 59,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 54,
+       "pageEnd": 55
+      },
+      {
+       "title": "Test II",
+       "pageStart": 56,
+       "pageEnd": 57
+      },
+      {
+       "title": "Test III",
+       "pageStart": 58,
+       "pageEnd": 59
+      }
+     ]
+    },
+    {
+     "title": "Zarf (Belirteç)",
+     "pageStart": 60,
+     "pageEnd": 67,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 60,
+       "pageEnd": 61
+      },
+      {
+       "title": "Test II",
+       "pageStart": 62,
+       "pageEnd": 64
+      },
+      {
+       "title": "Test III",
+       "pageStart": 65,
+       "pageEnd": 67
+      }
+     ]
+    },
+    {
+     "title": "Edat (İlgeç) - Bağlaç - Ünlem",
+     "pageStart": 68,
+     "pageEnd": 75,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 68,
+       "pageEnd": 69
+      },
+      {
+       "title": "Test II",
+       "pageStart": 70,
+       "pageEnd": 72
+      },
+      {
+       "title": "Test III",
+       "pageStart": 73,
+       "pageEnd": 75
+      }
+     ]
+    },
+    {
+     "title": "Eylem (Fiil)",
+     "pageStart": 76,
+     "pageEnd": 81,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 76,
+       "pageEnd": 77
+      },
+      {
+       "title": "Test II",
+       "pageStart": 78,
+       "pageEnd": 79
+      },
+      {
+       "title": "Test III",
+       "pageStart": 80,
+       "pageEnd": 81
+      }
+     ]
+    },
+    {
+     "title": "Ek Fiil (Ek Eylem)",
+     "pageStart": 82,
+     "pageEnd": 87,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 82,
+       "pageEnd": 83
+      },
+      {
+       "title": "Test II",
+       "pageStart": 84,
+       "pageEnd": 85
+      },
+      {
+       "title": "Test III",
+       "pageStart": 86,
+       "pageEnd": 87
+      }
+     ]
+    },
+    {
+     "title": "Fiil Çatısı (Eylemde Çatı)",
+     "pageStart": 88,
+     "pageEnd": 94,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 88,
+       "pageEnd": 89
+      },
+      {
+       "title": "Test II",
+       "pageStart": 90,
+       "pageEnd": 91
+      },
+      {
+       "title": "Test III",
+       "pageStart": 92,
+       "pageEnd": 94
+      }
+     ]
+    },
+    {
+     "title": "Fiilimsi (Eylemsi)",
+     "pageStart": 95,
+     "pageEnd": 100,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 95,
+       "pageEnd": 96
+      },
+      {
+       "title": "Test II",
+       "pageStart": 97,
+       "pageEnd": 98
+      },
+      {
+       "title": "Test III",
+       "pageStart": 99,
+       "pageEnd": 100
+      }
+     ]
+    },
+    {
+     "title": "Bölüm 2 Karma Test",
+     "pageStart": 101,
+     "pageEnd": 106,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 101,
+       "pageEnd": 102
+      },
+      {
+       "title": "Test II",
+       "pageStart": 103,
+       "pageEnd": 104
+      },
+      {
+       "title": "Test III",
+       "pageStart": 105,
+       "pageEnd": 106
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Bölüm 3: Cümle Bilgisi",
+   "pageStart": 108,
+   "pageEnd": 126,
+   "children": [
+    {
+     "title": "Cümlenin Ögeleri",
+     "pageStart": 108,
+     "pageEnd": 114,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 108,
+       "pageEnd": 109
+      },
+      {
+       "title": "Test II",
+       "pageStart": 110,
+       "pageEnd": 111
+      },
+      {
+       "title": "Test III",
+       "pageStart": 112,
+       "pageEnd": 114
+      }
+     ]
+    },
+    {
+     "title": "Cümle Türleri ve Yapısı",
+     "pageStart": 115,
+     "pageEnd": 120,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 115,
+       "pageEnd": 116
+      },
+      {
+       "title": "Test II",
+       "pageStart": 117,
+       "pageEnd": 118
+      },
+      {
+       "title": "Test III",
+       "pageStart": 119,
+       "pageEnd": 120
+      }
+     ]
+    },
+    {
+     "title": "Bölüm 3 Karma Test",
+     "pageStart": 121,
+     "pageEnd": 126,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 121,
+       "pageEnd": 122
+      },
+      {
+       "title": "Test II",
+       "pageStart": 123,
+       "pageEnd": 124
+      },
+      {
+       "title": "Test III",
+       "pageStart": 125,
+       "pageEnd": 126
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Bölüm 4: Anlatım Bozuklukları",
+   "pageStart": 128,
+   "pageEnd": 148,
+   "children": [
+    {
+     "title": "Anlama Dayalı Anlatım Bozukluğu",
+     "pageStart": 128,
+     "pageEnd": 136,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 128,
+       "pageEnd": 130
+      },
+      {
+       "title": "Test II",
+       "pageStart": 131,
+       "pageEnd": 133
+      },
+      {
+       "title": "Test III",
+       "pageStart": 134,
+       "pageEnd": 136
+      }
+     ]
+    },
+    {
+     "title": "Yapıya Dayalı Anlatım Bozukluğu",
+     "pageStart": 137,
+     "pageEnd": 142,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 137,
+       "pageEnd": 138
+      },
+      {
+       "title": "Test II",
+       "pageStart": 139,
+       "pageEnd": 140
+      },
+      {
+       "title": "Test III",
+       "pageStart": 141,
+       "pageEnd": 142
+      }
+     ]
+    },
+    {
+     "title": "Bölüm 4 Karma Test",
+     "pageStart": 143,
+     "pageEnd": 148,
+     "children": [
+      {
+       "title": "Test I",
+       "pageStart": 143,
+       "pageEnd": 144
+      },
+      {
+       "title": "Test II",
+       "pageStart": 145,
+       "pageEnd": 146
+      },
+      {
+       "title": "Test III",
+       "pageStart": 147,
+       "pageEnd": 148
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Bölüm 5: Denemeler",
+   "pageStart": 150,
+   "pageEnd": 161,
+   "children": [
+    {
+     "title": "Deneme 1",
+     "pageStart": 150,
+     "pageEnd": 151
+    },
+    {
+     "title": "Deneme 2",
+     "pageStart": 152,
+     "pageEnd": 153
+    },
+    {
+     "title": "Deneme 3",
+     "pageStart": 154,
+     "pageEnd": 156
+    },
+    {
+     "title": "Deneme 4",
+     "pageStart": 157,
+     "pageEnd": 158
+    },
+    {
+     "title": "Deneme 5",
+     "pageStart": 159,
+     "pageEnd": 161
+    }
+   ]
+  }
+ ]
+}

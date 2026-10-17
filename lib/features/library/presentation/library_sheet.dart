@@ -17,12 +17,16 @@ class BundledTemplate {
     required this.asset,
     required this.title,
     required this.subtitle,
+    required this.shelf,
     this.isSample = false,
   });
 
   final String asset;
   final String title;
   final String subtitle;
+
+  /// "TYT", "AYT" ya da "MEB": listede başlık olarak kullanılır.
+  final String shelf;
 
   /// Yalnızca denemek için hazırlanmış örnek veri.
   final bool isSample;
@@ -39,7 +43,9 @@ final bundledTemplatesProvider = FutureProvider<List<BundledTemplate>>((ref) asy
       final json = jsonDecode(await rootBundle.loadString(asset)) as Map<String, dynamic>;
       final book = json['book'] as Map<String, dynamic>;
       final sample = json['author'] == 'ornek_kullanici';
+      final isMeb = (book['publisher'] as String? ?? '').trim().toUpperCase() == 'MEB';
       out.add(BundledTemplate(
+        shelf: isMeb ? 'MEB' : (book['examType'] == 'TYT' ? 'TYT' : 'AYT'),
         asset: asset,
         title: book['title'] as String,
         subtitle: '${book['examType']} ${book['subject']}, ${book['pageCount']} sayfa'
@@ -50,7 +56,12 @@ final bundledTemplatesProvider = FutureProvider<List<BundledTemplate>>((ref) asy
       // Bozuk bir şablon listeyi düşürmesin.
     }
   }
-  out.sort((a, b) => a.isSample == b.isSample ? a.title.compareTo(b.title) : (a.isSample ? 1 : -1));
+  const order = {'TYT': 0, 'AYT': 1, 'MEB': 2};
+  out.sort((a, b) {
+    if (a.isSample != b.isSample) return a.isSample ? 1 : -1;
+    final s = (order[a.shelf] ?? 9).compareTo(order[b.shelf] ?? 9);
+    return s != 0 ? s : a.title.compareTo(b.title);
+  });
   return out;
 });
 
@@ -169,7 +180,15 @@ class _LibrarySheet extends ConsumerWidget {
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                       child: Text('Hazır kitaplar', style: theme.textTheme.titleMedium),
                     ),
-                  for (final t in templates)
+                  for (final (i, t) in templates.indexed) ...[
+                    if (i == 0 || templates[i - 1].shelf != t.shelf)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
+                        child: Text(
+                          '${t.shelf} kitapları',
+                          style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
+                        ),
+                      ),
                     ListTile(
                       leading: Icon(
                         owned.contains(t.title) ? Icons.check_circle_rounded : Icons.library_add_outlined,
@@ -185,6 +204,7 @@ class _LibrarySheet extends ConsumerWidget {
                               child: const Text('Ekle'),
                             ),
                     ),
+                  ],
                 ],
               ),
             ),

@@ -1,0 +1,1024 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Bilgi Sarmal İlk Aşama Biyoloji Soru Bankası",
+  "publisher": "Bilgi Sarmal Yayınları",
+  "examType": "TYT",
+  "subject": "Biyoloji",
+  "pageCount": 272,
+  "avgQuestionsPerPage": 6
+ },
+ "units": [
+  {
+   "title": "1. Tema: Yaşam",
+   "pageStart": 8,
+   "pageEnd": 69,
+   "children": [
+    {
+     "title": "Biyolojinin Önemi ve Biyolojideki Dönüm Noktaları",
+     "pageStart": 8,
+     "pageEnd": 9,
+     "children": [
+      {
+       "title": "Test 1: Biyolojinin Önemi ve Biyolojideki Dönüm Noktaları",
+       "pageStart": 8,
+       "pageEnd": 9
+      }
+     ]
+    },
+    {
+     "title": "Bilim, Bilimin Doğası ve Bilimsel Araştırma Süreçleri",
+     "pageStart": 10,
+     "pageEnd": 11,
+     "children": [
+      {
+       "title": "Test 2: Bilim, Bilimin Doğası ve Bilimsel Araştırma Süreçleri",
+       "pageStart": 10,
+       "pageEnd": 11
+      }
+     ]
+    },
+    {
+     "title": "Bilimsel Yöntem Basamakları ile Bilimsel Araştırmalar ve Etik",
+     "pageStart": 12,
+     "pageEnd": 13,
+     "children": [
+      {
+       "title": "Test 3: Bilimsel Yöntem Basamakları ile Bilimsel Araştırmalar ve Etik",
+       "pageStart": 12,
+       "pageEnd": 13
+      }
+     ]
+    },
+    {
+     "title": "Canlıların Ortak Özellikleri",
+     "pageStart": 14,
+     "pageEnd": 23,
+     "children": [
+      {
+       "title": "Test 4: Canlıların Ortak Özellikleri - 1",
+       "pageStart": 14,
+       "pageEnd": 15
+      },
+      {
+       "title": "Test 5: Canlıların Ortak Özellikleri - 2",
+       "pageStart": 16,
+       "pageEnd": 17
+      },
+      {
+       "title": "Test 6: Canlıların Ortak Özellikleri - 3",
+       "pageStart": 18,
+       "pageEnd": 19
+      },
+      {
+       "title": "Test 7: Canlıların Ortak Özellikleri - 4",
+       "pageStart": 20,
+       "pageEnd": 21
+      },
+      {
+       "title": "Test 8: Canlıların Ortak Özellikleri - 5",
+       "pageStart": 22,
+       "pageEnd": 23
+      }
+     ]
+    },
+    {
+     "title": "Virüsler",
+     "pageStart": 24,
+     "pageEnd": 25,
+     "children": [
+      {
+       "title": "Test 9: Virüsler",
+       "pageStart": 24,
+       "pageEnd": 25
+      }
+     ]
+    },
+    {
+     "title": "Canlıların Ortak Özellikleri",
+     "pageStart": 26,
+     "pageEnd": 27,
+     "children": [
+      {
+       "title": "Test 10: Canlıların Ortak Özellikleri - 6",
+       "pageStart": 26,
+       "pageEnd": 27
+      }
+     ]
+    },
+    {
+     "title": "Canlıların Sınıflandırılması",
+     "pageStart": 28,
+     "pageEnd": 59,
+     "children": [
+      {
+       "title": "Test 11: Canlıların Sınıflandırılması - 1",
+       "pageStart": 28,
+       "pageEnd": 29
+      },
+      {
+       "title": "Test 12: Canlıların Sınıflandırılması - 2",
+       "pageStart": 30,
+       "pageEnd": 31
+      },
+      {
+       "title": "Test 13: Canlıların Sınıflandırılması - 3",
+       "pageStart": 32,
+       "pageEnd": 33
+      },
+      {
+       "title": "Test 14: Canlıların Sınıflandırılması - 4 (Bakteriler Âlemi)",
+       "pageStart": 34,
+       "pageEnd": 35
+      },
+      {
+       "title": "Test 15: Canlıların Sınıflandırılması - 5 (Bakteriler Âlemi)",
+       "pageStart": 36,
+       "pageEnd": 37
+      },
+      {
+       "title": "Test 16: Canlıların Sınıflandırılması - 6 (Arkeler Âlemi)",
+       "pageStart": 38,
+       "pageEnd": 39
+      },
+      {
+       "title": "Test 17: Canlıların Sınıflandırılması - 7 (Protista Âlemi)",
+       "pageStart": 40,
+       "pageEnd": 41
+      },
+      {
+       "title": "Test 18: Canlıların Sınıflandırılması - 8 (Bitkiler Âlemi)",
+       "pageStart": 42,
+       "pageEnd": 43
+      },
+      {
+       "title": "Test 19: Canlıların Sınıflandırılması - 9 (Mantarlar Âlemi)",
+       "pageStart": 44,
+       "pageEnd": 45
+      },
+      {
+       "title": "Test 20: Canlıların Sınıflandırılması - 10 (Canlılar Âlemi)",
+       "pageStart": 46,
+       "pageEnd": 47
+      },
+      {
+       "title": "Test 21: Canlıların Sınıflandırılması - 11 (Hayvanlar Âlemi)",
+       "pageStart": 48,
+       "pageEnd": 49
+      },
+      {
+       "title": "Test 22: Canlıların Sınıflandırılması - 12 (Omurgasız Hayvanlar)",
+       "pageStart": 50,
+       "pageEnd": 51
+      },
+      {
+       "title": "Test 23: Canlıların Sınıflandırılması - 13 (Omurgalı Hayvanlar)",
+       "pageStart": 52,
+       "pageEnd": 53
+      },
+      {
+       "title": "Test 24: Canlıların Sınıflandırılması - 14 (Omurgalı Hayvanlar)",
+       "pageStart": 54,
+       "pageEnd": 55
+      },
+      {
+       "title": "Test 25: Canlıların Sınıflandırılması - 15 (Omurgalı Hayvanlar)",
+       "pageStart": 56,
+       "pageEnd": 57
+      },
+      {
+       "title": "Test 26: Canlıların Sınıflandırılması - 16 (Biyoçeşitlilik ve Hayvanlar)",
+       "pageStart": 58,
+       "pageEnd": 59
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 60,
+     "pageEnd": 69,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 60,
+       "pageEnd": 61
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 62,
+       "pageEnd": 63
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 64,
+       "pageEnd": 65
+      },
+      {
+       "title": "Tema Testi - 4",
+       "pageStart": 66,
+       "pageEnd": 67
+      },
+      {
+       "title": "Tema Testi - 5",
+       "pageStart": 68,
+       "pageEnd": 69
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Organizasyon",
+   "pageStart": 72,
+   "pageEnd": 131,
+   "children": [
+    {
+     "title": "İnorganik Moleküller - Su",
+     "pageStart": 72,
+     "pageEnd": 73,
+     "children": [
+      {
+       "title": "Test 1: İnorganik Moleküller - Su",
+       "pageStart": 72,
+       "pageEnd": 73
+      }
+     ]
+    },
+    {
+     "title": "İnorganik Moleküller - Su - Mineral",
+     "pageStart": 74,
+     "pageEnd": 75,
+     "children": [
+      {
+       "title": "Test 2: İnorganik Moleküller - Su - Mineral",
+       "pageStart": 74,
+       "pageEnd": 75
+      }
+     ]
+    },
+    {
+     "title": "İnorganik Moleküller - Mineral",
+     "pageStart": 76,
+     "pageEnd": 77,
+     "children": [
+      {
+       "title": "Test 3: İnorganik Moleküller - Mineral",
+       "pageStart": 76,
+       "pageEnd": 77
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Karbohidrat",
+     "pageStart": 78,
+     "pageEnd": 81,
+     "children": [
+      {
+       "title": "Test 4: Organik Moleküller - Karbohidrat - 1",
+       "pageStart": 78,
+       "pageEnd": 79
+      },
+      {
+       "title": "Test 5: Organik Moleküller - Karbohidrat - 2",
+       "pageStart": 80,
+       "pageEnd": 81
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Lipit",
+     "pageStart": 82,
+     "pageEnd": 83,
+     "children": [
+      {
+       "title": "Test 6: Organik Moleküller - Lipit",
+       "pageStart": 82,
+       "pageEnd": 83
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Protein",
+     "pageStart": 84,
+     "pageEnd": 87,
+     "children": [
+      {
+       "title": "Test 7: Organik Moleküller - Protein - 1",
+       "pageStart": 84,
+       "pageEnd": 85
+      },
+      {
+       "title": "Test 8: Organik Moleküller - Protein - 2",
+       "pageStart": 86,
+       "pageEnd": 87
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Enzim",
+     "pageStart": 88,
+     "pageEnd": 93,
+     "children": [
+      {
+       "title": "Test 9: Organik Moleküller - Enzim - 1",
+       "pageStart": 88,
+       "pageEnd": 89
+      },
+      {
+       "title": "Test 10: Organik Moleküller - Enzim - 2",
+       "pageStart": 90,
+       "pageEnd": 91
+      },
+      {
+       "title": "Test 11: Organik Moleküller - Enzim - 3",
+       "pageStart": 92,
+       "pageEnd": 93
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Nükleik Asitler",
+     "pageStart": 94,
+     "pageEnd": 95,
+     "children": [
+      {
+       "title": "Test 12: Organik Moleküller - Nükleik Asitler",
+       "pageStart": 94,
+       "pageEnd": 95
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Vitamin",
+     "pageStart": 96,
+     "pageEnd": 99,
+     "children": [
+      {
+       "title": "Test 13: Organik Moleküller - Vitamin - 1",
+       "pageStart": 96,
+       "pageEnd": 97
+      },
+      {
+       "title": "Test 14: Organik Moleküller - Vitamin - 2",
+       "pageStart": 98,
+       "pageEnd": 99
+      }
+     ]
+    },
+    {
+     "title": "Organik Moleküller - Organik Moleküllerin Ayıraçları",
+     "pageStart": 100,
+     "pageEnd": 101,
+     "children": [
+      {
+       "title": "Test 15: Organik Moleküller - Organik Moleküllerin Ayıraçları",
+       "pageStart": 100,
+       "pageEnd": 101
+      }
+     ]
+    },
+    {
+     "title": "Prokaryot ve Ökaryot Hücre",
+     "pageStart": 102,
+     "pageEnd": 103,
+     "children": [
+      {
+       "title": "Test 16: Prokaryot ve Ökaryot Hücre",
+       "pageStart": 102,
+       "pageEnd": 103
+      }
+     ]
+    },
+    {
+     "title": "Hücrenin Kısımları",
+     "pageStart": 104,
+     "pageEnd": 109,
+     "children": [
+      {
+       "title": "Test 17: Hücrenin Kısımları - 1",
+       "pageStart": 104,
+       "pageEnd": 105
+      },
+      {
+       "title": "Test 18: Hücrenin Kısımları - 2",
+       "pageStart": 106,
+       "pageEnd": 107
+      },
+      {
+       "title": "Test 19: Hücrenin Kısımları - 3",
+       "pageStart": 108,
+       "pageEnd": 109
+      }
+     ]
+    },
+    {
+     "title": "Hücre Zarından Madde Geçişleri",
+     "pageStart": 110,
+     "pageEnd": 115,
+     "children": [
+      {
+       "title": "Test 20: Hücre Zarından Madde Geçişleri - 1",
+       "pageStart": 110,
+       "pageEnd": 111
+      },
+      {
+       "title": "Test 21: Hücre Zarından Madde Geçişleri - 2",
+       "pageStart": 112,
+       "pageEnd": 113
+      },
+      {
+       "title": "Test 22: Hücre Zarından Madde Geçişleri - 3",
+       "pageStart": 114,
+       "pageEnd": 115
+      }
+     ]
+    },
+    {
+     "title": "Hücre, Doku, Organ ve Sistemlerin Organizasyonu",
+     "pageStart": 116,
+     "pageEnd": 117,
+     "children": [
+      {
+       "title": "Test 23: Hücre, Doku, Organ ve Sistemlerin Organizasyonu",
+       "pageStart": 116,
+       "pageEnd": 117
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 118,
+     "pageEnd": 131,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 118,
+       "pageEnd": 119
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 120,
+       "pageEnd": 121
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 122,
+       "pageEnd": 123
+      },
+      {
+       "title": "Tema Testi - 4",
+       "pageStart": 124,
+       "pageEnd": 125
+      },
+      {
+       "title": "Tema Testi - 5",
+       "pageStart": 126,
+       "pageEnd": 127
+      },
+      {
+       "title": "Sarmal Test - 1",
+       "pageStart": 128,
+       "pageEnd": 129
+      },
+      {
+       "title": "Sarmal Test - 2",
+       "pageStart": 130,
+       "pageEnd": 131
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Enerji",
+   "pageStart": 134,
+   "pageEnd": 199,
+   "children": [
+    {
+     "title": "Canlılarda Yaşamın Devam Etmesi İçin Enerjinin Gerekliliği",
+     "pageStart": 134,
+     "pageEnd": 137,
+     "children": [
+      {
+       "title": "Test 1: Canlılarda Yaşamın Devam Etmesi İçin Enerjinin Gerekliliği - 1",
+       "pageStart": 134,
+       "pageEnd": 135
+      },
+      {
+       "title": "Test 2: Canlılarda Yaşamın Devam Etmesi İçin Enerjinin Gerekliliği - 2",
+       "pageStart": 136,
+       "pageEnd": 137
+      }
+     ]
+    },
+    {
+     "title": "Fotosentez ve Pigmentler",
+     "pageStart": 138,
+     "pageEnd": 139,
+     "children": [
+      {
+       "title": "Test 3: Fotosentez ve Pigmentler",
+       "pageStart": 138,
+       "pageEnd": 139
+      }
+     ]
+    },
+    {
+     "title": "Fotosentez Reaksiyonları",
+     "pageStart": 140,
+     "pageEnd": 143,
+     "children": [
+      {
+       "title": "Test 4: Fotosentez Reaksiyonları - 1",
+       "pageStart": 140,
+       "pageEnd": 141
+      },
+      {
+       "title": "Test 5: Fotosentez Reaksiyonları - 2",
+       "pageStart": 142,
+       "pageEnd": 143
+      }
+     ]
+    },
+    {
+     "title": "Fotosentez Hızına Etki Eden Faktörler",
+     "pageStart": 144,
+     "pageEnd": 147,
+     "children": [
+      {
+       "title": "Test 6: Fotosentez Hızına Etki Eden Faktörler - 1",
+       "pageStart": 144,
+       "pageEnd": 145
+      },
+      {
+       "title": "Test 7: Fotosentez Hızına Etki Eden Faktörler - 2",
+       "pageStart": 146,
+       "pageEnd": 147
+      }
+     ]
+    },
+    {
+     "title": "Fotosentezde Üretilen ve Kullanılan Maddeler ile Kemosentez",
+     "pageStart": 148,
+     "pageEnd": 149,
+     "children": [
+      {
+       "title": "Test 8: Fotosentezde Üretilen ve Kullanılan Maddeler ile Kemosentez",
+       "pageStart": 148,
+       "pageEnd": 149
+      }
+     ]
+    },
+    {
+     "title": "Fotosentez ve Kemosentez",
+     "pageStart": 150,
+     "pageEnd": 153,
+     "children": [
+      {
+       "title": "Test 9: Fotosentez ve Kemosentez - 1",
+       "pageStart": 150,
+       "pageEnd": 151
+      },
+      {
+       "title": "Test 10: Fotosentez ve Kemosentez - 2",
+       "pageStart": 152,
+       "pageEnd": 153
+      }
+     ]
+    },
+    {
+     "title": "Sindirim",
+     "pageStart": 154,
+     "pageEnd": 167,
+     "children": [
+      {
+       "title": "Test 11: Sindirim - 1",
+       "pageStart": 154,
+       "pageEnd": 155
+      },
+      {
+       "title": "Test 12: Sindirim - 2",
+       "pageStart": 156,
+       "pageEnd": 157
+      },
+      {
+       "title": "Test 13: Sindirim - 3",
+       "pageStart": 158,
+       "pageEnd": 159
+      },
+      {
+       "title": "Test 14: Sindirim - 4",
+       "pageStart": 160,
+       "pageEnd": 161
+      },
+      {
+       "title": "Test 15: Sindirim - 5",
+       "pageStart": 162,
+       "pageEnd": 163
+      },
+      {
+       "title": "Test 16: Sindirim - 6",
+       "pageStart": 164,
+       "pageEnd": 165
+      },
+      {
+       "title": "Test 17: Sindirim - 7",
+       "pageStart": 166,
+       "pageEnd": 167
+      }
+     ]
+    },
+    {
+     "title": "Oksijenli Solunum",
+     "pageStart": 168,
+     "pageEnd": 179,
+     "children": [
+      {
+       "title": "Test 18: Oksijenli Solunum - 1",
+       "pageStart": 168,
+       "pageEnd": 169
+      },
+      {
+       "title": "Test 19: Oksijenli Solunum - 2",
+       "pageStart": 170,
+       "pageEnd": 171
+      },
+      {
+       "title": "Test 20: Oksijenli Solunum - 3",
+       "pageStart": 172,
+       "pageEnd": 173
+      },
+      {
+       "title": "Test 21: Oksijenli Solunum - 4",
+       "pageStart": 174,
+       "pageEnd": 175
+      },
+      {
+       "title": "Test 22: Oksijenli Solunum - 5",
+       "pageStart": 176,
+       "pageEnd": 177
+      },
+      {
+       "title": "Test 23: Oksijenli Solunum - 6",
+       "pageStart": 178,
+       "pageEnd": 179
+      }
+     ]
+    },
+    {
+     "title": "Fermantasyon",
+     "pageStart": 180,
+     "pageEnd": 183,
+     "children": [
+      {
+       "title": "Test 24: Fermantasyon - 1",
+       "pageStart": 180,
+       "pageEnd": 181
+      },
+      {
+       "title": "Test 25: Fermantasyon - 2",
+       "pageStart": 182,
+       "pageEnd": 183
+      }
+     ]
+    },
+    {
+     "title": "Enerji - Metabolizma İlişkisi",
+     "pageStart": 184,
+     "pageEnd": 185,
+     "children": [
+      {
+       "title": "Test 26: Enerji - Metabolizma İlişkisi",
+       "pageStart": 184,
+       "pageEnd": 185
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 186,
+     "pageEnd": 199,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 186,
+       "pageEnd": 187
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 188,
+       "pageEnd": 189
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 190,
+       "pageEnd": 191
+      },
+      {
+       "title": "Tema Testi - 4",
+       "pageStart": 192,
+       "pageEnd": 193
+      },
+      {
+       "title": "Tema Testi - 5",
+       "pageStart": 194,
+       "pageEnd": 195
+      },
+      {
+       "title": "Sarmal Test - 3",
+       "pageStart": 196,
+       "pageEnd": 197
+      },
+      {
+       "title": "Sarmal Test - 4",
+       "pageStart": 198,
+       "pageEnd": 199
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "4. Tema: Ekoloji",
+   "pageStart": 202,
+   "pageEnd": 271,
+   "children": [
+    {
+     "title": "Ekosistemin Cansız Faktörleri",
+     "pageStart": 202,
+     "pageEnd": 203,
+     "children": [
+      {
+       "title": "Test 1: Ekosistemin Cansız Faktörleri - 1",
+       "pageStart": 202,
+       "pageEnd": 203
+      }
+     ]
+    },
+    {
+     "title": "Ekosistemin Canlı Faktörleri",
+     "pageStart": 204,
+     "pageEnd": 205,
+     "children": [
+      {
+       "title": "Test 2: Ekosistemin Canlı Faktörleri - 2",
+       "pageStart": 204,
+       "pageEnd": 205
+      }
+     ]
+    },
+    {
+     "title": "Komünitede Tür İçi ve Türler Arası Etkileşimler",
+     "pageStart": 206,
+     "pageEnd": 213,
+     "children": [
+      {
+       "title": "Test 3: Komünitede Tür İçi ve Türler Arası Etkileşimler - 1",
+       "pageStart": 206,
+       "pageEnd": 207
+      },
+      {
+       "title": "Test 4: Komünitede Tür İçi ve Türler Arası Etkileşimler - 2",
+       "pageStart": 208,
+       "pageEnd": 209
+      },
+      {
+       "title": "Test 5: Komünitede Tür İçi ve Türler Arası Etkileşimler - 3",
+       "pageStart": 210,
+       "pageEnd": 211
+      },
+      {
+       "title": "Test 6: Komünitede Tür İçi ve Türler Arası Etkileşimler - 4",
+       "pageStart": 212,
+       "pageEnd": 213
+      }
+     ]
+    },
+    {
+     "title": "Popülasyon Dinamikleri",
+     "pageStart": 214,
+     "pageEnd": 217,
+     "children": [
+      {
+       "title": "Test 7: Popülasyon Dinamikleri - 1",
+       "pageStart": 214,
+       "pageEnd": 215
+      },
+      {
+       "title": "Test 8: Popülasyon Dinamikleri - 2",
+       "pageStart": 216,
+       "pageEnd": 217
+      }
+     ]
+    },
+    {
+     "title": "Ekosistemde Madde ve Enerji Akışı",
+     "pageStart": 218,
+     "pageEnd": 219,
+     "children": [
+      {
+       "title": "Test 9: Ekosistemde Madde ve Enerji Akışı",
+       "pageStart": 218,
+       "pageEnd": 219
+      }
+     ]
+    },
+    {
+     "title": "Besin Zinciri ve Besin Ağı",
+     "pageStart": 220,
+     "pageEnd": 221,
+     "children": [
+      {
+       "title": "Test 10: Besin Zinciri ve Besin Ağı",
+       "pageStart": 220,
+       "pageEnd": 221
+      }
+     ]
+    },
+    {
+     "title": "Ekolojik Piramitler",
+     "pageStart": 222,
+     "pageEnd": 225,
+     "children": [
+      {
+       "title": "Test 11: Ekolojik Piramitler - 1",
+       "pageStart": 222,
+       "pageEnd": 223
+      },
+      {
+       "title": "Test 12: Ekolojik Piramitler - 2",
+       "pageStart": 224,
+       "pageEnd": 225
+      }
+     ]
+    },
+    {
+     "title": "Biyolojik Birikim ve Etkileri",
+     "pageStart": 226,
+     "pageEnd": 227,
+     "children": [
+      {
+       "title": "Test 13: Biyolojik Birikim ve Etkileri",
+       "pageStart": 226,
+       "pageEnd": 227
+      }
+     ]
+    },
+    {
+     "title": "Madde Döngüleri",
+     "pageStart": 228,
+     "pageEnd": 237,
+     "children": [
+      {
+       "title": "Test 14: Madde Döngüleri - 1",
+       "pageStart": 228,
+       "pageEnd": 229
+      },
+      {
+       "title": "Test 15: Madde Döngüleri - 2",
+       "pageStart": 230,
+       "pageEnd": 231
+      },
+      {
+       "title": "Test 16: Madde Döngüleri - 3",
+       "pageStart": 232,
+       "pageEnd": 233
+      },
+      {
+       "title": "Test 17: Madde Döngüleri - 4",
+       "pageStart": 234,
+       "pageEnd": 235
+      },
+      {
+       "title": "Test 18: Madde Döngüleri - 5",
+       "pageStart": 236,
+       "pageEnd": 237
+      }
+     ]
+    },
+    {
+     "title": "Ekolojik Sürdürülebilirlik",
+     "pageStart": 238,
+     "pageEnd": 249,
+     "children": [
+      {
+       "title": "Test 19: Ekolojik Sürdürülebilirlik - 1",
+       "pageStart": 238,
+       "pageEnd": 239
+      },
+      {
+       "title": "Test 20: Ekolojik Sürdürülebilirlik - 2",
+       "pageStart": 240,
+       "pageEnd": 241
+      },
+      {
+       "title": "Test 21: Ekolojik Sürdürülebilirlik - 3",
+       "pageStart": 242,
+       "pageEnd": 243
+      },
+      {
+       "title": "Test 22: Ekolojik Sürdürülebilirlik - 4",
+       "pageStart": 244,
+       "pageEnd": 245
+      },
+      {
+       "title": "Test 23: Ekolojik Sürdürülebilirlik - 5",
+       "pageStart": 246,
+       "pageEnd": 247
+      },
+      {
+       "title": "Test 24: Ekolojik Sürdürülebilirlik - 6",
+       "pageStart": 248,
+       "pageEnd": 249
+      }
+     ]
+    },
+    {
+     "title": "Ekolojik Ayak İzinin Küçültülmesi",
+     "pageStart": 250,
+     "pageEnd": 251,
+     "children": [
+      {
+       "title": "Test 25: Ekolojik Ayak İzinin Küçültülmesi",
+       "pageStart": 250,
+       "pageEnd": 251
+      }
+     ]
+    },
+    {
+     "title": "Doğal Kaynakların ve Biyoçeşitliliğin Korunması",
+     "pageStart": 252,
+     "pageEnd": 253,
+     "children": [
+      {
+       "title": "Test 26: Doğal Kaynakların ve Biyoçeşitliliğin Korunması",
+       "pageStart": 252,
+       "pageEnd": 253
+      }
+     ]
+    },
+    {
+     "title": "Atık Yönetimi",
+     "pageStart": 254,
+     "pageEnd": 255,
+     "children": [
+      {
+       "title": "Test 27: Atık Yönetimi",
+       "pageStart": 254,
+       "pageEnd": 255
+      }
+     ]
+    },
+    {
+     "title": "Tema ve Sarmal Testleri",
+     "pageStart": 256,
+     "pageEnd": 271,
+     "children": [
+      {
+       "title": "Tema Testi - 1",
+       "pageStart": 256,
+       "pageEnd": 257
+      },
+      {
+       "title": "Tema Testi - 2",
+       "pageStart": 258,
+       "pageEnd": 259
+      },
+      {
+       "title": "Tema Testi - 3",
+       "pageStart": 260,
+       "pageEnd": 261
+      },
+      {
+       "title": "Tema Testi - 4",
+       "pageStart": 262,
+       "pageEnd": 263
+      },
+      {
+       "title": "Tema Testi - 5",
+       "pageStart": 264,
+       "pageEnd": 265
+      },
+      {
+       "title": "Tema Testi - 6",
+       "pageStart": 266,
+       "pageEnd": 267
+      },
+      {
+       "title": "Sarmal Test - 5",
+       "pageStart": 268,
+       "pageEnd": 269
+      },
+      {
+       "title": "Sarmal Test - 6",
+       "pageStart": 270,
+       "pageEnd": 271
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

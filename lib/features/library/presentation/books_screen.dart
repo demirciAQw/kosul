@@ -5,43 +5,90 @@ import 'package:go_router/go_router.dart';
 import '../../../app/routes.dart';
 import '../../../core/di/core_providers.dart';
 import '../../../core/utils/formatters.dart';
+import '../domain/library.dart';
 import '../domain/progress.dart';
 import '../library_providers.dart';
 import 'library_sheet.dart';
 import 'widgets/progress_widgets.dart';
 
 /// Kitaplar sekmesi: her kitabın ne kadarı bitti, ne kadarı duruyor.
+/// Kitap kategorisi: sınav türüne ve yayıncıya göre üç sekme.
+enum BookShelf {
+  tyt('TYT'),
+  ayt('AYT'),
+  meb('MEB');
+
+  const BookShelf(this.label);
+  final String label;
+
+  /// MEB ders kitapları ayrı rafta; diğerleri sınav türüne göre.
+  static BookShelf of(Book book) {
+    if ((book.publisher ?? '').trim().toUpperCase() == 'MEB') return BookShelf.meb;
+    return book.examType == 'TYT' ? BookShelf.tyt : BookShelf.ayt;
+  }
+}
+
+/// Kitaplar sekmesi: TYT, AYT ve MEB kitapları ayrı sekmelerde; her kitabın ne
+/// kadarı bitti, ne kadarı duruyor.
 class BooksScreen extends ConsumerWidget {
   const BooksScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progress = ref.watch(bookProgressProvider);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Kitaplarım')),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'books-add',
-        onPressed: () => showLibrarySheet(context),
-        icon: const Icon(Icons.library_add_outlined),
-        label: const Text('Kitap ekle'),
-      ),
-      body: progress.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Kitaplar yüklenemedi: $e')),
-        data: (list) {
-          if (list.isEmpty) return const _EmptyBooks();
-          final done = list.fold<int>(0, (a, p) => a + p.doneLeaves);
-          final total = list.fold<int>(0, (a, p) => a + p.totalLeaves);
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
-            children: [
-              _Overview(done: done, total: total, books: list.length),
-              const SizedBox(height: 12),
-              for (final p in list) _BookCard(progress: p),
+    final all = progress.value ?? const <BookProgress>[];
+    int count(BookShelf s) => all.where((p) => BookShelf.of(p.book) == s).length;
+
+    return DefaultTabController(
+      length: BookShelf.values.length,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Kitaplarım'),
+          bottom: TabBar(
+            tabs: [
+              for (final s in BookShelf.values)
+                Tab(text: count(s) == 0 ? s.label : '${s.label} (${count(s)})'),
             ],
-          );
-        },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          heroTag: 'books-add',
+          onPressed: () => showLibrarySheet(context),
+          icon: const Icon(Icons.library_add_outlined),
+          label: const Text('Kitap ekle'),
+        ),
+        body: progress.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Kitaplar yüklenemedi: $e')),
+          data: (list) => TabBarView(
+            children: [
+              for (final shelf in BookShelf.values)
+                _ShelfView(shelf: shelf, items: [for (final p in list) if (BookShelf.of(p.book) == shelf) p]),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class _ShelfView extends StatelessWidget {
+  const _ShelfView({required this.shelf, required this.items});
+  final BookShelf shelf;
+  final List<BookProgress> items;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) return _EmptyBooks(shelf: shelf);
+    final done = items.fold<int>(0, (a, p) => a + p.doneLeaves);
+    final total = items.fold<int>(0, (a, p) => a + p.totalLeaves);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+      children: [
+        _Overview(done: done, total: total, books: items.length),
+        const SizedBox(height: 12),
+        for (final p in items) _BookCard(progress: p),
+      ],
     );
   }
 }
@@ -144,7 +191,8 @@ class _BookCard extends ConsumerWidget {
 }
 
 class _EmptyBooks extends StatelessWidget {
-  const _EmptyBooks();
+  const _EmptyBooks({required this.shelf});
+  final BookShelf shelf;
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +205,7 @@ class _EmptyBooks extends StatelessWidget {
           children: [
             Icon(Icons.menu_book_outlined, size: 48, color: theme.colorScheme.primary),
             const SizedBox(height: 16),
-            Text('Henüz kitap yok', style: theme.textTheme.titleMedium),
+            Text('${shelf.label} rafında kitap yok', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             const Text(
               'Hazır kitaplardan ekle ya da JSON şablonu içe aktar. Çözdüğün testler burada '

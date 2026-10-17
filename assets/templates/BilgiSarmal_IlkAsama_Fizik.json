@@ -1,0 +1,1018 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Bilgi Sarmal İlk Aşama Fizik Soru Bankası",
+  "publisher": "Bilgi Sarmal Yayınları",
+  "examType": "TYT",
+  "subject": "Fizik",
+  "pageCount": 286,
+  "avgQuestionsPerPage": 6
+ },
+ "units": [
+  {
+   "title": "1. Ünite: Fizik Bilimi ve Kariyer Keşfi",
+   "pageStart": 8,
+   "pageEnd": 17,
+   "children": [
+    {
+     "title": "Fizik Bilimi ve Kariyer Keşfi",
+     "pageStart": 8,
+     "pageEnd": 13,
+     "children": [
+      {
+       "title": "Test 1: Fizik Bilimi ve Kariyer Keşfi - 1",
+       "pageStart": 8,
+       "pageEnd": 9
+      },
+      {
+       "title": "Test 2: Fizik Bilimi ve Kariyer Keşfi - 2",
+       "pageStart": 10,
+       "pageEnd": 11
+      },
+      {
+       "title": "Test 3: Fizik Bilimi ve Kariyer Keşfi - 3",
+       "pageStart": 12,
+       "pageEnd": 13
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 14,
+     "pageEnd": 17,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 14,
+       "pageEnd": 15
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 16,
+       "pageEnd": 17
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Ünite: Kuvvet ve Hareket",
+   "pageStart": 20,
+   "pageEnd": 51,
+   "children": [
+    {
+     "title": "Fiziksel Niceliklerin Sınıflandırılması",
+     "pageStart": 20,
+     "pageEnd": 25,
+     "children": [
+      {
+       "title": "Test 1: Fiziksel Niceliklerin Sınıflandırılması - 1",
+       "pageStart": 20,
+       "pageEnd": 21
+      },
+      {
+       "title": "Test 2: Fiziksel Niceliklerin Sınıflandırılması - 2",
+       "pageStart": 22,
+       "pageEnd": 23
+      },
+      {
+       "title": "Test 3: Fiziksel Niceliklerin Sınıflandırılması - 3",
+       "pageStart": 24,
+       "pageEnd": 25
+      }
+     ]
+    },
+    {
+     "title": "Vektörler",
+     "pageStart": 26,
+     "pageEnd": 31,
+     "children": [
+      {
+       "title": "Test 4: Vektörler - 1",
+       "pageStart": 26,
+       "pageEnd": 27
+      },
+      {
+       "title": "Test 5: Vektörler - 2",
+       "pageStart": 28,
+       "pageEnd": 29
+      },
+      {
+       "title": "Test 6: Vektörler - 3",
+       "pageStart": 30,
+       "pageEnd": 31
+      }
+     ]
+    },
+    {
+     "title": "Kuvvet",
+     "pageStart": 32,
+     "pageEnd": 37,
+     "children": [
+      {
+       "title": "Test 7: Kuvvet - 1",
+       "pageStart": 32,
+       "pageEnd": 33
+      },
+      {
+       "title": "Test 8: Kuvvet - 2",
+       "pageStart": 34,
+       "pageEnd": 35
+      },
+      {
+       "title": "Test 9: Kuvvet - 3",
+       "pageStart": 36,
+       "pageEnd": 37
+      }
+     ]
+    },
+    {
+     "title": "Hareket ile İlgili Kavramlar",
+     "pageStart": 38,
+     "pageEnd": 43,
+     "children": [
+      {
+       "title": "Test 10: Hareket ile İlgili Kavramlar - 1",
+       "pageStart": 38,
+       "pageEnd": 39
+      },
+      {
+       "title": "Test 11: Hareket ile İlgili Kavramlar - 2",
+       "pageStart": 40,
+       "pageEnd": 41
+      },
+      {
+       "title": "Test 12: Hareket ile İlgili Kavramlar - 3",
+       "pageStart": 42,
+       "pageEnd": 43
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 44,
+     "pageEnd": 51,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 44,
+       "pageEnd": 45
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 46,
+       "pageEnd": 47
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 48,
+       "pageEnd": 49
+      },
+      {
+       "title": "Sarmal Test - 1",
+       "pageStart": 50,
+       "pageEnd": 51
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Ünite: Akışkanlar",
+   "pageStart": 54,
+   "pageEnd": 93,
+   "children": [
+    {
+     "title": "Katı Basıncı",
+     "pageStart": 54,
+     "pageEnd": 59,
+     "children": [
+      {
+       "title": "Test 1: Katı Basıncı - 1",
+       "pageStart": 54,
+       "pageEnd": 55
+      },
+      {
+       "title": "Test 2: Katı Basıncı - 2",
+       "pageStart": 56,
+       "pageEnd": 57
+      },
+      {
+       "title": "Test 3: Katı Basıncı - 3",
+       "pageStart": 58,
+       "pageEnd": 59
+      }
+     ]
+    },
+    {
+     "title": "Durgun Sıvı Basıncı",
+     "pageStart": 60,
+     "pageEnd": 65,
+     "children": [
+      {
+       "title": "Test 4: Durgun Sıvı Basıncı - 1",
+       "pageStart": 60,
+       "pageEnd": 61
+      },
+      {
+       "title": "Test 5: Durgun Sıvı Basıncı - 2",
+       "pageStart": 62,
+       "pageEnd": 63
+      },
+      {
+       "title": "Test 6: Durgun Sıvı Basıncı - 3",
+       "pageStart": 64,
+       "pageEnd": 65
+      }
+     ]
+    },
+    {
+     "title": "Açık Hava Basıncı",
+     "pageStart": 66,
+     "pageEnd": 71,
+     "children": [
+      {
+       "title": "Test 7: Açık Hava Basıncı - 1",
+       "pageStart": 66,
+       "pageEnd": 67
+      },
+      {
+       "title": "Test 8: Açık Hava Basıncı - 2",
+       "pageStart": 68,
+       "pageEnd": 69
+      },
+      {
+       "title": "Test 9: Açık Hava Basıncı - 3",
+       "pageStart": 70,
+       "pageEnd": 71
+      }
+     ]
+    },
+    {
+     "title": "Sıvıların Kaldırma Kuvveti",
+     "pageStart": 72,
+     "pageEnd": 77,
+     "children": [
+      {
+       "title": "Test 10: Sıvıların Kaldırma Kuvveti - 1",
+       "pageStart": 72,
+       "pageEnd": 73
+      },
+      {
+       "title": "Test 11: Sıvıların Kaldırma Kuvveti - 2",
+       "pageStart": 74,
+       "pageEnd": 75
+      },
+      {
+       "title": "Test 12: Sıvıların Kaldırma Kuvveti - 3",
+       "pageStart": 76,
+       "pageEnd": 77
+      }
+     ]
+    },
+    {
+     "title": "Akışkan Basıncı",
+     "pageStart": 78,
+     "pageEnd": 83,
+     "children": [
+      {
+       "title": "Test 13: Akışkan Basıncı - 1",
+       "pageStart": 78,
+       "pageEnd": 79
+      },
+      {
+       "title": "Test 14: Akışkan Basıncı - 2",
+       "pageStart": 80,
+       "pageEnd": 81
+      },
+      {
+       "title": "Test 15: Akışkan Basıncı - 3",
+       "pageStart": 82,
+       "pageEnd": 83
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 84,
+     "pageEnd": 93,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 84,
+       "pageEnd": 85
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 86,
+       "pageEnd": 87
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 88,
+       "pageEnd": 89
+      },
+      {
+       "title": "Ünite Testi - 4",
+       "pageStart": 90,
+       "pageEnd": 91
+      },
+      {
+       "title": "Ünite Testi - 5",
+       "pageStart": 92,
+       "pageEnd": 93
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "4. Ünite: Enerji",
+   "pageStart": 96,
+   "pageEnd": 143,
+   "children": [
+    {
+     "title": "Isı - İç Enerji - Öz Isı - Isı Sığası",
+     "pageStart": 96,
+     "pageEnd": 101,
+     "children": [
+      {
+       "title": "Test 1: Isı - İç Enerji - Öz Isı - Isı Sığası - 1",
+       "pageStart": 96,
+       "pageEnd": 97
+      },
+      {
+       "title": "Test 2: Isı - İç Enerji - Öz Isı - Isı Sığası - 2",
+       "pageStart": 98,
+       "pageEnd": 99
+      },
+      {
+       "title": "Test 3: Isı - İç Enerji - Öz Isı - Isı Sığası - 3",
+       "pageStart": 100,
+       "pageEnd": 101
+      }
+     ]
+    },
+    {
+     "title": "Termometreler",
+     "pageStart": 102,
+     "pageEnd": 107,
+     "children": [
+      {
+       "title": "Test 4: Termometreler - 1",
+       "pageStart": 102,
+       "pageEnd": 103
+      },
+      {
+       "title": "Test 5: Termometreler - 2",
+       "pageStart": 104,
+       "pageEnd": 105
+      },
+      {
+       "title": "Test 6: Termometreler - 3",
+       "pageStart": 106,
+       "pageEnd": 107
+      }
+     ]
+    },
+    {
+     "title": "Hâl Değişimi",
+     "pageStart": 108,
+     "pageEnd": 113,
+     "children": [
+      {
+       "title": "Test 7: Hâl Değişimi - 1",
+       "pageStart": 108,
+       "pageEnd": 109
+      },
+      {
+       "title": "Test 8: Hâl Değişimi - 2",
+       "pageStart": 110,
+       "pageEnd": 111
+      },
+      {
+       "title": "Test 9: Hâl Değişimi - 3",
+       "pageStart": 112,
+       "pageEnd": 113
+      }
+     ]
+    },
+    {
+     "title": "Isıl Denge",
+     "pageStart": 114,
+     "pageEnd": 119,
+     "children": [
+      {
+       "title": "Test 10: Isıl Denge - 1",
+       "pageStart": 114,
+       "pageEnd": 115
+      },
+      {
+       "title": "Test 11: Isıl Denge - 2",
+       "pageStart": 116,
+       "pageEnd": 117
+      },
+      {
+       "title": "Test 12: Isıl Denge - 3",
+       "pageStart": 118,
+       "pageEnd": 119
+      }
+     ]
+    },
+    {
+     "title": "Basıncın Hâl Değişimine Etkisi",
+     "pageStart": 120,
+     "pageEnd": 125,
+     "children": [
+      {
+       "title": "Test 13: Basıncın Hâl Değişimine Etkisi - 1",
+       "pageStart": 120,
+       "pageEnd": 121
+      },
+      {
+       "title": "Test 14: Basıncın Hâl Değişimine Etkisi - 2",
+       "pageStart": 122,
+       "pageEnd": 123
+      },
+      {
+       "title": "Test 15: Basıncın Hâl Değişimine Etkisi - 3",
+       "pageStart": 124,
+       "pageEnd": 125
+      }
+     ]
+    },
+    {
+     "title": "Enerji İletim Yolları ve Enerji İletim Hızı",
+     "pageStart": 126,
+     "pageEnd": 131,
+     "children": [
+      {
+       "title": "Test 16: Enerji İletim Yolları ve Enerji İletim Hızı - 1",
+       "pageStart": 126,
+       "pageEnd": 127
+      },
+      {
+       "title": "Test 17: Enerji İletim Yolları ve Enerji İletim Hızı - 2",
+       "pageStart": 128,
+       "pageEnd": 129
+      },
+      {
+       "title": "Test 18: Enerji İletim Yolları ve Enerji İletim Hızı - 3",
+       "pageStart": 130,
+       "pageEnd": 131
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 132,
+     "pageEnd": 143,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 132,
+       "pageEnd": 133
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 134,
+       "pageEnd": 135
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 136,
+       "pageEnd": 137
+      },
+      {
+       "title": "Ünite Testi - 4",
+       "pageStart": 138,
+       "pageEnd": 139
+      },
+      {
+       "title": "Ünite Testi - 5",
+       "pageStart": 140,
+       "pageEnd": 141
+      },
+      {
+       "title": "Sarmal Test - 2",
+       "pageStart": 142,
+       "pageEnd": 143
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "5. Ünite: Kuvvet ve Hareket",
+   "pageStart": 146,
+   "pageEnd": 163,
+   "children": [
+    {
+     "title": "Sabit Hızlı Hareket",
+     "pageStart": 146,
+     "pageEnd": 151,
+     "children": [
+      {
+       "title": "Test 1: Sabit Hızlı Hareket - 1",
+       "pageStart": 146,
+       "pageEnd": 147
+      },
+      {
+       "title": "Test 2: Sabit Hızlı Hareket - 2",
+       "pageStart": 148,
+       "pageEnd": 149
+      },
+      {
+       "title": "Test 3: Sabit Hızlı Hareket - 3",
+       "pageStart": 150,
+       "pageEnd": 151
+      }
+     ]
+    },
+    {
+     "title": "Tek Boyutta Sabit İvmeli Hareket",
+     "pageStart": 152,
+     "pageEnd": 157,
+     "children": [
+      {
+       "title": "Test 4: Tek Boyutta Sabit İvmeli Hareket - 1",
+       "pageStart": 152,
+       "pageEnd": 153
+      },
+      {
+       "title": "Test 5: Tek Boyutta Sabit İvmeli Hareket - 2",
+       "pageStart": 154,
+       "pageEnd": 155
+      },
+      {
+       "title": "Test 6: Tek Boyutta Sabit İvmeli Hareket - 3",
+       "pageStart": 156,
+       "pageEnd": 157
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 158,
+     "pageEnd": 163,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 158,
+       "pageEnd": 159
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 160,
+       "pageEnd": 161
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 162,
+       "pageEnd": 163
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "6. Ünite: Enerji",
+   "pageStart": 166,
+   "pageEnd": 193,
+   "children": [
+    {
+     "title": "İş, Enerji ve Güç",
+     "pageStart": 166,
+     "pageEnd": 171,
+     "children": [
+      {
+       "title": "Test 1: İş, Enerji ve Güç - 1",
+       "pageStart": 166,
+       "pageEnd": 167
+      },
+      {
+       "title": "Test 2: İş, Enerji ve Güç - 2",
+       "pageStart": 168,
+       "pageEnd": 169
+      },
+      {
+       "title": "Test 3: İş, Enerji ve Güç - 3",
+       "pageStart": 170,
+       "pageEnd": 171
+      }
+     ]
+    },
+    {
+     "title": "Mekanik Enerji - Enerji Biçimleri",
+     "pageStart": 172,
+     "pageEnd": 177,
+     "children": [
+      {
+       "title": "Test 4: Mekanik Enerji - Enerji Biçimleri - 1",
+       "pageStart": 172,
+       "pageEnd": 173
+      },
+      {
+       "title": "Test 5: Mekanik Enerji - Enerji Biçimleri - 2",
+       "pageStart": 174,
+       "pageEnd": 175
+      },
+      {
+       "title": "Test 6: Mekanik Enerji - Enerji Biçimleri - 3",
+       "pageStart": 176,
+       "pageEnd": 177
+      }
+     ]
+    },
+    {
+     "title": "Enerji Kaynakları",
+     "pageStart": 178,
+     "pageEnd": 183,
+     "children": [
+      {
+       "title": "Test 7: Enerji Kaynakları - 1",
+       "pageStart": 178,
+       "pageEnd": 179
+      },
+      {
+       "title": "Test 8: Enerji Kaynakları - 2",
+       "pageStart": 180,
+       "pageEnd": 181
+      },
+      {
+       "title": "Test 9: Enerji Kaynakları - 3",
+       "pageStart": 182,
+       "pageEnd": 183
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 184,
+     "pageEnd": 193,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 184,
+       "pageEnd": 185
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 186,
+       "pageEnd": 187
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 188,
+       "pageEnd": 189
+      },
+      {
+       "title": "Ünite Testi - 4",
+       "pageStart": 190,
+       "pageEnd": 191
+      },
+      {
+       "title": "Sarmal Test - 3",
+       "pageStart": 192,
+       "pageEnd": 193
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "7. Ünite: Elektrik",
+   "pageStart": 196,
+   "pageEnd": 235,
+   "children": [
+    {
+     "title": "Akım - Potansiyel Fark ve Direnç",
+     "pageStart": 196,
+     "pageEnd": 201,
+     "children": [
+      {
+       "title": "Test 1: Akım - Potansiyel Fark ve Direnç - 1",
+       "pageStart": 196,
+       "pageEnd": 197
+      },
+      {
+       "title": "Test 2: Akım - Potansiyel Fark ve Direnç - 2",
+       "pageStart": 198,
+       "pageEnd": 199
+      },
+      {
+       "title": "Test 3: Akım - Potansiyel Fark ve Direnç - 3",
+       "pageStart": 200,
+       "pageEnd": 201
+      }
+     ]
+    },
+    {
+     "title": "Dirençlerin Bağlanması",
+     "pageStart": 202,
+     "pageEnd": 207,
+     "children": [
+      {
+       "title": "Test 4: Dirençlerin Bağlanması - 1",
+       "pageStart": 202,
+       "pageEnd": 203
+      },
+      {
+       "title": "Test 5: Dirençlerin Bağlanması - 2",
+       "pageStart": 204,
+       "pageEnd": 205
+      },
+      {
+       "title": "Test 6: Dirençlerin Bağlanması - 3",
+       "pageStart": 206,
+       "pageEnd": 207
+      }
+     ]
+    },
+    {
+     "title": "Devre Elemanları",
+     "pageStart": 208,
+     "pageEnd": 213,
+     "children": [
+      {
+       "title": "Test 7: Devre Elemanları - 1",
+       "pageStart": 208,
+       "pageEnd": 209
+      },
+      {
+       "title": "Test 8: Devre Elemanları - 2",
+       "pageStart": 210,
+       "pageEnd": 211
+      },
+      {
+       "title": "Test 9: Devre Elemanları - 3",
+       "pageStart": 212,
+       "pageEnd": 213
+      }
+     ]
+    },
+    {
+     "title": "Üreteçler",
+     "pageStart": 214,
+     "pageEnd": 219,
+     "children": [
+      {
+       "title": "Test 10: Üreteçler - 1",
+       "pageStart": 214,
+       "pageEnd": 215
+      },
+      {
+       "title": "Test 11: Üreteçler - 2",
+       "pageStart": 216,
+       "pageEnd": 217
+      },
+      {
+       "title": "Test 12: Üreteçler - 3",
+       "pageStart": 218,
+       "pageEnd": 219
+      }
+     ]
+    },
+    {
+     "title": "Elektrik Kazalarından Korunma ve Topraklama",
+     "pageStart": 220,
+     "pageEnd": 223,
+     "children": [
+      {
+       "title": "Test 13: Elektrik Kazalarından Korunma ve Topraklama - 1",
+       "pageStart": 220,
+       "pageEnd": 221
+      },
+      {
+       "title": "Test 14: Elektrik Kazalarından Korunma ve Topraklama - 2",
+       "pageStart": 222,
+       "pageEnd": 223
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 224,
+     "pageEnd": 235,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 224,
+       "pageEnd": 225
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 226,
+       "pageEnd": 227
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 228,
+       "pageEnd": 229
+      },
+      {
+       "title": "Ünite Testi - 4",
+       "pageStart": 230,
+       "pageEnd": 231
+      },
+      {
+       "title": "Ünite Testi - 5",
+       "pageStart": 232,
+       "pageEnd": 233
+      },
+      {
+       "title": "Sarmal Test - 4",
+       "pageStart": 234,
+       "pageEnd": 235
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "8. Ünite: Dalgalar",
+   "pageStart": 238,
+   "pageEnd": 285,
+   "children": [
+    {
+     "title": "Periyodik Hareketler",
+     "pageStart": 238,
+     "pageEnd": 243,
+     "children": [
+      {
+       "title": "Test 1: Periyodik Hareketler - 1",
+       "pageStart": 238,
+       "pageEnd": 239
+      },
+      {
+       "title": "Test 2: Periyodik Hareketler - 2",
+       "pageStart": 240,
+       "pageEnd": 241
+      },
+      {
+       "title": "Test 3: Periyodik Hareketler - 3",
+       "pageStart": 242,
+       "pageEnd": 243
+      }
+     ]
+    },
+    {
+     "title": "Dalgaların Temel Kavramları",
+     "pageStart": 244,
+     "pageEnd": 249,
+     "children": [
+      {
+       "title": "Test 4: Dalgaların Temel Kavramları - 1",
+       "pageStart": 244,
+       "pageEnd": 245
+      },
+      {
+       "title": "Test 5: Dalgaların Temel Kavramları - 2",
+       "pageStart": 246,
+       "pageEnd": 247
+      },
+      {
+       "title": "Test 6: Dalgaların Temel Kavramları - 3",
+       "pageStart": 248,
+       "pageEnd": 249
+      }
+     ]
+    },
+    {
+     "title": "Dalgaların Sınıflandırılması",
+     "pageStart": 250,
+     "pageEnd": 255,
+     "children": [
+      {
+       "title": "Test 7: Dalgaların Sınıflandırılması - 1",
+       "pageStart": 250,
+       "pageEnd": 251
+      },
+      {
+       "title": "Test 8: Dalgaların Sınıflandırılması - 2",
+       "pageStart": 252,
+       "pageEnd": 253
+      },
+      {
+       "title": "Test 9: Dalgaların Sınıflandırılması - 3",
+       "pageStart": 254,
+       "pageEnd": 255
+      }
+     ]
+    },
+    {
+     "title": "Dalgaların Yayılma Sürati",
+     "pageStart": 256,
+     "pageEnd": 261,
+     "children": [
+      {
+       "title": "Test 10: Dalgaların Yayılma Sürati - 1",
+       "pageStart": 256,
+       "pageEnd": 257
+      },
+      {
+       "title": "Test 11: Dalgaların Yayılma Sürati - 2",
+       "pageStart": 258,
+       "pageEnd": 259
+      },
+      {
+       "title": "Test 12: Dalgaların Yayılma Sürati - 3",
+       "pageStart": 260,
+       "pageEnd": 261
+      }
+     ]
+    },
+    {
+     "title": "Su Dalgalarında Yansıma",
+     "pageStart": 262,
+     "pageEnd": 265,
+     "children": [
+      {
+       "title": "Test 13: Su Dalgalarında Yansıma - 1",
+       "pageStart": 262,
+       "pageEnd": 263
+      },
+      {
+       "title": "Test 14: Su Dalgalarında Yansıma - 2",
+       "pageStart": 264,
+       "pageEnd": 265
+      }
+     ]
+    },
+    {
+     "title": "Su Dalgalarında Kırılma",
+     "pageStart": 266,
+     "pageEnd": 269,
+     "children": [
+      {
+       "title": "Test 15: Su Dalgalarında Kırılma - 1",
+       "pageStart": 266,
+       "pageEnd": 267
+      },
+      {
+       "title": "Test 16: Su Dalgalarında Kırılma - 2",
+       "pageStart": 268,
+       "pageEnd": 269
+      }
+     ]
+    },
+    {
+     "title": "Ses ve Deprem Dalgaları",
+     "pageStart": 270,
+     "pageEnd": 275,
+     "children": [
+      {
+       "title": "Test 17: Ses ve Deprem Dalgaları - 1",
+       "pageStart": 270,
+       "pageEnd": 271
+      },
+      {
+       "title": "Test 18: Ses ve Deprem Dalgaları - 2",
+       "pageStart": 272,
+       "pageEnd": 273
+      },
+      {
+       "title": "Test 19: Ses ve Deprem Dalgaları - 3",
+       "pageStart": 274,
+       "pageEnd": 275
+      }
+     ]
+    },
+    {
+     "title": "Ünite ve Sarmal Testleri",
+     "pageStart": 276,
+     "pageEnd": 285,
+     "children": [
+      {
+       "title": "Ünite Testi - 1",
+       "pageStart": 276,
+       "pageEnd": 277
+      },
+      {
+       "title": "Ünite Testi - 2",
+       "pageStart": 278,
+       "pageEnd": 279
+      },
+      {
+       "title": "Ünite Testi - 3",
+       "pageStart": 280,
+       "pageEnd": 281
+      },
+      {
+       "title": "Ünite Testi - 4",
+       "pageStart": 282,
+       "pageEnd": 283
+      },
+      {
+       "title": "Sarmal Test - 5",
+       "pageStart": 284,
+       "pageEnd": 285
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

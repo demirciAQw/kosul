@@ -1,0 +1,1126 @@
+{
+ "format": "kocum.book-template",
+ "schemaVersion": 1,
+ "author": "kocum",
+ "book": {
+  "title": "Orijinal Matematik Birinci Aşama Soru Bankası",
+  "publisher": "Orijinal Matematik Yayınları",
+  "examType": "TYT",
+  "subject": "Matematik",
+  "pageCount": 356,
+  "avgQuestionsPerPage": 5
+ },
+ "units": [
+  {
+   "title": "1. Tema: Sayılar",
+   "pageStart": 6,
+   "pageEnd": 123,
+   "children": [
+    {
+     "title": "Üslü İfadeler",
+     "pageStart": 6,
+     "pageEnd": 25,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 6,
+       "pageEnd": 6
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 7,
+       "pageEnd": 7
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 8,
+       "pageEnd": 8
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 9,
+       "pageEnd": 9
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 10,
+       "pageEnd": 10
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 11,
+       "pageEnd": 11
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 12,
+       "pageEnd": 12
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 8",
+       "pageStart": 13,
+       "pageEnd": 14
+      },
+      {
+       "title": "Beceri Temelli Tema Test 9",
+       "pageStart": 15,
+       "pageEnd": 16
+      },
+      {
+       "title": "Beceri Temelli Tema Test 10",
+       "pageStart": 17,
+       "pageEnd": 18
+      },
+      {
+       "title": "Beceri Temelli Tema Test 11",
+       "pageStart": 19,
+       "pageEnd": 20
+      },
+      {
+       "title": "Beceri Temelli Tema Test 12",
+       "pageStart": 21,
+       "pageEnd": 22
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 13",
+       "pageStart": 23,
+       "pageEnd": 25
+      }
+     ]
+    },
+    {
+     "title": "Köklü İfadeler",
+     "pageStart": 26,
+     "pageEnd": 45,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 26,
+       "pageEnd": 26
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 27,
+       "pageEnd": 27
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 28,
+       "pageEnd": 29
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 30,
+       "pageEnd": 30
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 31,
+       "pageEnd": 31
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 32,
+       "pageEnd": 33
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 34,
+       "pageEnd": 35
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 36,
+       "pageEnd": 37
+      },
+      {
+       "title": "Beceri Temelli Tema Test 9",
+       "pageStart": 38,
+       "pageEnd": 39
+      },
+      {
+       "title": "Beceri Temelli Tema Test 10",
+       "pageStart": 40,
+       "pageEnd": 41
+      },
+      {
+       "title": "Beceri Temelli Tema Test 11",
+       "pageStart": 42,
+       "pageEnd": 43
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 12",
+       "pageStart": 44,
+       "pageEnd": 45
+      }
+     ]
+    },
+    {
+     "title": "Sayılar - 1 (Sayı Kümeleri ve Gerçek Sayı Aralıkları)",
+     "pageStart": 46,
+     "pageEnd": 63,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 46,
+       "pageEnd": 46
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 47,
+       "pageEnd": 47
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 48,
+       "pageEnd": 49
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 50,
+       "pageEnd": 50
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 51,
+       "pageEnd": 51
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 52,
+       "pageEnd": 53
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 54,
+       "pageEnd": 54
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 8",
+       "pageStart": 55,
+       "pageEnd": 55
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 9",
+       "pageStart": 56,
+       "pageEnd": 57
+      },
+      {
+       "title": "Beceri Temelli Tema Test 10",
+       "pageStart": 58,
+       "pageEnd": 59
+      },
+      {
+       "title": "Beceri Temelli Tema Test 11",
+       "pageStart": 60,
+       "pageEnd": 61
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 12",
+       "pageStart": 62,
+       "pageEnd": 63
+      }
+     ]
+    },
+    {
+     "title": "Sayılar - 2",
+     "pageStart": 64,
+     "pageEnd": 78,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 13",
+       "pageStart": 64,
+       "pageEnd": 64
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 14",
+       "pageStart": 65,
+       "pageEnd": 65
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 15",
+       "pageStart": 66,
+       "pageEnd": 66
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 16",
+       "pageStart": 67,
+       "pageEnd": 67
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 17",
+       "pageStart": 68,
+       "pageEnd": 68
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 18",
+       "pageStart": 69,
+       "pageEnd": 69
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 19",
+       "pageStart": 70,
+       "pageEnd": 71
+      },
+      {
+       "title": "Beceri Temelli Tema Test 20",
+       "pageStart": 72,
+       "pageEnd": 73
+      },
+      {
+       "title": "Beceri Temelli Tema Test 21",
+       "pageStart": 74,
+       "pageEnd": 75
+      },
+      {
+       "title": "Beceri Temelli Tema Test 22",
+       "pageStart": 76,
+       "pageEnd": 77
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 23",
+       "pageStart": 78,
+       "pageEnd": 78
+      }
+     ]
+    },
+    {
+     "title": "Bir Doğal Sayının Asal Çarpanları ve Bölen Sayıları",
+     "pageStart": 79,
+     "pageEnd": 90,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 79,
+       "pageEnd": 79
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 80,
+       "pageEnd": 80
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 81,
+       "pageEnd": 82
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 83,
+       "pageEnd": 83
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 84,
+       "pageEnd": 84
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 85,
+       "pageEnd": 86
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 87,
+       "pageEnd": 88
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 8",
+       "pageStart": 89,
+       "pageEnd": 90
+      }
+     ]
+    },
+    {
+     "title": "EBOB-EKOK",
+     "pageStart": 91,
+     "pageEnd": 104,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 91,
+       "pageEnd": 91
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 92,
+       "pageEnd": 92
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 93,
+       "pageEnd": 93
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 94,
+       "pageEnd": 95
+      },
+      {
+       "title": "Beceri Temelli Tema Test 5",
+       "pageStart": 96,
+       "pageEnd": 96
+      },
+      {
+       "title": "Beceri Temelli Tema Test 6",
+       "pageStart": 97,
+       "pageEnd": 98
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 99,
+       "pageEnd": 100
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 101,
+       "pageEnd": 102
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 12",
+       "pageStart": 103,
+       "pageEnd": 104
+      }
+     ]
+    },
+    {
+     "title": "Bölme ve Bölünebilme",
+     "pageStart": 105,
+     "pageEnd": 123,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 105,
+       "pageEnd": 105
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 106,
+       "pageEnd": 107
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 108,
+       "pageEnd": 109
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 110,
+       "pageEnd": 111
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 112,
+       "pageEnd": 113
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 114,
+       "pageEnd": 115
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 116,
+       "pageEnd": 117
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 118,
+       "pageEnd": 119
+      },
+      {
+       "title": "Beceri Temelli Tema Test 9",
+       "pageStart": 120,
+       "pageEnd": 121
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 10",
+       "pageStart": 122,
+       "pageEnd": 123
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "2. Tema: Nicelikler ve Değişimler",
+   "pageStart": 126,
+   "pageEnd": 261,
+   "children": [
+    {
+     "title": "Doğrusal Fonksiyonlar",
+     "pageStart": 126,
+     "pageEnd": 166,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 126,
+       "pageEnd": 126
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 127,
+       "pageEnd": 128
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 129,
+       "pageEnd": 130
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 131,
+       "pageEnd": 131
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 132,
+       "pageEnd": 133
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 134,
+       "pageEnd": 135
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 136,
+       "pageEnd": 137
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 8",
+       "pageStart": 138,
+       "pageEnd": 138
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 9",
+       "pageStart": 139,
+       "pageEnd": 140
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 10",
+       "pageStart": 141,
+       "pageEnd": 142
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 11",
+       "pageStart": 143,
+       "pageEnd": 144
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 12",
+       "pageStart": 145,
+       "pageEnd": 145
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 13",
+       "pageStart": 146,
+       "pageEnd": 147
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 14",
+       "pageStart": 148,
+       "pageEnd": 149
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 15",
+       "pageStart": 150,
+       "pageEnd": 151
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 16",
+       "pageStart": 152,
+       "pageEnd": 152
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 17",
+       "pageStart": 153,
+       "pageEnd": 154
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 18",
+       "pageStart": 155,
+       "pageEnd": 156
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 19",
+       "pageStart": 157,
+       "pageEnd": 158
+      },
+      {
+       "title": "Beceri Temelli Tema Test 20",
+       "pageStart": 159,
+       "pageEnd": 160
+      },
+      {
+       "title": "Beceri Temelli Tema Test 21",
+       "pageStart": 161,
+       "pageEnd": 162
+      },
+      {
+       "title": "Beceri Temelli Tema Test 22",
+       "pageStart": 163,
+       "pageEnd": 164
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 23",
+       "pageStart": 165,
+       "pageEnd": 166
+      }
+     ]
+    },
+    {
+     "title": "Karesel Fonksiyonlar",
+     "pageStart": 167,
+     "pageEnd": 199,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 167,
+       "pageEnd": 167
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 168,
+       "pageEnd": 169
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 170,
+       "pageEnd": 170
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 171,
+       "pageEnd": 172
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 173,
+       "pageEnd": 173
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 174,
+       "pageEnd": 175
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 176,
+       "pageEnd": 176
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 8",
+       "pageStart": 177,
+       "pageEnd": 178
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 9",
+       "pageStart": 179,
+       "pageEnd": 180
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 10",
+       "pageStart": 181,
+       "pageEnd": 181
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 11",
+       "pageStart": 182,
+       "pageEnd": 183
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 12",
+       "pageStart": 184,
+       "pageEnd": 184
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 13",
+       "pageStart": 185,
+       "pageEnd": 186
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 14",
+       "pageStart": 187,
+       "pageEnd": 187
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 15",
+       "pageStart": 188,
+       "pageEnd": 189
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 16",
+       "pageStart": 190,
+       "pageEnd": 191
+      },
+      {
+       "title": "Beceri Temelli Tema Test 17",
+       "pageStart": 192,
+       "pageEnd": 192
+      },
+      {
+       "title": "Beceri Temelli Tema Test 18",
+       "pageStart": 193,
+       "pageEnd": 194
+      },
+      {
+       "title": "Beceri Temelli Tema Test 19",
+       "pageStart": 195,
+       "pageEnd": 196
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 20",
+       "pageStart": 197,
+       "pageEnd": 199
+      }
+     ]
+    },
+    {
+     "title": "Karekök Fonksiyonlar",
+     "pageStart": 200,
+     "pageEnd": 216,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 200,
+       "pageEnd": 200
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 201,
+       "pageEnd": 202
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 203,
+       "pageEnd": 204
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 205,
+       "pageEnd": 206
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 207,
+       "pageEnd": 208
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 209,
+       "pageEnd": 210
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 211,
+       "pageEnd": 212
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 213,
+       "pageEnd": 214
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 9",
+       "pageStart": 215,
+       "pageEnd": 216
+      }
+     ]
+    },
+    {
+     "title": "Rasyonel Fonksiyonlar",
+     "pageStart": 217,
+     "pageEnd": 230,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 217,
+       "pageEnd": 217
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 218,
+       "pageEnd": 219
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 220,
+       "pageEnd": 221
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 222,
+       "pageEnd": 223
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 224,
+       "pageEnd": 225
+      },
+      {
+       "title": "Beceri Temelli Tema Test 6",
+       "pageStart": 226,
+       "pageEnd": 227
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 228,
+       "pageEnd": 229
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 8",
+       "pageStart": 230,
+       "pageEnd": 230
+      }
+     ]
+    },
+    {
+     "title": "Ters Fonksiyonlar",
+     "pageStart": 231,
+     "pageEnd": 249,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 231,
+       "pageEnd": 231
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 232,
+       "pageEnd": 233
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 234,
+       "pageEnd": 235
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 236,
+       "pageEnd": 237
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 238,
+       "pageEnd": 239
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 240,
+       "pageEnd": 241
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 242,
+       "pageEnd": 243
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 244,
+       "pageEnd": 244
+      },
+      {
+       "title": "Beceri Temelli Tema Test 9",
+       "pageStart": 245,
+       "pageEnd": 246
+      },
+      {
+       "title": "Beceri Temelli Tema Test 10",
+       "pageStart": 247,
+       "pageEnd": 248
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 11",
+       "pageStart": 249,
+       "pageEnd": 249
+      }
+     ]
+    },
+    {
+     "title": "Fonksiyonlarda İfade Edilebilen Denklem ve Eşitsizlikler İçeren Problemlerin Çözümü",
+     "pageStart": 250,
+     "pageEnd": 261,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 250,
+       "pageEnd": 251
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 252,
+       "pageEnd": 253
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 254,
+       "pageEnd": 255
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 256,
+       "pageEnd": 257
+      },
+      {
+       "title": "Beceri Temelli Tema Test 5",
+       "pageStart": 258,
+       "pageEnd": 258
+      },
+      {
+       "title": "Beceri Temelli Tema Test 6",
+       "pageStart": 259,
+       "pageEnd": 260
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 7",
+       "pageStart": 261,
+       "pageEnd": 261
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "3. Tema: Algoritma ve Bilişim - İstatistiksel Araştırma Süreci",
+   "pageStart": 264,
+   "pageEnd": 353,
+   "children": [
+    {
+     "title": "Algoritma ve Bilişim",
+     "pageStart": 264,
+     "pageEnd": 314,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 264,
+       "pageEnd": 265
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 266,
+       "pageEnd": 267
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 268,
+       "pageEnd": 269
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 270,
+       "pageEnd": 271
+      },
+      {
+       "title": "Beceri Temelli Tema Test 5",
+       "pageStart": 272,
+       "pageEnd": 273
+      },
+      {
+       "title": "Beceri Temelli Tema Test 6",
+       "pageStart": 274,
+       "pageEnd": 275
+      },
+      {
+       "title": "Beceri Temelli Tema Test 7",
+       "pageStart": 276,
+       "pageEnd": 277
+      },
+      {
+       "title": "Beceri Temelli Tema Test 8",
+       "pageStart": 278,
+       "pageEnd": 279
+      },
+      {
+       "title": "Beceri Temelli Tema Test 9",
+       "pageStart": 280,
+       "pageEnd": 282
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 10",
+       "pageStart": 283,
+       "pageEnd": 284
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 11",
+       "pageStart": 285,
+       "pageEnd": 286
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 12",
+       "pageStart": 287,
+       "pageEnd": 288
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 13",
+       "pageStart": 289,
+       "pageEnd": 290
+      },
+      {
+       "title": "Beceri Temelli Tema Test 14",
+       "pageStart": 291,
+       "pageEnd": 292
+      },
+      {
+       "title": "Beceri Temelli Tema Test 15",
+       "pageStart": 293,
+       "pageEnd": 294
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 16",
+       "pageStart": 295,
+       "pageEnd": 296
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 17",
+       "pageStart": 297,
+       "pageEnd": 297
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 18",
+       "pageStart": 298,
+       "pageEnd": 298
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 19",
+       "pageStart": 299,
+       "pageEnd": 300
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 20",
+       "pageStart": 301,
+       "pageEnd": 301
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 21",
+       "pageStart": 302,
+       "pageEnd": 303
+      },
+      {
+       "title": "Beceri Temelli Tema Test 22",
+       "pageStart": 304,
+       "pageEnd": 305
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 23",
+       "pageStart": 306,
+       "pageEnd": 308
+      },
+      {
+       "title": "Beceri Temelli Tema Test 24",
+       "pageStart": 309,
+       "pageEnd": 311
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 25",
+       "pageStart": 312,
+       "pageEnd": 314
+      }
+     ]
+    },
+    {
+     "title": "İstatistiksel Araştırma Süreci",
+     "pageStart": 315,
+     "pageEnd": 353,
+     "children": [
+      {
+       "title": "Bilgi Temelli Tema Test 1",
+       "pageStart": 315,
+       "pageEnd": 316
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 2",
+       "pageStart": 317,
+       "pageEnd": 318
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 3",
+       "pageStart": 319,
+       "pageEnd": 320
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 4",
+       "pageStart": 321,
+       "pageEnd": 322
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 5",
+       "pageStart": 323,
+       "pageEnd": 324
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 6",
+       "pageStart": 325,
+       "pageEnd": 326
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 7",
+       "pageStart": 327,
+       "pageEnd": 328
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 8",
+       "pageStart": 329,
+       "pageEnd": 330
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 9",
+       "pageStart": 331,
+       "pageEnd": 332
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 10",
+       "pageStart": 333,
+       "pageEnd": 335
+      },
+      {
+       "title": "Beceri Temelli Tema Test 11",
+       "pageStart": 335,
+       "pageEnd": 336
+      },
+      {
+       "title": "Beceri Temelli Tema Test 12",
+       "pageStart": 337,
+       "pageEnd": 338
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 13",
+       "pageStart": 339,
+       "pageEnd": 340
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 14",
+       "pageStart": 341,
+       "pageEnd": 342
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 15",
+       "pageStart": 343,
+       "pageEnd": 344
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 16",
+       "pageStart": 345,
+       "pageEnd": 346
+      },
+      {
+       "title": "Bilgi Temelli Tema Test 17",
+       "pageStart": 347,
+       "pageEnd": 348
+      },
+      {
+       "title": "Beceri Temelli Tema Test 18",
+       "pageStart": 349,
+       "pageEnd": 350
+      },
+      {
+       "title": "Bağlam Temelli Tema Test 19",
+       "pageStart": 351,
+       "pageEnd": 353
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
