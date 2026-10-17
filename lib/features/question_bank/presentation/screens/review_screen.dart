@@ -104,6 +104,39 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
     }
   }
 
+  /// Tekrar sırasında soruyu siler; liste ve sayaçlar hemen güncellenir.
+  Future<void> _deleteCurrent() async {
+    final item = _current;
+    if (item == null || _busy) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Soruyu sil?'),
+        content: const Text('Soru, fotoğrafları ve tekrar geçmişi silinir.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(deleteQuestionCardProvider).call(item.card.id);
+      if (!mounted) return;
+      setState(() {
+        _queue.removeWhere((q) => q.card.id == item.card.id);
+        _showSolution = false;
+        _busy = false;
+      });
+      messenger.showSnackBar(const SnackBar(content: Text('Soru silindi.')));
+    } on Exception catch (e) {
+      if (mounted) setState(() => _busy = false);
+      messenger.showSnackBar(SnackBar(content: Text('Silinemedi: $e')));
+    }
+  }
+
   static String _interval(int days) => days <= 1 ? 'yarın' : '$days gün';
 
   @override
@@ -125,6 +158,11 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Row(
             children: [
+              IconButton(
+                tooltip: 'Soruyu sil',
+                onPressed: _busy ? null : _deleteCurrent,
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
               Expanded(
                 child: Text(
                   [if (topic != null) topic.title, card.sourceName].join(', '),

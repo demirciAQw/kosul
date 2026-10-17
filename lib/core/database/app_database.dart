@@ -29,8 +29,9 @@ class AppDatabase extends _$AppDatabase {
   /// v3: testlerin kesin soru sayısı, planların tamamlanma tarihi.
   /// v4: test ilerlemesi (çözüldü/çözülmedi), "Diğer" nedeni için açıklama.
   /// v5: kartlarda serbest konu/kazanım adı (karneden içe aktarma).
+  /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -76,6 +77,11 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(questionCards, questionCards.reasonNote);
             }
             await _createV2Indexes();
+          }
+          if (from < 6) {
+            await customStatement(
+              'DELETE FROM review_states WHERE card_id NOT IN (SELECT id FROM question_cards)',
+            );
           }
           if (from < 5) {
             final cols = await customSelect('PRAGMA table_info(question_cards)').get();

@@ -46,8 +46,12 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
           .write(QuestionCardsCompanion(isStarred: Value(starred)));
 
   @override
-  Future<void> delete(String cardId) =>
-      (_db.delete(_db.questionCards)..where((c) => c.id.equals(cardId))).go();
+  Future<void> delete(String cardId) => _db.transaction(() async {
+        // Tekrar kaydı açıkça silinir; yabancı anahtar zincirine güvenmiyoruz
+        // (eski sürümden yükseltmede bağ kopmuş olabilir).
+        await (_db.delete(_db.reviewStates)..where((r) => r.cardId.equals(cardId))).go();
+        await (_db.delete(_db.questionCards)..where((c) => c.id.equals(cardId))).go();
+      });
 
   @override
   Stream<List<QuestionCard>> watch(QuestionFilter f) {
@@ -122,8 +126,12 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
   @override
   Stream<int> watchDueCount(DateTime now) {
     final r = _db.reviewStates;
+    final c = _db.questionCards;
     final count = r.cardId.count();
+    // Yalnızca hâlâ var olan kartlar sayılır: kart silinmiş ama tekrar kaydı
+    // kalmışsa (eski veri) sayaca girmez.
     final q = _db.selectOnly(r)
+      ..join([innerJoin(c, c.id.equalsExp(r.cardId))])
       ..addColumns([count])
       ..where(r.dueAt.isSmallerOrEqualValue(now));
     return q.map((row) => row.read(count) ?? 0).watchSingle();

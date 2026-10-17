@@ -141,6 +141,31 @@ class _IncompleteTileState extends ConsumerState<_IncompleteTile> {
     }
   }
 
+  Future<void> _delete() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Soruyu sil?'),
+        content: const Text('Soru, fotoğrafları ve tekrar geçmişi silinir.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _busy = true);
+    try {
+      await ref.read(deleteQuestionCardProvider).call(_card.id);
+      messenger.showSnackBar(const SnackBar(content: Text('Soru silindi.')));
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Silinemedi: $e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _pickReason() async {
     final messenger = ScaffoldMessenger.of(context);
     final reason = await showReasonSheet(context, status: _card.status);
@@ -211,6 +236,11 @@ class _IncompleteTileState extends ConsumerState<_IncompleteTile> {
                     onPressed: _addPhoto,
                     icon: const Icon(Icons.add_a_photo_outlined),
                   ),
+                IconButton(
+                  tooltip: 'Soruyu sil',
+                  onPressed: _delete,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                ),
               ],
             ),
     );
