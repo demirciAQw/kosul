@@ -59,7 +59,6 @@ class _MockExamsScreenState extends ConsumerState<MockExamsScreen> {
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
             children: [
               SegmentedButton<MockKind>(
-                showSelectedIcon: false,
                 segments: [
                   for (final k in MockKind.values)
                     ButtonSegment(value: k, label: Text(k.label)),

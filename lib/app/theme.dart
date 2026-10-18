@@ -73,8 +73,8 @@ abstract final class AppTheme {
     final text = base.textTheme.apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
 
     return base.copyWith(
-      // Zemin beyaz; kartlar ince gri çizgiyle ayrılır.
-      scaffoldBackgroundColor: dark ? scheme.surface : Colors.white,
+      // Zemin çok açık gri, kartlar beyaz: Google uygulamalarındaki katman hissi.
+      scaffoldBackgroundColor: dark ? scheme.surface : KocumColors.grey50,
       textTheme: text.copyWith(
         titleLarge: text.titleLarge?.copyWith(fontWeight: FontWeight.w500),
         titleMedium: text.titleMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -82,7 +82,7 @@ abstract final class AppTheme {
         labelLarge: text.labelLarge?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.1),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: dark ? scheme.surface : Colors.white,
+        backgroundColor: dark ? scheme.surface : KocumColors.grey50,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
@@ -143,16 +143,46 @@ abstract final class AppTheme {
         highlightElevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
+      // Seçili seçenek: Google'daki gibi açık mavi dolgu, koyu mavi kalın yazı
+      // ve onay işareti. Seçili olmayan sade beyaz; dokunmaya davet eder.
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        side: BorderSide(color: scheme.outlineVariant),
+        side: WidgetStateBorderSide.resolveWith(
+          (s) => BorderSide(color: s.contains(WidgetState.selected) ? Colors.transparent : scheme.outlineVariant),
+        ),
+        backgroundColor: dark ? scheme.surfaceContainerLow : Colors.white,
         selectedColor: scheme.primaryContainer,
-        labelStyle: text.labelLarge,
+        checkmarkColor: scheme.onPrimaryContainer,
+        labelStyle: WidgetStateTextStyle.resolveWith(
+          (s) => (text.labelLarge ?? const TextStyle()).copyWith(
+            color: s.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+            fontWeight: s.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
+        selectedIcon: const Icon(Icons.check_rounded, size: 18),
         style: ButtonStyle(
           shape: const WidgetStatePropertyAll(StadiumBorder()),
-          side: WidgetStatePropertyAll(BorderSide(color: scheme.outline)),
+          minimumSize: const WidgetStatePropertyAll(Size(0, 44)),
+          side: WidgetStatePropertyAll(BorderSide(color: scheme.outlineVariant)),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected)
+                ? scheme.primaryContainer
+                : (dark ? scheme.surfaceContainerLow : Colors.white),
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+          ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
+          ),
+          textStyle: WidgetStateProperty.resolveWith(
+            (s) => text.labelLarge?.copyWith(
+              fontWeight: s.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+          overlayColor: WidgetStatePropertyAll(scheme.primary.withValues(alpha: 0.08)),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -176,9 +206,14 @@ abstract final class AppTheme {
       tabBarTheme: TabBarThemeData(
         labelColor: scheme.primary,
         unselectedLabelColor: scheme.onSurfaceVariant,
-        indicatorColor: scheme.primary,
+        indicatorSize: TabBarIndicatorSize.label,
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(width: 3, color: scheme.primary),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+        ),
         dividerColor: scheme.outlineVariant,
-        labelStyle: text.titleSmall,
+        labelStyle: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: text.titleSmall,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,

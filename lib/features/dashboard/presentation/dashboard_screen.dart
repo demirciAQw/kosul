@@ -26,7 +26,6 @@ class DashboardScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [
           SegmentedButton<int>(
-            showSelectedIcon: false,
             segments: const [
               ButtonSegment(value: 7, label: Text('7 gün')),
               ButtonSegment(value: 30, label: Text('30 gün')),
@@ -48,7 +47,6 @@ class DashboardScreen extends ConsumerWidget {
           Text('En çok yanlış', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           SegmentedButton<MistakeDimension>(
-            showSelectedIcon: false,
             segments: [for (final d in MistakeDimension.values) ButtonSegment(value: d, label: Text(d.label))],
             selected: {dimension},
             onSelectionChanged: (s) => ref.read(dashboardDimensionProvider.notifier).set(s.first),
