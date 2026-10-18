@@ -12,6 +12,8 @@ import '../question_bank/question_bank_providers.dart';
 import '../study_session/domain/study_session.dart';
 import '../study_session/presentation/widgets/elapsed_clock.dart';
 import '../study_session/study_session_providers.dart';
+import '../../app/palette.dart';
+import '../../app/widgets/tone_icon.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -66,7 +68,7 @@ class HomeScreen extends ConsumerWidget {
             Card(
               color: theme.colorScheme.tertiaryContainer,
               child: ListTile(
-                leading: Icon(Icons.pending_actions_outlined, color: theme.colorScheme.onTertiaryContainer),
+                leading: ToneIcon(Icons.pending_actions_outlined, color: KocumColors.amber),
                 title: const Text('Eksiklerini doldur'),
                 subtitle: Text('${pending.length} oturumun doğru/yanlış sayıları bekliyor'),
                 trailing: const Icon(Icons.chevron_right_rounded),
@@ -78,7 +80,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             Card(
               child: ListTile(
-                leading: Icon(Icons.pending_actions_outlined, color: theme.colorScheme.primary),
+                leading: ToneIcon(Icons.pending_actions_outlined, color: KocumColors.amber),
                 title: const Text('Eksikler'),
                 subtitle: Text('$incomplete sorunun fotoğrafı, çözümü ya da nedeni eksik'),
                 trailing: const Icon(Icons.chevron_right_rounded),
@@ -89,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Card(
             child: ListTile(
-              leading: Icon(Icons.replay_rounded, color: theme.colorScheme.primary),
+              leading: ToneIcon(Icons.replay_rounded, color: KocumColors.red),
               title: const Text('Yanlışlarımı göster'),
               subtitle: Text(due > 0 ? '$due soru tekrar bekliyor' : 'Bugün tekrar edecek soru yok'),
               trailing: const Icon(Icons.chevron_right_rounded),
@@ -99,7 +101,7 @@ class HomeScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Card(
             child: ListTile(
-              leading: Icon(Icons.event_note_outlined, color: theme.colorScheme.primary),
+              leading: ToneIcon(Icons.event_note_outlined, color: KocumColors.green),
               title: const Text('Planlarım'),
               subtitle: Text(
                 activePlans.isEmpty
@@ -115,31 +117,31 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           ListTile(
-            leading: const Icon(Icons.add_a_photo_outlined),
+            leading: ToneIcon(Icons.add_a_photo_outlined, color: KocumColors.blue),
             title: const Text('Soru ekle'),
             subtitle: const Text('Kitaptan test ve soru no ile ya da kitap dışı bir soru'),
             onTap: () => context.push(AppRoutes.newQuestion),
           ),
           ListTile(
-            leading: const Icon(Icons.history_rounded),
+            leading: ToneIcon(Icons.history_rounded, color: KocumColors.grey700),
             title: const Text('Geçmiş oturumlar'),
             subtitle: const Text('Süreyi düzelt, sonuçları düzenle ya da sil'),
             onTap: () => context.push(AppRoutes.sessions),
           ),
           ListTile(
-            leading: const Icon(Icons.assignment_outlined),
+            leading: ToneIcon(Icons.assignment_outlined, color: KocumColors.amber),
             title: const Text('Deneme ekle'),
             subtitle: const Text('Netlerini ders ders gir, yanlışları optikten işaretle'),
             onTap: () => context.push(AppRoutes.newMockExam),
           ),
           ListTile(
-            leading: const Icon(Icons.file_open_outlined),
+            leading: ToneIcon(Icons.file_open_outlined, color: KocumColors.green),
             title: const Text('JSON şablonu içe aktar'),
             subtitle: const Text('Kitabın ünite, konu ve sayfaları tek dokunuşla gelsin'),
             onTap: () => importBookTemplateFlow(context, ref),
           ),
           ListTile(
-            leading: const Icon(Icons.auto_stories_outlined),
+            leading: ToneIcon(Icons.auto_stories_outlined, color: KocumColors.blue),
             title: const Text('Hazır kitap ekle'),
             subtitle: const Text('Sıfır Risk Paragraf, Aydın 11. Sınıf Kimya ve diğerleri'),
             onTap: () => showLibrarySheet(context),

@@ -13,6 +13,7 @@ import '../mock_exam_providers.dart';
 import 'karne_import_screen.dart';
 import 'widgets/net_chart.dart';
 import 'widgets/topic_loss_list.dart';
+import '../../../app/palette.dart';
 
 /// Deneme analizi: net seyri, ders bazlı netler, konu bazlı net kaybı ve tüm denemeler.
 class MockExamsScreen extends ConsumerStatefulWidget {
@@ -189,7 +190,7 @@ class _Headline extends StatelessWidget {
                 Text(
                   '${diff >= 0 ? '+' : '−'}${formatNet(diff.abs())} net',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: diff >= 0 ? Colors.green.shade600 : scheme.error,
+                    color: diff >= 0 ? KocumColors.good : scheme.error,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -248,7 +249,7 @@ class _SubjectTable extends StatelessWidget {
                     },
                     size: 18,
                     color: switch (s.change) {
-                      final c? when c > 0 => Colors.green.shade600,
+                      final c? when c > 0 => KocumColors.good,
                       final c? when c < 0 => scheme.error,
                       _ => scheme.onSurfaceVariant,
                     },

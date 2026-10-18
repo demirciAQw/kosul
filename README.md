@@ -3,6 +3,10 @@
 YKS öğrencileri için tamamen çevrimdışı çalışma(ilk sürmler için), süre ve hata analizi takipçisi.
 Flutter, Clean Architecture, SQLite (Drift). Telefonda denemek için `NASIL_DENENIR.md`.
 
+## Tasarım (v6.0)
+
+Google renkleri ve sade Material 3 bileşenleri: açık gri zemin üzerinde beyaz kartlar, ince çizgiler, hap biçimli düğmeler. Tek vurgu rengi mavi; yeşil, kırmızı ve sarı yalnızca anlam taşır (doğru, yanlış, boş). Koyu temada pastel tonlar. Tüm renkler `lib/app/palette.dart`, bileşen görünümü `lib/app/theme.dart`. Logo `tool/make_icon.py` ile üretilir.
+
 ## Özellikler
 
 | Modül | Ne yapar |

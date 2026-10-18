@@ -10,6 +10,7 @@ import '../../../curriculum/domain/curriculum.dart';
 import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import '../widgets/media_image.dart';
+import '../../../../app/palette.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.cardId});
@@ -50,7 +51,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
             onPressed: () => ref.read(questionCardRepositoryProvider).setStarred(card.id, !card.isStarred),
             icon: Icon(
               card.isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
-              color: card.isStarred ? Colors.amber.shade600 : null,
+              color: card.isStarred ? KocumColors.star : null,
             ),
           ),
           IconButton(

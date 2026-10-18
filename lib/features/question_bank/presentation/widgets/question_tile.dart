@@ -7,11 +7,12 @@ import '../../../../core/text/turkish_text.dart';
 import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import 'media_image.dart';
+import '../../../../app/palette.dart';
 
 Color statusColor(QuestionStatus status) => switch (status) {
-      QuestionStatus.wrong => Colors.red.shade400,
-      QuestionStatus.blank => Colors.orange.shade500,
-      QuestionStatus.correct => Colors.green.shade500,
+      QuestionStatus.wrong => KocumColors.wrong,
+      QuestionStatus.blank => KocumColors.blank,
+      QuestionStatus.correct => KocumColors.correct,
     };
 
 /// Galeri hissi: soru fotoğrafı, sağ üstte yıldız (GK), altta neden + zorluk.

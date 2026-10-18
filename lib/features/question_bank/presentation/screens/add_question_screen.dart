@@ -23,6 +23,7 @@ import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import '../question_prefill.dart';
 import '../widgets/photo_slot.dart';
+import '../../../../app/palette.dart';
 
 /// Soru ekleme ve (Eksikler'den) tamamlama ekranı.
 ///
@@ -230,7 +231,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
             onPressed: () => setState(() => _starred = !_starred),
             icon: Icon(
               _starred ? Icons.star_rounded : Icons.star_outline_rounded,
-              color: _starred ? Colors.amber.shade600 : null,
+              color: _starred ? KocumColors.star : null,
             ),
           ),
         ],

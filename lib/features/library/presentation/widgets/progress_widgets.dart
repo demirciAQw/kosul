@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/library.dart';
 import '../../domain/progress.dart';
+import '../../../../app/palette.dart';
 
 /// Testin sonucuna göre renk: yeşil (iyi), amber (orta), kırmızı (zayıf);
 /// sayısız "çözüldü" ana renk; çözülmemiş soluk.
@@ -13,9 +14,9 @@ Color testColor(BuildContext context, TestResult? r) {
   final answered = (r.correct ?? 0) + (r.wrong ?? 0) + (r.blank ?? 0);
   if (!r.hasCounts || answered == 0) return scheme.primary;
   final ratio = (r.correct ?? 0) / answered;
-  if (ratio >= 0.8) return Colors.green.shade600;
-  if (ratio >= 0.5) return Colors.amber.shade700;
-  return Colors.red.shade400;
+  if (ratio >= 0.8) return KocumColors.good;
+  if (ratio >= 0.5) return KocumColors.fair;
+  return KocumColors.weak;
 }
 
 /// Ortası yüzde yazan ilerleme halkası.
@@ -161,9 +162,9 @@ class BookMapLegend extends StatelessWidget {
       spacing: 12,
       runSpacing: 4,
       children: [
-        item(Colors.green.shade600, '%80+'),
-        item(Colors.amber.shade700, '%50–80'),
-        item(Colors.red.shade400, '%50 altı'),
+        item(KocumColors.good, '%80+'),
+        item(KocumColors.fair, '%50–80'),
+        item(KocumColors.weak, '%50 altı'),
         item(scheme.primary, 'çözüldü'),
         item(scheme.surfaceContainerHighest, 'çözülmedi'),
       ],
@@ -190,9 +191,9 @@ class ResultBar extends StatelessWidget {
         height: height,
         child: Row(
           children: [
-            if (correct > 0) Expanded(flex: correct, child: ColoredBox(color: Colors.green.shade600)),
-            if (wrong > 0) Expanded(flex: wrong, child: ColoredBox(color: Colors.red.shade400)),
-            if (blank > 0) Expanded(flex: blank, child: ColoredBox(color: Colors.amber.shade700)),
+            if (correct > 0) Expanded(flex: correct, child: ColoredBox(color: KocumColors.good)),
+            if (wrong > 0) Expanded(flex: wrong, child: ColoredBox(color: KocumColors.weak)),
+            if (blank > 0) Expanded(flex: blank, child: ColoredBox(color: KocumColors.fair)),
           ],
         ),
       ),
