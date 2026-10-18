@@ -123,6 +123,12 @@ class HomeScreen extends ConsumerWidget {
             onTap: () => context.push(AppRoutes.newQuestion),
           ),
           ListTile(
+            leading: ToneIcon(Icons.edit_note_rounded, color: KocumColors.green),
+            title: const Text('Not ekle'),
+            subtitle: const Text('Tarih ve saat kendiliğinden; dersin defterine kaydolur'),
+            onTap: () => context.push(AppRoutes.newNote),
+          ),
+          ListTile(
             leading: ToneIcon(Icons.history_rounded, color: KocumColors.grey700),
             title: const Text('Geçmiş oturumlar'),
             subtitle: const Text('Süreyi düzelt, sonuçları düzenle ya da sil'),

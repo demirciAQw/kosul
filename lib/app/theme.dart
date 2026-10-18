@@ -73,8 +73,8 @@ abstract final class AppTheme {
     final text = base.textTheme.apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
 
     return base.copyWith(
-      // Zemin hafif gri, kartlar beyaz: Google uygulamalarındaki katman hissi.
-      scaffoldBackgroundColor: dark ? scheme.surface : KocumColors.grey50,
+      // Zemin beyaz; kartlar ince gri çizgiyle ayrılır.
+      scaffoldBackgroundColor: dark ? scheme.surface : Colors.white,
       textTheme: text.copyWith(
         titleLarge: text.titleLarge?.copyWith(fontWeight: FontWeight.w500),
         titleMedium: text.titleMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -82,7 +82,7 @@ abstract final class AppTheme {
         labelLarge: text.labelLarge?.copyWith(fontWeight: FontWeight.w500, letterSpacing: 0.1),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: dark ? scheme.surface : KocumColors.grey50,
+        backgroundColor: dark ? scheme.surface : Colors.white,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,

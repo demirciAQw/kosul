@@ -222,6 +222,24 @@ class ReviewStates extends Table {
   Set<Column> get primaryKey => {cardId};
 }
 
+// ───────────────────────── Ders notları (v7) ─────────────────────────
+
+/// Defterdeki serbest notlar: her not bir derse ("TYT Matematik") bağlıdır;
+/// yazıldığı tarih ve saat kendiliğinden kaydedilir.
+@DataClassName('StudyNoteRow')
+class StudyNotes extends Table {
+  TextColumn get id => text()();
+  TextColumn get subject => text()();
+  TextColumn get title => text().nullable()();
+  TextColumn get body => text()();
+  BoolColumn get isPinned => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ───────────────────────── Kitap ilerlemesi (v4) ─────────────────────────
 
 /// Bir testin (ya da kitap ağacındaki bir yaprak başlığın) çözüldü kaydı.

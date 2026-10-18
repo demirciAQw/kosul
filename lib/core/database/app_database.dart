@@ -19,6 +19,7 @@ part 'app_database.g.dart';
   MockExams,
   MockExamSections,
   TestResults,
+  StudyNotes,
   AppMeta,
 ])
 class AppDatabase extends _$AppDatabase {
@@ -30,8 +31,9 @@ class AppDatabase extends _$AppDatabase {
   /// v4: test ilerlemesi (çözüldü/çözülmedi), "Diğer" nedeni için açıklama.
   /// v5: kartlarda serbest konu/kazanım adı (karneden içe aktarma).
   /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
+  /// v7: ders notları (study_notes).
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +79,9 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(questionCards, questionCards.reasonNote);
             }
             await _createV2Indexes();
+          }
+          if (from < 7) {
+            await m.createTable(studyNotes);
           }
           if (from < 6) {
             await customStatement(

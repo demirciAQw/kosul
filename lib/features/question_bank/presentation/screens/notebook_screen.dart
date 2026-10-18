@@ -10,6 +10,8 @@ import '../../domain/question_grouping.dart';
 import '../../question_bank_providers.dart';
 import '../widgets/filter_sheet.dart';
 import '../widgets/question_tile.dart';
+import '../../../notes/notes_providers.dart';
+import '../../../notes/presentation/notes_view.dart';
 
 /// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
 class NotebookScreen extends ConsumerStatefulWidget {
@@ -19,12 +21,23 @@ class NotebookScreen extends ConsumerStatefulWidget {
   ConsumerState<NotebookScreen> createState() => _NotebookScreenState();
 }
 
-class _NotebookScreenState extends ConsumerState<NotebookScreen> {
+class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTickerProviderStateMixin {
+  /// Sorular ve Notlar sekmeleri; düğme ve araçlar seçili sekmeye göre değişir.
+  late final TabController _tabs = TabController(length: 2, vsync: this)..addListener(_onTab);
+
+  void _onTab() {
+    if (!_tabs.indexIsChanging) setState(() {});
+  }
+
+  bool get _onNotes => _tabs.index == 1;
+
   final _search = TextEditingController();
   Timer? _debounce;
 
   @override
   void dispose() {
+    _tabs.removeListener(_onTab);
+    _tabs.dispose();
     _debounce?.cancel();
     _search.dispose();
     super.dispose();
@@ -77,7 +90,15 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
             )
           : AppBar(
         title: const Text('Defterim'),
+        bottom: TabBar(
+          controller: _tabs,
+          tabs: const [
+            Tab(icon: Icon(Icons.quiz_outlined), text: 'Sorular'),
+            Tab(icon: Icon(Icons.sticky_note_2_outlined), text: 'Notlar'),
+          ],
+        ),
         actions: [
+          if (!_onNotes)
           IconButton(
             tooltip: 'Filtrele',
             onPressed: () => showQuestionFilterSheet(context),
@@ -89,13 +110,25 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
           ),
         ],
       ),
-      floatingActionButton: selection.isNotEmpty ? null : FloatingActionButton.extended(
-        heroTag: 'notebook-add',
-        onPressed: () => context.push(AppRoutes.newQuestion),
-        icon: const Icon(Icons.add_a_photo_outlined),
-        label: const Text('Soru ekle'),
-      ),
-      body: Column(
+      floatingActionButton: selection.isNotEmpty
+          ? null
+          : _onNotes
+              ? FloatingActionButton.extended(
+                  heroTag: 'notebook-note',
+                  onPressed: () => context.push(AppRoutes.newNote, extra: ref.read(noteSubjectFilterProvider)),
+                  icon: const Icon(Icons.edit_note_rounded),
+                  label: const Text('Not ekle'),
+                )
+              : FloatingActionButton.extended(
+                  heroTag: 'notebook-add',
+                  onPressed: () => context.push(AppRoutes.newQuestion),
+                  icon: const Icon(Icons.add_a_photo_outlined),
+                  label: const Text('Soru ekle'),
+                ),
+      body: TabBarView(
+        controller: _tabs,
+        children: [
+      Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
@@ -198,6 +231,9 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> {
                     ),
             ),
           ),
+        ],
+      ),
+      const NotesView(),
         ],
       ),
     ),
