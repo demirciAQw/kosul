@@ -30,6 +30,8 @@ extension QuestionCardJson on QuestionCard {
         if (mockExamId != null) 'mockExamId': mockExamId,
         if (reasonNote != null) 'reasonNote': reasonNote,
         if (topicText != null) 'topicText': topicText,
+        if (correctAnswer != null) 'correctAnswer': correctAnswer,
+        if (givenAnswer != null) 'givenAnswer': givenAnswer,
       };
 }
 
@@ -77,5 +79,7 @@ QuestionCard questionCardFromJson(Map<String, dynamic> json, {String path = r'$'
     mockExamId: r.optString('mockExamId'),
     reasonNote: r.optString('reasonNote'),
     topicText: r.optString('topicText'),
+    correctAnswer: r.optString('correctAnswer', maxLength: 1),
+    givenAnswer: r.optString('givenAnswer', maxLength: 1),
   );
 }

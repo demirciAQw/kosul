@@ -24,6 +24,9 @@ import '../../question_bank_providers.dart';
 import '../question_prefill.dart';
 import '../widgets/photo_slot.dart';
 import '../../../../app/palette.dart';
+import '../../../study_session/study_session_providers.dart';
+import '../../../study_session/presentation/session_quick_mark.dart';
+import '../../../study_session/domain/study_session.dart';
 
 /// Soru ekleme ve (Eksikler'den) tamamlama ekranı.
 ///
@@ -69,6 +72,11 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
 
   String? _bookId, _contentNodeId, _sessionId, _sessionItemId, _mockExamId, _subject, _mebNodeId, _testLabel;
   MistakeReason? _reason;
+
+  /// Şıklar: doğru cevap ve öğrencinin işaretlediği ("A"–"E").
+  String? _correctAnswer;
+  String? _givenAnswer;
+  bool _answerError = false;
   int _difficulty = 5;
   bool _starred = false;
   bool _saving = false;
@@ -77,6 +85,13 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   Set<DraftIssue> _issues = const {};
 
   bool get _editing => widget.editCardId != null;
+
+  /// Kaynak kullanıcı ya da bağlam tarafından belirlendi mi? Belirlenmediyse
+  /// kitap listesi (geç de olsa) yüklenince "Kitap" varsayılır.
+  bool _originDecided = false;
+
+  /// Son oturumdan kendiliğinden dolduruldu (bilgi şeridi için).
+  String? _recentLabel;
   bool get _bookMode => _origin == QuestionOrigin.book;
 
   /// Kitaptan eklenen sorunun testi "çözüldü" olarak işaretlensin mi?
@@ -90,7 +105,9 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           (_solutionText.text.trim().isNotEmpty ||
               _note.text.trim().isNotEmpty ||
               _reasonNote.text.trim().isNotEmpty ||
-              _reason != null));
+              _reason != null ||
+              _correctAnswer != null ||
+              _givenAnswer != null));
 
   @override
   void initState() {
@@ -101,13 +118,46 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       _loading = true;
       unawaited(_loadCard(widget.editCardId!));
     } else if (widget.prefill != null) {
+      _originDecided = true;
       _applyPrefill(widget.prefill);
     } else {
       // Kitabı olan biri için en sık yol: kitaptan, test ve soru no ile.
       final hasBooks = ref.read(libraryProvider).value?.isNotEmpty ?? false;
       _origin = hasBooks ? QuestionOrigin.book : QuestionOrigin.independent;
+      _originDecided = hasBooks;
+      unawaited(_fillFromRecentSession());
     }
   }
+
+  /// Süren ya da son 3 saatte biten oturumun kitap bloğunu getirir: oturum
+  /// bitince Defter'den eklenen soru da o kitaba ve teste bağlanır.
+  Future<void> _fillFromRecentSession() async {
+    final repo = ref.read(studySessionRepositoryProvider);
+    final running = await repo.watchRunning().first;
+    final history = running != null ? const <StudySession>[] : await repo.watchHistory(limit: 1).first;
+    final session = running ?? history.firstOrNull;
+    if (session == null || !mounted) return;
+    final end = session.endedAt ?? DateTime.now();
+    if (DateTime.now().difference(end).inHours >= 3) return;
+    final item = session.items.where((i) => i.hasQuestions && i.bookId != null).firstOrNull;
+    if (item == null || _bookId != null) return; // kullanıcı kendisi seçmişse dokunma
+    final prefill = sessionItemPrefill(ref, session, item);
+    setState(() {
+      _originDecided = true;
+      _applyPrefill(prefill);
+      _recentLabel = prefill.testLabel ?? prefill.sourceName;
+    });
+  }
+
+  void _clearRecent() => setState(() {
+        _recentLabel = null;
+        _bookId = null;
+        _contentNodeId = null;
+        _testLabel = null;
+        _sessionId = null;
+        _sessionItemId = null;
+        _source.clear();
+      });
 
   void _applyPrefill(QuestionPrefill? p) {
     if (p == null) return;
@@ -146,6 +196,8 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       _testLabel = card.testLabel;
       _reason = card.reason;
       _reasonNote.text = card.reasonNote ?? '';
+      _correctAnswer = card.correctAnswer;
+      _givenAnswer = card.givenAnswer;
       _difficulty = card.difficulty;
       _starred = card.isStarred;
       _source.text = card.sourceName == unknownSourceName ? '' : card.sourceName;
@@ -199,6 +251,10 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
     final topics = _subject == null
         ? const <CurriculumNode>[]
         : depthFirst(curriculum.where((n) => n.subjectLabel == _subject));
+    if (!_originDecided && !_editing && books.isNotEmpty) {
+      _origin = QuestionOrigin.book;
+      _originDecided = true;
+    }
     final book = books.where((b) => b.id == _bookId).firstOrNull;
     final test = book == null ? null : findNode(book, _contentNodeId);
     final results = ref.watch(testResultsProvider).value ?? const <String, TestResult>{};
@@ -258,8 +314,42 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               ButtonSegment(value: QuestionStatus.correct, label: Text('Doğru'), icon: Icon(Icons.check_rounded)),
             ],
             selected: {_status},
-            onSelectionChanged: (s) => setState(() => _status = s.first),
+            onSelectionChanged: (s) => setState(() {
+              _status = s.first;
+              _answerError = false;
+            }),
           ),
+          const _SectionTitle('Cevaplar'),
+          _AnswerPicker(
+            label: _status == QuestionStatus.blank ? 'Doğru cevap (isteğe bağlı)' : 'Doğru cevap',
+            value: _correctAnswer,
+            error: _answerError && _status != QuestionStatus.blank && _correctAnswer == null,
+            onChanged: (v) => setState(() {
+              _correctAnswer = v;
+              _answerError = false;
+            }),
+          ),
+          if (_status == QuestionStatus.wrong) ...[
+            const SizedBox(height: 8),
+            _AnswerPicker(
+              label: 'Senin cevabın',
+              value: _givenAnswer,
+              disabled: _correctAnswer,
+              error: _answerError && (_givenAnswer == null || _givenAnswer == _correctAnswer),
+              onChanged: (v) => setState(() {
+                _givenAnswer = v;
+                _answerError = false;
+              }),
+            ),
+          ],
+          if (_answerError)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                _answerProblem() ?? '',
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
+              ),
+            ),
           const _SectionTitle('Kaynak'),
           SegmentedButton<QuestionOrigin>(
             showSelectedIcon: false,
@@ -268,6 +358,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
             onSelectionChanged: (s) => setState(() {
               final wasBook = _bookMode;
               _origin = s.first;
+              _originDecided = true;
               if (wasBook && !_bookMode && _contentNodeId != null) {
                 // Kitaptan çıkınca testin bilgileri yanıltmasın.
                 _contentNodeId = null;
@@ -275,6 +366,21 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               }
             }),
           ),
+          if (_bookMode && _recentLabel != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Material(
+                color: theme.colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(Icons.history_rounded, color: theme.colorScheme.onPrimaryContainer),
+                  title: Text('Son oturumdan: $_recentLabel',
+                      style: TextStyle(color: theme.colorScheme.onPrimaryContainer)),
+                  trailing: TextButton(onPressed: _clearRecent, child: const Text('Temizle')),
+                ),
+              ),
+            ),
           if (_bookMode) ...[
             const SizedBox(height: 12),
             if (books.isEmpty)
@@ -327,6 +433,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                   ),
                 ],
               ),
+              if (book != null && test == null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    'Testi seç: soru o teste ve konusuna bağlanır, test kitap haritasında işaretlenir.',
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary),
+                  ),
+                ),
               if (book != null && test != null) ...[
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
@@ -744,13 +858,35 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       avgSecondsPerQuestion: double.tryParse(_avgSeconds.text.trim()),
       reason: _status == QuestionStatus.correct ? null : _reason,
       reasonNote: _reasonNote.text,
+      correctAnswer: _correctAnswer,
+      givenAnswer: _status == QuestionStatus.wrong ? _givenAnswer : null,
       difficulty: _difficulty,
       isStarred: _starred,
       note: _note.text,
     );
   }
 
+  /// Boş değilse şıklar zorunlu: yanlışta ikisi de (ve farklı), doğruda doğru şık.
+  String? _answerProblem() {
+    switch (_status) {
+      case QuestionStatus.blank:
+        return null;
+      case QuestionStatus.correct:
+        return _correctAnswer == null ? 'Doğru cevabı seç.' : null;
+      case QuestionStatus.wrong:
+        if (_correctAnswer == null || _givenAnswer == null) return 'Doğru cevabı ve senin cevabını seç.';
+        if (_correctAnswer == _givenAnswer) return 'Yanlış soruda iki şık aynı olamaz.';
+        return null;
+    }
+  }
+
   Future<void> _save({required bool addAnother}) async {
+    final answerProblem = _answerProblem();
+    if (answerProblem != null) {
+      setState(() => _answerError = true);
+      _snack(answerProblem);
+      return;
+    }
     if (_bookMode && _bookId == null && (ref.read(libraryProvider).value?.isNotEmpty ?? false)) {
       _snack('Önce kitabı seç.');
       return;
@@ -803,6 +939,8 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           _questionNo.clear();
           _reasonNote.clear();
           _reason = null;
+          _correctAnswer = null;
+          _givenAnswer = null;
           _starred = false;
           _difficulty = 5;
         });
@@ -849,4 +987,60 @@ class _NumberField extends StatelessWidget {
         inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
         decoration: InputDecoration(labelText: label, suffixText: suffix, errorText: errorText),
       );
+}
+
+/// A–E şık seçici. Seçili şıkka yeniden dokunmak seçimi kaldırır.
+class _AnswerPicker extends StatelessWidget {
+  const _AnswerPicker({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+    this.disabled,
+    this.error = false,
+  });
+
+  final String label;
+  final String? value;
+  final ValueChanged<String?> onChanged;
+
+  /// Bu şık seçilemez (yanlış soruda doğru cevapla aynı şık).
+  final String? disabled;
+  final bool error;
+
+  static const letters = ['A', 'B', 'C', 'D', 'E'];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Row(
+      children: [
+        SizedBox(
+          width: 92,
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(color: error ? scheme.error : scheme.onSurfaceVariant),
+          ),
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (final l in letters)
+                ChoiceChip(
+                  showCheckmark: false,
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  label: SizedBox(width: 18, child: Text(l, textAlign: TextAlign.center)),
+                  selected: value == l,
+                  side: error && value == null ? BorderSide(color: scheme.error) : null,
+                  onSelected: l == disabled ? null : (on) => onChanged(on ? l : null),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

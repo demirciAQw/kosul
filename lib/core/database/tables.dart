@@ -180,6 +180,10 @@ class QuestionCards extends Table {
   /// Serbest konu/kazanım adı (v5): karneden gelen "ÖZDEŞLİKLER" gibi. MEB
   /// listesinde karşılığı olmasa da analizde konu olarak sayılır.
   TextColumn get topicText => text().nullable()();
+
+  /// Şıklar (v8): sorunun doğru cevabı ve öğrencinin işaretlediği ("A"–"E").
+  TextColumn get correctAnswer => text().nullable()();
+  TextColumn get givenAnswer => text().nullable()();
   RealColumn get avgSecondsPerQuestion => real().nullable()();
   IntColumn get difficulty => integer()();
   BoolColumn get isStarred => boolean().withDefault(const Constant(false))();

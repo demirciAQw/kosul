@@ -49,6 +49,12 @@ class DueReview {
   final ReviewState state;
 }
 
+/// Şıkkı "A"–"E" biçimine getirir; geçersizse null.
+String? _answer(String? s) {
+  final t = s?.trim().toUpperCase();
+  return (t != null && const {'A', 'B', 'C', 'D', 'E'}.contains(t)) ? t : null;
+}
+
 String? _clean(String? s) {
   final t = s?.trim();
   return (t == null || t.isEmpty) ? null : t;
@@ -110,6 +116,13 @@ class SaveQuestionCard {
             ? _clean(draft.reasonNote)
             : null,
         topicText: _clean(draft.topicText),
+        correctAnswer: _answer(draft.correctAnswer),
+        // Doğru çözülen soruda işaretlenen şık doğru cevaptır; boşta işaret yoktur.
+        givenAnswer: switch (draft.status) {
+          QuestionStatus.correct => _answer(draft.correctAnswer),
+          QuestionStatus.blank => null,
+          QuestionStatus.wrong => _answer(draft.givenAnswer),
+        },
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,
@@ -207,6 +220,13 @@ class UpdateQuestionCard {
             ? _clean(draft.reasonNote)
             : null,
         topicText: _clean(draft.topicText),
+        correctAnswer: _answer(draft.correctAnswer),
+        // Doğru çözülen soruda işaretlenen şık doğru cevaptır; boşta işaret yoktur.
+        givenAnswer: switch (draft.status) {
+          QuestionStatus.correct => _answer(draft.correctAnswer),
+          QuestionStatus.blank => null,
+          QuestionStatus.wrong => _answer(draft.givenAnswer),
+        },
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
         isStarred: draft.isStarred,

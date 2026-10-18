@@ -223,6 +223,8 @@ class ImportKarne {
           questionNo: m.questionNo,
           testTotalQuestions: exam.section(m.subject)?.questionCount,
           topicText: m.kazanim,
+          correctAnswer: m.correctAnswer,
+          givenAnswer: m.status == QuestionStatus.wrong ? m.givenAnswer : null,
           note: m.answerNote,
           avgSecondsPerQuestion: exam.secondsPerQuestion,
         ),

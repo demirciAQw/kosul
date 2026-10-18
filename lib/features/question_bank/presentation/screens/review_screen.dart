@@ -309,6 +309,13 @@ class _Solution extends StatelessWidget {
   Widget build(BuildContext context) {
     final image = card.solutionImage;
     final text = card.solutionText;
+    final answer = card.answerText;
+    if (image == null && text == null && answer != null) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(answer, style: Theme.of(context).textTheme.titleMedium),
+      );
+    }
     if (image == null && text == null) {
       return const Padding(
         padding: EdgeInsets.all(16),

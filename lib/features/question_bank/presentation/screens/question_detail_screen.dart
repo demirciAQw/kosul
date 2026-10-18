@@ -98,6 +98,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
               if (card.questionNo != null) meta('${card.questionNo}. soru'),
               if (card.topicText != null) meta(titleCaseTr(card.topicText!)),
               if (card.reasonText != null) meta(card.reasonText!),
+              if (card.answerText != null) meta(card.answerText!),
               meta('Zorluk ${card.difficulty}/10'),
               if (card.avgSecondsPerQuestion != null) meta('${card.avgSecondsPerQuestion!.round()} sn/soru'),
               meta(formatShortDate(card.createdAt)),

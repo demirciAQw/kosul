@@ -63,6 +63,8 @@ class QuestionCard {
     this.reason,
     this.reasonNote,
     this.topicText,
+    this.correctAnswer,
+    this.givenAnswer,
     this.avgSecondsPerQuestion,
     this.isStarred = false,
     this.note,
@@ -92,6 +94,20 @@ class QuestionCard {
 
   /// Serbest konu/kazanım adı (karneden): MEB konusu yoksa analizde bu kullanılır.
   final String? topicText;
+
+  /// Şıklar: doğru cevap ve öğrencinin işaretlediği ("A"–"E").
+  final String? correctAnswer;
+  final String? givenAnswer;
+
+  /// "Doğru cevap C, senin cevabın B" / "Doğru cevap D, boş bıraktın".
+  String? get answerText {
+    final dc = correctAnswer;
+    if (dc == null) return null;
+    if (status == QuestionStatus.blank) return 'Doğru cevap $dc, boş bıraktın';
+    final g = givenAnswer;
+    if (status == QuestionStatus.correct || g == null || g == dc) return 'Doğru cevap $dc';
+    return 'Doğru cevap $dc, senin cevabın $g';
+  }
   final double? avgSecondsPerQuestion;
   final int difficulty; // 1–10
   final bool isStarred; // GK (Güzel Soru)
@@ -155,6 +171,8 @@ class QuestionCard {
         reason: reason,
         reasonNote: reasonNote,
         topicText: topicText,
+        correctAnswer: correctAnswer,
+        givenAnswer: givenAnswer,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred ?? this.isStarred,
@@ -268,6 +286,8 @@ class QuestionDraft {
     this.reason,
     this.reasonNote,
     this.topicText,
+    this.correctAnswer,
+    this.givenAnswer,
     this.avgSecondsPerQuestion,
     this.difficulty = 5,
     this.isStarred = false,
@@ -294,6 +314,8 @@ class QuestionDraft {
         reason: c.reason,
         reasonNote: c.reasonNote,
         topicText: c.topicText,
+        correctAnswer: c.correctAnswer,
+        givenAnswer: c.givenAnswer,
         avgSecondsPerQuestion: c.avgSecondsPerQuestion,
         difficulty: c.difficulty,
         isStarred: c.isStarred,
@@ -319,6 +341,8 @@ class QuestionDraft {
   final MistakeReason? reason;
   final String? reasonNote;
   final String? topicText;
+  final String? correctAnswer;
+  final String? givenAnswer;
   final double? avgSecondsPerQuestion;
   final int difficulty;
   final bool isStarred;
@@ -350,6 +374,8 @@ class QuestionDraft {
         reason: reason != null ? reason() : this.reason,
         reasonNote: reasonNote != null ? reasonNote() : this.reasonNote,
         topicText: topicText,
+        correctAnswer: correctAnswer,
+        givenAnswer: givenAnswer,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred,

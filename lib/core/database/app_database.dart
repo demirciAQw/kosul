@@ -33,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
   /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
   /// v7: ders notları (study_notes).
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -63,6 +63,8 @@ class AppDatabase extends _$AppDatabase {
               questionCards.mockExamId,
               questionCards.reasonNote,
               questionCards.topicText,
+              questionCards.correctAnswer,
+              questionCards.givenAnswer,
             ]));
             await _createV2Indexes();
           }
@@ -79,6 +81,12 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(questionCards, questionCards.reasonNote);
             }
             await _createV2Indexes();
+          }
+          if (from < 8) {
+            final cols = await customSelect('PRAGMA table_info(question_cards)').get();
+            final names = {for (final c in cols) c.read<String>('name')};
+            if (!names.contains('correct_answer')) await m.addColumn(questionCards, questionCards.correctAnswer);
+            if (!names.contains('given_answer')) await m.addColumn(questionCards, questionCards.givenAnswer);
           }
           if (from < 7) {
             await m.createTable(studyNotes);

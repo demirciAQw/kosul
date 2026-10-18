@@ -215,6 +215,8 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         mockExamId: Value(c.mockExamId),
         reasonNote: Value(c.reasonNote),
         topicText: Value(c.topicText),
+        correctAnswer: Value(c.correctAnswer),
+        givenAnswer: Value(c.givenAnswer),
       );
 
   static QuestionCard _toEntity(QuestionCardRow r) => QuestionCard(
@@ -243,5 +245,7 @@ class DriftQuestionCardRepository implements QuestionCardRepository {
         mockExamId: r.mockExamId,
         reasonNote: r.reasonNote,
         topicText: r.topicText,
+        correctAnswer: r.correctAnswer,
+        givenAnswer: r.givenAnswer,
       );
 }

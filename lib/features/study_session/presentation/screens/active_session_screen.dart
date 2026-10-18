@@ -6,6 +6,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/routes.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/di/core_providers.dart';
+import '../../../library/domain/library.dart';
+import '../../../library/library_providers.dart';
+import '../session_coverage.dart';
 import '../../domain/study_session.dart';
 import '../../study_session_providers.dart';
 import '../session_quick_mark.dart';
@@ -188,9 +192,14 @@ class _RunningViewState extends ConsumerState<_RunningView> {
     final router = GoRouter.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final submit = ref.read(submitSessionResultsProvider);
+    final progress = ref.read(testProgressRepositoryProvider);
+    final books = ref.read(libraryProvider).value ?? const <Book>[];
+    final now = ref.read(clockProvider)();
     setState(() => _busy = true);
     try {
       await ref.read(finishStudySessionProvider).call(s.id);
+      // Çalışılan testler hemen kitap haritasına düşer; sonuç girmek beklenmez.
+      await progress.saveIfAbsent(sessionCoverage(session: s, books: books, now: now));
       if (s.hasQuestionWork) {
         unawaited(router.pushReplacement(AppRoutes.sessionResults(s.id)));
       } else {

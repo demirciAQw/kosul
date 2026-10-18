@@ -7,10 +7,10 @@ import '../../../../app/routes.dart';
 import '../../../../core/di/core_providers.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../library/domain/library.dart';
-import '../../../library/domain/progress.dart';
 import '../../../library/library_providers.dart';
 import '../../domain/study_session.dart';
 import '../../study_session_providers.dart';
+import '../session_coverage.dart';
 import '../session_quick_mark.dart';
 
 /// "Eksiklerini doldur": bitmiş oturumun D/Y/B sonuçları. "Sonra" ile
@@ -143,26 +143,14 @@ class _SessionResultsScreenState extends ConsumerState<SessionResultsScreen> {
   /// Bu oturumda çalışılan testleri/başlıkları kitap haritasında "çözüldü" yapar.
   /// Daha önce sonucu olanlara dokunmaz; optikte dışarıda bırakılanları atlar;
   /// sayfalarının yalnızca bir kısmı seçilmiş başlıkları işaretlemez.
-  Future<void> _markCoverage(StudySession s) async {
-    final books = ref.read(libraryProvider).value ?? const <Book>[];
-    final now = ref.read(clockProvider)();
-    final marks = <TestResult>[];
-    for (final item in s.items) {
-      if (!item.hasQuestions || item.bookId == null || _fieldsFor(item).solved == 0) continue;
-      final book = books.where((b) => b.id == item.bookId).firstOrNull;
-      if (book == null) continue;
-      final node = findNode(book, item.contentNodeId);
-      final pages = item.pages.toSet();
-      for (final leaf in node == null ? progressLeaves(book) : leavesUnder(node)) {
-        if (_excluded.contains(leaf.id)) continue;
-        final covered = !leaf.hasPages ||
-            pages.isEmpty ||
-            [for (var p = leaf.pageStart!; p <= leaf.pageEnd!; p++) p].every(pages.contains);
-        if (covered) marks.add(TestResult(nodeId: leaf.id, bookId: book.id, solvedAt: now, sessionId: s.id));
-      }
-    }
-    await ref.read(testProgressRepositoryProvider).saveIfAbsent(marks);
-  }
+  Future<void> _markCoverage(StudySession s) => ref.read(testProgressRepositoryProvider).saveIfAbsent(
+        sessionCoverage(
+          session: s,
+          books: ref.read(libraryProvider).value ?? const <Book>[],
+          now: ref.read(clockProvider)(),
+          excluded: _excluded,
+        ),
+      );
 
   Future<void> _save(StudySession s) async {
     setState(() => _saving = true);
