@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/di/core_providers.dart';
+import '../../../core/media/media_storage.dart';
 import '../../../core/utils/formatters.dart';
 import '../../curriculum/curriculum_providers.dart';
 import '../../curriculum/domain/curriculum.dart';
@@ -12,6 +16,8 @@ import '../../library/library_providers.dart';
 import '../domain/notes.dart';
 import '../notes_providers.dart';
 import 'notes_view.dart' show deleteNoteWithUndo;
+import '../../question_bank/presentation/widgets/media_image.dart';
+import '../../../core/media/photo_flow.dart';
 
 /// Not yaz / düzenle. Tarih ve saat kendiliğinden; yalnızca ders ve metin istenir.
 class NoteEditorScreen extends ConsumerStatefulWidget {
@@ -36,20 +42,31 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   bool _loading = false;
   bool _saving = false;
 
+  /// Sayfa fotoğrafları: kayıtlılar ve yeni çekilenler, sırayla.
+  final _photos = <NotePhotoDraft>[];
+  final _originals = <String>[]; // yeni çekimlerin kırpılmamış hâlleri (temizlik için)
+  bool _capturing = false;
+
+  /// dispose içinde ref kullanılamaz; medya deposu bir kez alınır.
+  late final MediaStorage _media;
+
   bool get _editing => widget.noteId != null;
 
   bool get _dirty {
     final o = _original;
-    if (o == null) return _body.text.trim().isNotEmpty || _title.text.trim().isNotEmpty;
+    if (o == null) return _body.text.trim().isNotEmpty || _title.text.trim().isNotEmpty || _photos.isNotEmpty;
     return _body.text.trim() != o.body ||
         _title.text.trim() != (o.title ?? '') ||
         _subject != o.subject ||
-        _noteAt != o.createdAt;
+        _noteAt != o.createdAt ||
+        _photos.length != o.photos.length ||
+        _photos.any((p) => p.temp != null);
   }
 
   @override
   void initState() {
     super.initState();
+    _media = ref.read(mediaStorageProvider);
     _noteAt = ref.read(clockProvider)();
     _subject = widget.initialSubject;
     if (_editing) {
@@ -69,11 +86,58 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
       _noteAt = note.createdAt;
       _title.text = note.title ?? '';
       _body.text = note.body;
+      _photos
+        ..clear()
+        ..addAll([for (final p in note.photos) NotePhotoDraft.stored(p)]);
     });
+  }
+
+  /// Defter sayfası çek ya da galeriden seç; uygulama içinde kırpılır.
+  Future<void> _addPhoto() async {
+    final source = await askPhotoSource(context);
+    if (source == null || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _capturing = true);
+    try {
+      final photo = await capturePhoto(context, ref.read(photoCaptureProvider), source, title: 'Sayfayı kırp');
+      if (photo == null || !mounted) return;
+      setState(() {
+        _photos.add(NotePhotoDraft.fresh(photo.path));
+        _originals.add(photo.originalPath);
+      });
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Fotoğraf eklenemedi: $e')));
+    } finally {
+      if (mounted) setState(() => _capturing = false);
+    }
+  }
+
+  void _removePhoto(int i) {
+    final p = _photos.removeAt(i);
+    final temp = p.temp;
+    if (temp != null) unawaited(_media.discardTemp(temp));
+    setState(() {});
+  }
+
+  void _openPhoto(NotePhotoDraft p) {
+    final stored = p.stored;
+    if (stored != null) {
+      openImageZoom(context, stored);
+      return;
+    }
+    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+      builder: (_) => Scaffold(
+        appBar: AppBar(),
+        body: InteractiveViewer(maxScale: 5, child: Center(child: Image.file(File(p.temp!)))),
+      ),
+    ));
   }
 
   @override
   void dispose() {
+    for (final path in [..._originals, for (final p in _photos) if (p.temp != null) p.temp!]) {
+      unawaited(_media.discardTemp(path));
+    }
     _title.dispose();
     _body.dispose();
     super.dispose();
@@ -111,6 +175,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
             title: _title.text,
             body: _body.text,
             at: _noteAt,
+            photos: List.of(_photos),
           );
       ref.read(noteSubjectFilterProvider.notifier).set(note.subject);
       messenger.showSnackBar(SnackBar(content: Text('Not ${note.subject} defterine kaydedildi.')));
@@ -245,6 +310,43 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                 alignLabelWithHint: true,
               ),
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: Text('Sayfa fotoğrafları', style: theme.textTheme.titleSmall)),
+                Text(
+                  _photos.isEmpty ? 'isteğe bağlı' : '${_photos.length} sayfa',
+                  style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 132,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final (i, p) in _photos.indexed)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: _PhotoThumb(
+                        photo: p,
+                        number: i + 1,
+                        onOpen: () => _openPhoto(p),
+                        onRemove: () => _removePhoto(i),
+                      ),
+                    ),
+                  _AddPhotoTile(busy: _capturing, onTap: _capturing ? null : _addPhoto),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                'El yazısı defter sayfalarını ekle; asıl görüntü her zaman saklanır.',
+                style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ),
           ],
         ),
         bottomNavigationBar: SafeArea(
@@ -264,6 +366,94 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PhotoThumb extends StatelessWidget {
+  const _PhotoThumb({required this.photo, required this.number, required this.onOpen, required this.onRemove});
+  final NotePhotoDraft photo;
+  final int number;
+  final VoidCallback onOpen;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final stored = photo.stored;
+    return SizedBox(
+      width: 99,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Material(
+              color: scheme.surfaceContainerHighest,
+              child: InkWell(
+                onTap: onOpen,
+                child: stored != null
+                    ? MediaImage(stored, cacheWidth: 300)
+                    : Image.file(File(photo.temp!), fit: BoxFit.cover, cacheWidth: 300),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 6,
+            bottom: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+              child: Text('$number', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+          ),
+          Positioned(
+            right: 2,
+            top: 2,
+            child: IconButton.filledTonal(
+              visualDensity: VisualDensity.compact,
+              tooltip: 'Sayfayı çıkar',
+              onPressed: onRemove,
+              icon: const Icon(Icons.close_rounded, size: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddPhotoTile extends StatelessWidget {
+  const _AddPhotoTile({required this.busy, required this.onTap});
+  final bool busy;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return SizedBox(
+      width: 99,
+      child: Material(
+        color: scheme.primaryContainer.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Center(
+            child: busy
+                ? const CircularProgressIndicator()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_a_photo_outlined, color: scheme.onPrimaryContainer),
+                      const SizedBox(height: 6),
+                      Text('Sayfa ekle', style: theme.textTheme.labelMedium?.copyWith(color: scheme.onPrimaryContainer)),
+                    ],
+                  ),
           ),
         ),
       ),

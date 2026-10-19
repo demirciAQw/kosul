@@ -6,6 +6,7 @@ import '../../../app/palette.dart';
 import '../../../app/routes.dart';
 import '../../../app/widgets/tone_icon.dart';
 import '../../../core/utils/formatters.dart';
+import '../../question_bank/presentation/widgets/media_image.dart';
 import '../domain/notes.dart';
 import '../notes_providers.dart';
 
@@ -133,7 +134,27 @@ class _NoteCard extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    if (n.hasPhotos) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(width: 56, height: 72, child: MediaImage(n.photos.first, cacheWidth: 200)),
+                          ),
+                          if (n.photos.length > 1)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Text(
+                                '+${n.photos.length - 1} sayfa',
+                                style: theme.textTheme.labelMedium?.copyWith(color: scheme.primary),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 4),
+                    if (n.body.isNotEmpty)
                     Text(
                       n.body,
                       maxLines: 3,
@@ -166,10 +187,28 @@ class _NoteCard extends ConsumerWidget {
   }
 }
 
-/// Notu siler; "Geri al" ile aynen geri gelir.
+/// Notu siler. Yalnızca yazı ise "Geri al" ile aynen geri gelir; sayfa
+/// fotoğrafı varsa dosyalar da silineceği için önce onay sorulur.
 Future<void> deleteNoteWithUndo(BuildContext context, WidgetRef ref, StudyNote note) async {
   final repo = ref.read(noteRepositoryProvider);
   final messenger = ScaffoldMessenger.of(context);
+  if (note.hasPhotos) {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: const Text('Notu sil?'),
+        content: Text('Not ve ${note.photos.length} sayfa fotoğrafı silinir. Bu geri alınamaz.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await ref.read(deleteNoteProvider).call(note);
+    messenger.showSnackBar(const SnackBar(content: Text('Not silindi.')));
+    return;
+  }
   await repo.delete(note.id);
   messenger.showSnackBar(SnackBar(
     content: const Text('Not silindi.'),

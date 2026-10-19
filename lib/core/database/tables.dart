@@ -244,6 +244,19 @@ class StudyNotes extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Notun sayfa fotoğrafları (v9): el yazısı defter sayfaları, sırayla.
+/// Asıl görüntü her zaman saklanır; ileride okunan metin bunun üstüne eklenir.
+@DataClassName('NotePhotoRow')
+class NotePhotos extends Table {
+  TextColumn get id => text()();
+  TextColumn get noteId => text().references(StudyNotes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get path => text()(); // medya köküne göre göreli
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ───────────────────────── Kitap ilerlemesi (v4) ─────────────────────────
 
 /// Bir testin (ya da kitap ağacındaki bir yaprak başlığın) çözüldü kaydı.

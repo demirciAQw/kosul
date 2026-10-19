@@ -7,6 +7,7 @@ import '../../../library/library_providers.dart';
 import '../../../library/presentation/library_sheet.dart';
 import '../../domain/study_session.dart';
 import '../tree_selection.dart';
+import '../../../library/domain/progress.dart';
 
 typedef _Row = ({SelectableNode node, int depth, bool isPageStrip});
 
@@ -49,6 +50,8 @@ class _TopicSelectionViewState extends ConsumerState<TopicSelectionView> {
   @override
   Widget build(BuildContext context) {
     final library = ref.watch(libraryProvider);
+    // Kitap haritasındaki çözüldü bilgisi: çözülmüş kısımlar mavi tikle görünür.
+    final results = ref.watch(testResultsProvider).value ?? const <String, TestResult>{};
     return library.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Kitaplar yüklenemedi: $e')),
@@ -80,10 +83,13 @@ class _TopicSelectionViewState extends ConsumerState<TopicSelectionView> {
                 );
               }
               final state = states[node.id] ?? CheckState.none;
+              final solved = _solvedOf(node, results);
               return _NodeTile(
                 node: node,
                 depth: row.depth,
                 state: state,
+                solved: solved.done,
+                solvable: solved.total,
                 expanded: _expanded.contains(node.id),
                 onToggleExpand: () => setState(() {
                   if (!_expanded.remove(node.id)) _expanded.add(node.id);
@@ -129,6 +135,19 @@ class _TopicSelectionViewState extends ConsumerState<TopicSelectionView> {
   }
 }
 
+/// Düğümün altındaki testlerden kaçı kitap haritasında çözüldü.
+({int done, int total}) _solvedOf(SelectableNode n, Map<String, TestResult> results) {
+  final List<ContentNode> leaves;
+  if (n.contentNodeId == null) {
+    leaves = progressLeaves(n.book);
+  } else {
+    final c = findNode(n.book, n.contentNodeId);
+    if (c == null) return (done: 0, total: 0);
+    leaves = leavesUnder(c);
+  }
+  return (done: leaves.where((l) => results.containsKey(l.id)).length, total: leaves.length);
+}
+
 class _NodeTile extends StatelessWidget {
   const _NodeTile({
     required this.node,
@@ -137,11 +156,17 @@ class _NodeTile extends StatelessWidget {
     required this.expanded,
     required this.onToggleExpand,
     required this.onCheck,
+    this.solved = 0,
+    this.solvable = 0,
   });
 
   final SelectableNode node;
   final int depth;
   final CheckState state;
+
+  /// Altındaki testlerden çözülenler / toplam. Seçimi etkilemez, yalnızca gösterir.
+  final int solved;
+  final int solvable;
   final bool expanded;
   final VoidCallback onToggleExpand;
   final VoidCallback onCheck;
@@ -150,6 +175,8 @@ class _NodeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final estimate = node.estimatedQuestions;
+    final scheme = theme.colorScheme;
+    final allSolved = solvable > 0 && solved == solvable;
     final subtitle = [
       if (node.pages.isNotEmpty) 's. ${formatPages(node.pages)}',
       if (estimate != null) node.exactQuestions != null ? '$estimate soru' : 'yaklaşık $estimate soru',
@@ -180,7 +207,8 @@ class _NodeTile extends StatelessWidget {
                       node.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: depth == 0 ? theme.textTheme.titleMedium : theme.textTheme.bodyLarge,
+                      style: (depth == 0 ? theme.textTheme.titleMedium : theme.textTheme.bodyLarge)
+                          ?.copyWith(color: allSolved ? scheme.primary : null),
                     ),
                     if (subtitle.isNotEmpty)
                       Text(
@@ -193,6 +221,26 @@ class _NodeTile extends StatelessWidget {
                 ),
               ),
             ),
+            if (allSolved)
+              Tooltip(
+                message: solvable == 1 ? 'Çözüldü' : 'Hepsi çözüldü',
+                child: Icon(Icons.check_circle_rounded, color: scheme.primary, size: 22),
+              )
+            else if (solved > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$solved/$solvable',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             if (node.isExpandable)
               AnimatedRotation(
                 turns: expanded ? 0.25 : 0,

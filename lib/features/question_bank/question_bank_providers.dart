@@ -142,3 +142,12 @@ class QuestionSelection extends Notifier<Set<String>> {
 }
 
 final questionSelectionProvider = NotifierProvider<QuestionSelection, Set<String>>(QuestionSelection.new);
+
+/// Defter görünümü: galeri (ızgara) ya da gruplu liste.
+class NotebookGalleryMode extends Notifier<bool> {
+  @override
+  bool build() => true;
+  void set(bool gallery) => state = gallery;
+}
+
+final notebookGalleryProvider = NotifierProvider<NotebookGalleryMode, bool>(NotebookGalleryMode.new);

@@ -12,6 +12,7 @@ import '../widgets/filter_sheet.dart';
 import '../widgets/question_tile.dart';
 import '../../../notes/notes_providers.dart';
 import '../../../notes/presentation/notes_view.dart';
+import 'question_viewer_screen.dart';
 
 /// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
 class NotebookScreen extends ConsumerStatefulWidget {
@@ -57,6 +58,8 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
     final filter = ref.watch(questionFilterProvider);
     final groupBy = ref.watch(questionGroupByProvider);
     final groups = ref.watch(questionGroupsProvider);
+    final gallery = ref.watch(notebookGalleryProvider);
+    final cards = ref.watch(filteredQuestionsProvider);
     final due = ref.watch(dueCountProvider).value ?? 0;
     final incomplete = ref.watch(incompleteCountProvider);
     final selection = ref.watch(questionSelectionProvider);
@@ -202,34 +205,75 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
-                Text('Grupla:', style: theme.textTheme.labelLarge),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SegmentedButton<GroupBy>(
-                    showSelectedIcon: false,
-                    style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                    segments: [for (final g in GroupBy.values) ButtonSegment(value: g, label: Text(g.label))],
-                    selected: {groupBy},
-                    onSelectionChanged: (s) => ref.read(questionGroupByProvider.notifier).set(s.first),
-                  ),
+                SegmentedButton<bool>(
+                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                  segments: const [
+                    ButtonSegment(value: true, label: Text('Galeri'), icon: Icon(Icons.grid_view_rounded)),
+                    ButtonSegment(value: false, label: Text('Gruplu'), icon: Icon(Icons.account_tree_outlined)),
+                  ],
+                  selected: {gallery},
+                  onSelectionChanged: (s) => ref.read(notebookGalleryProvider.notifier).set(s.first),
                 ),
+                const Spacer(),
+                if (gallery)
+                  Text(
+                    '${cards.value?.length ?? 0} soru',
+                    style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  ),
               ],
             ),
           ),
-          Expanded(
-            child: groups.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
-              data: (list) => list.isEmpty
-                  ? _EmptyState(filtered: !filter.isUnfiltered)
-                  : ListView(
-                      padding: const EdgeInsets.only(bottom: 96),
-                      children: [
-                        for (final g in list)
-                          _GroupTile(group: g, path: g.title, depth: 0, expanded: list.length <= 3),
-                      ],
-                    ),
+          if (!gallery)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<GroupBy>(
+                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                  segments: [for (final g in GroupBy.values) ButtonSegment(value: g, label: Text(g.label))],
+                  selected: {groupBy},
+                  onSelectionChanged: (s) => ref.read(questionGroupByProvider.notifier).set(s.first),
+                ),
+              ),
             ),
+          Expanded(
+            child: gallery
+                // Galeri: arama ve filtrelerin sonucu doğrudan sorular; dokununca tam
+                // ekran açılır ve sonuçlar arasında kaydırılır.
+                ? cards.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
+                    data: (list) => list.isEmpty
+                        ? _EmptyState(filtered: !filter.isUnfiltered)
+                        : GridView.builder(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 220,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 3 / 4,
+                            ),
+                            itemCount: list.length,
+                            itemBuilder: (context, i) => QuestionTile(
+                              key: ValueKey(list[i].id),
+                              card: list[i],
+                              onOpen: () => QuestionViewerScreen.open(context, list, i),
+                            ),
+                          ),
+                  )
+                : groups.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
+                    data: (list) => list.isEmpty
+                        ? _EmptyState(filtered: !filter.isUnfiltered)
+                        : ListView(
+                            padding: const EdgeInsets.only(bottom: 96),
+                            children: [
+                              for (final g in list)
+                                _GroupTile(group: g, path: g.title, depth: 0, expanded: list.length <= 3),
+                            ],
+                          ),
+                  ),
           ),
         ],
       ),

@@ -17,8 +17,11 @@ Color statusColor(QuestionStatus status) => switch (status) {
 
 /// Galeri hissi: soru fotoğrafı, sağ üstte yıldız (GK), altta neden + zorluk.
 class QuestionTile extends ConsumerWidget {
-  const QuestionTile({super.key, required this.card});
+  const QuestionTile({super.key, required this.card, this.onOpen});
   final QuestionCard card;
+
+  /// Galeride: soruyu tam ekran görüntüleyicide aç. Yoksa ayrıntı sayfası açılır.
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,7 +41,7 @@ class QuestionTile extends ConsumerWidget {
         // Seçim modundayken dokunmak seçer; değilken soruyu açar. Uzun bas: seçimi başlat.
         onTap: selecting
             ? () => ref.read(questionSelectionProvider.notifier).toggle(card.id)
-            : () => context.push(AppRoutes.question(card.id)),
+            : (onOpen ?? () => context.push(AppRoutes.question(card.id))),
         onLongPress: () => ref.read(questionSelectionProvider.notifier).toggle(card.id),
         child: Stack(
           fit: StackFit.expand,

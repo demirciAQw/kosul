@@ -6,8 +6,15 @@ import 'domain/notes.dart';
 
 final noteRepositoryProvider = Provider<NoteRepository>((ref) => DriftNoteRepository(ref.watch(appDatabaseProvider)));
 
-final saveNoteProvider = Provider(
-    (ref) => SaveNote(ref.watch(noteRepositoryProvider), ref.watch(idGeneratorProvider), ref.watch(clockProvider)));
+final saveNoteProvider = Provider((ref) => SaveNote(
+      ref.watch(noteRepositoryProvider),
+      ref.watch(idGeneratorProvider),
+      ref.watch(clockProvider),
+      ref.watch(mediaStorageProvider),
+    ));
+
+final deleteNoteProvider =
+    Provider((ref) => DeleteNote(ref.watch(noteRepositoryProvider), ref.watch(mediaStorageProvider)));
 
 final notesProvider = StreamProvider<List<StudyNote>>((ref) => ref.watch(noteRepositoryProvider).watchAll());
 
