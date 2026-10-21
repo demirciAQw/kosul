@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/di/core_providers.dart';
+import '../features/question_bank/question_bank_providers.dart';
+import '../features/settings/domain/settings.dart';
+import '../features/settings/settings_providers.dart';
 import '../features/study_session/domain/study_session.dart';
 import '../features/study_session/study_session_providers.dart';
 import 'router.dart';
@@ -35,6 +40,25 @@ class _KocumAppState extends ConsumerState<KocumApp> {
       },
       fireImmediately: true,
     );
+
+    // Hatırlatıcılar: uygulama açılınca ve bekleyen tekrar sayısı değişince
+    // yeniden kurulur; bildirim metni güncel sayıyı söyler.
+    void refreshReminders() {
+      final s = ref.read(settingsProvider).value;
+      if (s == null || !(s.reviewReminder || s.studyReminder)) return;
+      unawaited(applyReminders(
+        ref.read(reminderServiceProvider),
+        s,
+        due: ref.read(dueCountProvider).value ?? 0,
+      ).catchError((_) {}));
+    }
+
+    ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
+      if (previous?.hasValue != true && next.hasValue) refreshReminders();
+    }, fireImmediately: true);
+    ref.listenManual<AsyncValue<int>>(dueCountProvider, (previous, next) {
+      if (next.hasValue && previous?.value != next.value) refreshReminders();
+    });
   }
 
   @override
@@ -44,6 +68,7 @@ class _KocumAppState extends ConsumerState<KocumApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      themeMode: ref.watch(settingsProvider).value?.themeMode ?? ThemeMode.system,
       locale: const Locale('tr', 'TR'),
       supportedLocales: const [Locale('tr', 'TR')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

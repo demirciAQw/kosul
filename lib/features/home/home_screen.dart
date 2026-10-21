@@ -44,6 +44,11 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Ayarlar ve hatırlatıcılar',
+            onPressed: () => context.push(AppRoutes.settings),
+            icon: const Icon(Icons.settings_outlined),
+          ),
+          IconButton(
             tooltip: 'Eksiklerini doldur',
             onPressed: pending.isEmpty ? null : () => _openPending(context, pending),
             icon: Badge.count(

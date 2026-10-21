@@ -62,6 +62,27 @@ void _copyLauncherIcons() {
 void _patchManifest(File file) {
   var s = file.readAsStringSync();
 
+  // Zamanlanmış hatırlatıcılar: telefon yeniden başlayınca yeniden kurulsun.
+  if (!s.contains('RECEIVE_BOOT_COMPLETED')) {
+    s = s.replaceFirst(
+      '<application',
+      '<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <application',
+    );
+  }
+  if (!s.contains('ScheduledNotificationReceiver')) {
+    s = s.replaceFirst('</application>', '''
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+    </application>''');
+  }
+
   if (!s.contains('POST_NOTIFICATIONS')) {
     s = s.replaceFirst(
       '<application',

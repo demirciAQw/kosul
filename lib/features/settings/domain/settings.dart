@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+
+/// Kullanıcı ayarları: hatırlatıcılar ve görünüm.
+class AppSettings {
+  const AppSettings({
+    this.reviewReminder = false,
+    this.reviewTime = const TimeOfDay(hour: 20, minute: 0),
+    this.studyReminder = false,
+    this.studyTime = const TimeOfDay(hour: 17, minute: 30),
+    this.themeMode = ThemeMode.system,
+  });
+
+  /// Her gün tekrar zamanı gelen soruları hatırlat.
+  final bool reviewReminder;
+  final TimeOfDay reviewTime;
+
+  /// Her gün çalışmaya başlamayı hatırlat.
+  final bool studyReminder;
+  final TimeOfDay studyTime;
+
+  final ThemeMode themeMode;
+
+  AppSettings copyWith({
+    bool? reviewReminder,
+    TimeOfDay? reviewTime,
+    bool? studyReminder,
+    TimeOfDay? studyTime,
+    ThemeMode? themeMode,
+  }) =>
+      AppSettings(
+        reviewReminder: reviewReminder ?? this.reviewReminder,
+        reviewTime: reviewTime ?? this.reviewTime,
+        studyReminder: studyReminder ?? this.studyReminder,
+        studyTime: studyTime ?? this.studyTime,
+        themeMode: themeMode ?? this.themeMode,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'reviewReminder': reviewReminder,
+        'reviewTime': _time(reviewTime),
+        'studyReminder': studyReminder,
+        'studyTime': _time(studyTime),
+        'themeMode': themeMode.name,
+      };
+
+  /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
+  factory AppSettings.fromJson(Map<String, dynamic> j) {
+    const d = AppSettings();
+    return AppSettings(
+      reviewReminder: j['reviewReminder'] is bool ? j['reviewReminder'] as bool : d.reviewReminder,
+      reviewTime: _parse(j['reviewTime']) ?? d.reviewTime,
+      studyReminder: j['studyReminder'] is bool ? j['studyReminder'] as bool : d.studyReminder,
+      studyTime: _parse(j['studyTime']) ?? d.studyTime,
+      themeMode: ThemeMode.values.where((m) => m.name == j['themeMode']).firstOrNull ?? d.themeMode,
+    );
+  }
+
+  static String _time(TimeOfDay t) => '${t.hour}:${t.minute}';
+
+  static TimeOfDay? _parse(Object? v) {
+    if (v is! String) return null;
+    final parts = v.split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]), m = int.tryParse(parts[1]);
+    if (h == null || m == null || h < 0 || h > 23 || m < 0 || m > 59) return null;
+    return TimeOfDay(hour: h, minute: m);
+  }
+}
+
+/// Tekrar hatırlatıcısının metni: bekleyen soru sayısına göre.
+String reviewReminderBody(int due) => due > 0
+    ? '$due soru tekrar seni bekliyor. Birkaç dakikan yeter.'
+    : 'Bugünkü tekrarlarına bir göz at.';
+
+const studyReminderBody = 'Çalışma zamanı. Küçük bir oturum bile sayılır.';

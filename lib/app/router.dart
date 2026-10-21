@@ -13,6 +13,7 @@ import '../features/mock_exam/presentation/mock_exam_detail_screen.dart';
 import '../features/mock_exam/presentation/mock_exams_screen.dart';
 import '../features/notes/presentation/note_editor_screen.dart';
 import '../features/planning/presentation/create_plan_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../features/planning/presentation/plan_screen.dart';
 import '../features/question_bank/presentation/question_prefill.dart';
 import '../features/question_bank/presentation/screens/add_question_screen.dart';
@@ -77,6 +78,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AppRoutes.plan, builder: (context, state) => const PlanScreen()),
       GoRoute(path: AppRoutes.newPlan, builder: (context, state) => const CreatePlanScreen()),
       GoRoute(path: AppRoutes.sessions, builder: (context, state) => const SessionHistoryScreen()),
+      GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
       GoRoute(
         path: AppRoutes.newNote,
         builder: (context, state) => NoteEditorScreen(initialSubject: state.extra as String?),

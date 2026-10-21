@@ -18,6 +18,7 @@ abstract final class AppRoutes {
   static const newPlan = '/plan/new';
   static const sessions = '/sessions';
   static const newNote = '/notes/new';
+  static const settings = '/settings';
   static String note(String id) => '/notes/$id';
   static String book(String id) => '/books/$id';
   static String bookTest(String bookId, String nodeId) => '/books/$bookId/tests/$nodeId';
