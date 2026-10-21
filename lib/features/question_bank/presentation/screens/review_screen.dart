@@ -79,21 +79,38 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
     final item = _current;
     if (item == null || _busy) return;
     setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
     try {
       // Aynı oturumda ikinci kez gösterilen kart zamanlamayı bir kez daha etkilemez.
+      ReviewState? before;
+      var counted = false, requeued = false;
       if (!_relearn.contains(item.card.id)) {
+        before = await ref.read(questionCardRepositoryProvider).reviewStateOf(item.card.id);
         await ref.read(gradeReviewProvider).call(item.card.id, grade);
         _graded++;
+        counted = true;
         if (grade == RecallGrade.again) {
           _relearn.add(item.card.id);
           _queue.add(item); // oturum sonunda bir kez daha göster
+          requeued = true;
         }
       }
       if (mounted) {
+        final at = _index;
         setState(() {
           _index++;
           _showSolution = false;
         });
+        // Yanlışlıkla basılan not geri alınabilir: zamanlama ve kuyruk eski hâline döner.
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(SnackBar(
+          duration: const Duration(seconds: 4),
+          content: Text('"${grade.label}" kaydedildi.'),
+          action: SnackBarAction(
+            label: 'Geri al',
+            onPressed: () => _undoGrade(item, at, before: before, counted: counted, requeued: requeued),
+          ),
+        ));
       }
     } on Exception catch (e) {
       if (mounted) {
@@ -102,6 +119,30 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _undoGrade(
+    DueReview item,
+    int at, {
+    required ReviewState? before,
+    required bool counted,
+    required bool requeued,
+  }) async {
+    if (!mounted) return;
+    if (counted && before != null) {
+      await ref.read(questionCardRepositoryProvider).applyReview(item.card.id, before);
+    }
+    if (!mounted) return;
+    setState(() {
+      if (requeued) {
+        final last = _queue.lastIndexWhere((q) => q.card.id == item.card.id);
+        if (last > at) _queue.removeAt(last);
+        _relearn.remove(item.card.id);
+      }
+      if (counted) _graded--;
+      _index = at;
+      _showSolution = false;
+    });
   }
 
   /// Tekrar sırasında soruyu siler; liste ve sayaçlar hemen güncellenir.

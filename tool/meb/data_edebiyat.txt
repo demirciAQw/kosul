@@ -3,7 +3,7 @@ U|1. Tema: Bir Diyeceğim Var!|12|83
 K|Metin Tahlili-1 (Anlama): Okuma|15
 K|Karagöz Oyunu (Yazıcı)|18
 K|Metin Tahlili-2 (Anlama): Okuma|36
-K|Mektup (Ali'ye Mektuplar)|37
+K|Mektup (Âli'ye Mektuplar)|37
 K|Dilekçe|51
 K|Edebiyat Atölyesi-1 (Anlatma): Konuşma|53
 K|Sözlü İletişim Engellerini Konu Alan Bir Drama Sergileyebilme|53
@@ -31,9 +31,9 @@ K|Metin Tahlili-1 (Anlama): Okuma|164
 K|Roman (Huzur)|167
 K|Metin Tahlili-2 (Anlama): Okuma|194
 K|Biyografi (Mehmet Akif Ersoy)|195
-K|Tezkire (Usülü)|206
+K|Tezkire (Usûlî)|206
 K|Edebiyat Atölyesi-1 (Anlatma): Konuşma|210
-K|Mülakat (Seçilen Roman Kişisiyle Romanın Bağlamına Uygun Hayal Bir Mülakat Yapabilme)|211
+K|Mülakat (Seçilen Roman Kişisiyle Romanın Bağlamına Uygun Hayali Bir Mülakat Yapabilme)|211
 K|Metin Tahlili-3 (Anlama): Dinleme / İzleme|215
 K|Radyo Tiyatrosu (Direnişin Ustaları)|216
 K|Edebiyat Atölyesi-2 (Anlatma): Yazma|225
@@ -43,7 +43,7 @@ U|4. Tema: Hayatın Aynası|236|307
 K|Metin Tahlili-1 (Anlama): Okuma|240
 K|Tiyatro (Ben, Mimar Sinan)|243
 K|Metin Tahlili-2 (Anlama): Okuma|263
-K|Küçük Hikâye (Merdiven)|265
+K|Küçürek Hikâye (Merdiven)|265
 K|Edebiyat Atölyesi-1 (Anlatma): Konuşma|280
 K|Tiyatro Metnini Canlandırarak Konuşma Becerisini Geliştirebilme|281
 K|Metin Tahlili-3 (Anlama): Dinleme / İzleme|284

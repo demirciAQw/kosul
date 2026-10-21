@@ -73,6 +73,10 @@ final questionGroupByProvider = NotifierProvider<GroupByNotifier, GroupBy>(Group
 final filteredQuestionsProvider = StreamProvider<List<QuestionCard>>((ref) =>
     ref.watch(questionCardRepositoryProvider).watch(ref.watch(questionFilterProvider)));
 
+/// Filtresiz bütün defter (dışa aktarma "Tüm defter" için).
+final allQuestionsProvider = StreamProvider<List<QuestionCard>>(
+    (ref) => ref.watch(questionCardRepositoryProvider).watch(const QuestionFilter()));
+
 final questionGroupsProvider = Provider<AsyncValue<List<QuestionGroup>>>((ref) {
   final cards = ref.watch(filteredQuestionsProvider);
   final by = ref.watch(questionGroupByProvider);
@@ -139,6 +143,7 @@ class QuestionSelection extends Notifier<Set<String>> {
 
   void toggle(String id) => state = state.contains(id) ? ({...state}..remove(id)) : {...state, id};
   void clear() => state = const {};
+  void selectAll(Iterable<String> ids) => state = {...state, ...ids};
 }
 
 final questionSelectionProvider = NotifierProvider<QuestionSelection, Set<String>>(QuestionSelection.new);

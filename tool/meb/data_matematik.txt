@@ -12,19 +12,19 @@ K|2.3 Çokgenlerin Sınıflandırılması|128
 K|2.4 Dışbükey Çokgenlerin Özellikleri|133
 K|2.5 Çokgenlerle İlgili Problemler|154
 K|2. Tema Ölçme ve Değerlendirme Soruları|164
-U|3. Tema: Niceliker ve Değişimler (1)|172|243
+U|3. Tema: Nicelikler ve Değişimler (1)|172|243
 K|Ön Değerlendirme|174
 K|3.1 Trigonometrik Fonksiyonlar ve Nitel Özellikleri|177
 K|3.2 Trigonometrik Fonksiyonlarla İfade Edilebilen Denklemler İçeren Problemler|228
 K|3. Tema Ölçme ve Değerlendirme Soruları|238
-U|4. Tema: Niceliker ve Değişimler (2)|244|321
+U|4. Tema: Nicelikler ve Değişimler (2)|244|321
 K|Ön Değerlendirme|246
 K|4.1 Üstel Fonksiyonlar ve Nitel Özellikleri|248
 K|4.2 Üstel Fonksiyonların Ters Fonksiyonları|267
 K|4.3 Logaritmik Fonksiyonlar ve Nitel Özellikleri|279
 K|4.4 Üstel ve Logaritmik Fonksiyonlarla İfade Edilebilen Denklem ve Eşitsizlikler İçeren Problemler|303
 K|4. Tema Ölçme ve Değerlendirme Soruları|316
-U|5. Tema: Niceliker ve Değişimler (3)|322|372
+U|5. Tema: Nicelikler ve Değişimler (3)|322|372
 K|Ön Değerlendirme|324
 K|5.1 Fonksiyonların Bileşkesi|327
 K|5.2 Fonksiyonlarda Dört İşlem|353

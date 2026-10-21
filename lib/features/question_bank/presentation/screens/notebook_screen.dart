@@ -13,6 +13,9 @@ import '../widgets/question_tile.dart';
 import '../../../notes/notes_providers.dart';
 import '../../../notes/presentation/notes_view.dart';
 import 'question_viewer_screen.dart';
+import '../../../notes/presentation/notes_export.dart';
+import '../../../notes/domain/notes.dart';
+import '../export_sheet.dart';
 
 /// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
 class NotebookScreen extends ConsumerStatefulWidget {
@@ -82,8 +85,20 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
                 icon: const Icon(Icons.close_rounded),
                 onPressed: () => ref.read(questionSelectionProvider.notifier).clear(),
               ),
-              title: Text('${selection.length} soru seçildi'),
+              title: Text('${selection.length} seçili'),
               actions: [
+                IconButton(
+                  tooltip: 'Tümünü seç',
+                  icon: const Icon(Icons.select_all_rounded),
+                  onPressed: () => ref
+                      .read(questionSelectionProvider.notifier)
+                      .selectAll([for (final c in ref.read(filteredQuestionsProvider).value ?? const <QuestionCard>[]) c.id]),
+                ),
+                IconButton(
+                  tooltip: 'Seçilenleri dışa aktar',
+                  icon: const Icon(Icons.ios_share_rounded),
+                  onPressed: () => _exportQuestions(selected: selection),
+                ),
                 IconButton(
                   tooltip: 'Seçilenleri sil',
                   icon: const Icon(Icons.delete_outline_rounded),
@@ -101,6 +116,11 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Dışa aktar',
+            icon: const Icon(Icons.ios_share_rounded),
+            onPressed: _onNotes ? _exportNotes : () => _exportQuestions(),
+          ),
           if (!_onNotes)
           IconButton(
             tooltip: 'Filtrele',
@@ -282,6 +302,28 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
       ),
     ),
     );
+  }
+
+  /// Sorular: seçili / bu arama / tüm defter kapsamlarıyla dışa aktarma paneli.
+  Future<void> _exportQuestions({Set<String>? selected}) async {
+    final filtered = ref.read(filteredQuestionsProvider).value ?? const <QuestionCard>[];
+    final all = await ref.read(allQuestionsProvider.future);
+    if (!mounted) return;
+    final filter = ref.read(questionFilterProvider);
+    final scopes = <String, List<QuestionCard>>{
+      if (selected != null && selected.isNotEmpty) 'Seçili': [for (final c in all) if (selected.contains(c.id)) c],
+      if (!filter.isUnfiltered) 'Bu arama ve filtre': filtered,
+      'Tüm defter': all,
+    };
+    await showQuestionExportSheet(context, scopes: scopes);
+  }
+
+  /// Notlar: seçili dersin (ya da tüm derslerin) notları ve sayfa fotoğrafları.
+  Future<void> _exportNotes() async {
+    final notes = ref.read(notesProvider).value ?? const <StudyNote>[];
+    final subject = ref.read(noteSubjectFilterProvider);
+    final list = [for (final n in notes) if (subject == null || n.subject == subject) n];
+    await exportNotes(context, ref, list, title: subject == null ? 'Tüm notlar' : '$subject defteri');
   }
 
   Future<void> _deleteSelected(Set<String> ids) async {

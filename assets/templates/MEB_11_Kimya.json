@@ -42,7 +42,7 @@
        "pageEnd": 42
       },
       {
-       "title": "1.1.5 Standart Tepkime Entalpisi",
+       "title": "1.1.4.a Standart Tepkime Entalpisi",
        "pageStart": 43,
        "pageEnd": 47
       }
@@ -215,7 +215,7 @@
        "pageEnd": 191
       },
       {
-       "title": "2.2.2.a Amfoter Oksitlerin Asidik Özelliği",
+       "title": "2.2.2.a Ametal Oksitlerin Asidik Özelliği",
        "pageStart": 192,
        "pageEnd": 194
       },
@@ -296,7 +296,7 @@
    ]
   },
   {
-   "title": "3. Tema: Nanoteknoloji ve Sürdürülebilirlik",
+   "title": "3. Tema: Sürdürülebilirlik",
    "pageStart": 282,
    "pageEnd": 325,
    "children": [

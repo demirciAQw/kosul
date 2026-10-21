@@ -25,7 +25,7 @@ A|2.2.2 Üzerinden Akım Geçen Düz İletken Telin Manyetik Alanı|198
 A|2.2.3 Akım Makarasının Manyetik Alanı|207
 A|2.2.4 Elektromıknatısların Kullanım Alanları|213
 A|2.2.5 Manyetik Alanda Üzerinden Akım Geçen Düz Bir Tele Etki Eden Kuvvet|218
-A|2.2.6 Manyetik Alanda Üzerinden Akım Geçen Dikdörtgen Tele Bir Eksen Etrafında Dönmesi|229
+A|2.2.6 Manyetik Alanda Üzerinden Akım Geçen Dikdörtgen Telin Bir Eksen Etrafında Dönmesi|229
 K|2.3 İndüksiyon Akımı|236
 A|2.3.1 Manyetik Akı|236
 A|2.3.2 İndüksiyon Gerilimi|242

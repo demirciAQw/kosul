@@ -5,7 +5,7 @@ A|1.1.1 Tepkimelerde Meydana Gelen Enerji Değişimi|15
 A|1.1.2 Maddelerin Enerji Kaynağı Olma Potansiyeli|23
 A|1.1.3 Bağ Enerjileriyle Tepkime Entalpisinin Hesaplanması|28
 A|1.1.4 Standart Oluşum Entalpisi|38
-A|1.1.5 Standart Tepkime Entalpisi|43
+A|1.1.4.a Standart Tepkime Entalpisi|43
 K|1.2 Kimyasal Tepkimelerde Hız|48
 A|1.2.1 Kimyasal Tepkimelerin Gerçekleşmesi İçin Gerekli Şartlar|48
 A|1.2.1.a Çarpışma Teorisi|54
@@ -38,7 +38,7 @@ A|2.1.5.e Katalizörün Dengeye Etkisi|177
 K|2.2 Asit ve Baz Çözeltilerinde Denge|179
 A|2.2.1 Saf Suyun Otoiyonizasyonu|179
 A|2.2.2 Asit-Baz Teorilerinin Karşılaştırılması|184
-A|2.2.2.a Amfoter Oksitlerin Asidik Özelliği|192
+A|2.2.2.a Ametal Oksitlerin Asidik Özelliği|192
 A|2.2.3 Asitlerin ve Bazların Kuvveti|195
 A|2.2.4 Kuvvetli Asit-Zayıf Asit ve Kuvvetli Baz-Zayıf Baz Sulu Çözeltilerindeki pH Hesaplamaları|207
 A|2.2.5 Kuvvetli Asit ve Kuvvetli Bazların Nötralleşme Tepkimeleri|219
@@ -53,7 +53,7 @@ A|2.3.1 Suda Az Çözünen Tuzların Molar Çözünürlükleri|246
 A|2.3.2 Suda Az Çözünen Tuzların Çözünürlüğüne Etki Eden Faktörler|253
 A|2.3.2.a Sıcaklığın Etkisi|256
 A|2.3.2.b Ortak İyon Etkisi|257
-U|3. Tema: Nanoteknoloji ve Sürdürülebilirlik|282|325
+U|3. Tema: Sürdürülebilirlik|282|325
 K|3.1 Nanoteknoloji ve Sürdürülebilirlik|285
 A|3.1.1 Yeşil Hidrojen Enerjisi|285
 A|3.1.1.a Evsel Atıklardan Fermantasyonla Hidrojen Gazı Üretiminde Hidrojen Gazı Miktarına Etki Eden Faktörler|291
