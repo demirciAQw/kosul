@@ -50,8 +50,6 @@ class _TopicSelectionViewState extends ConsumerState<TopicSelectionView> {
   @override
   Widget build(BuildContext context) {
     final library = ref.watch(libraryProvider);
-    // Kitap haritasındaki çözüldü bilgisi: çözülmüş kısımlar mavi tikle görünür.
-    final results = ref.watch(testResultsProvider).value ?? const <String, TestResult>{};
     return library.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Kitaplar yüklenemedi: $e')),
@@ -60,6 +58,8 @@ class _TopicSelectionViewState extends ConsumerState<TopicSelectionView> {
   }
 
   Widget _buildTree(List<SelectableNode> roots) {
+    // Kitap haritasındaki çözüldü bilgisi: çözülmüş kısımlar mavi tikle görünür.
+    final results = ref.watch(testResultsProvider).value ?? const <String, TestResult>{};
     final states = _selection.computeStates(roots);
     final rows = _visibleRows(roots);
     final drafts = _selection.isEmpty ? const <SessionItemDraft>[] : _selection.toDrafts(roots, states);
