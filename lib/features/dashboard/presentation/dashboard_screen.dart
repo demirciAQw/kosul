@@ -7,6 +7,7 @@ import '../../../core/utils/formatters.dart';
 import '../dashboard_providers.dart';
 import '../domain/dashboard.dart';
 import '../domain/patterns.dart';
+import 'ai_report_sheet.dart';
 
 /// "En çok hangi konuda/nedenden yanlış yapıyorum ve ne kadar süre kaybediyorum?"
 class DashboardScreen extends ConsumerWidget {
@@ -21,7 +22,16 @@ class DashboardScreen extends ConsumerWidget {
     final patterns = ref.watch(subjectPatternsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Analiz')),
+      appBar: AppBar(
+        title: const Text('Analiz'),
+        actions: [
+          TextButton.icon(
+            onPressed: () => showAiReportSheet(context),
+            icon: const Icon(Icons.auto_awesome_outlined),
+            label: const Text('Yapay zekâ raporu'),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [

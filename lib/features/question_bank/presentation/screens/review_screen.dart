@@ -11,6 +11,8 @@ import '../../domain/question_card.dart';
 import '../../domain/srs.dart';
 import '../../question_bank_providers.dart';
 import '../widgets/media_image.dart';
+import '../../../../app/palette.dart';
+import '../../domain/recurrence.dart';
 
 /// "Yanlışlarımı Göster": günü gelen kartlar SM-2'ye göre çözümleriyle getirilir.
 class ReviewScreen extends ConsumerWidget {
@@ -19,12 +21,20 @@ class ReviewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final due = ref.watch(dueReviewsProvider);
+    // Benzerlik için tüm defter: aynı konuda sık tekrarlanan hatalar öne alınır.
+    final all = ref.watch(allQuestionsProvider);
+    final curriculum = ref.watch(curriculumProvider).value ?? const <CurriculumNode>[];
     return Scaffold(
       appBar: AppBar(title: const Text('Yanlışlarım')),
       body: due.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Kartlar yüklenemedi: $e')),
-        data: (list) => list.isEmpty ? const _NothingDue() : _ReviewSession(initial: list),
+        data: (list) {
+          if (list.isEmpty) return const _NothingDue();
+          if (all.isLoading && !all.hasValue) return const Center(child: CircularProgressIndicator());
+          final rec = recurrenceOf(all.value ?? const <QuestionCard>[], {for (final n in curriculum) n.id: n});
+          return _ReviewSession(initial: prioritizeDue(list, rec), recurrence: rec);
+        },
       ),
     );
   }
@@ -58,8 +68,11 @@ class _NothingDue extends StatelessWidget {
 }
 
 class _ReviewSession extends ConsumerStatefulWidget {
-  const _ReviewSession({required this.initial});
+  const _ReviewSession({required this.initial, this.recurrence = const {}});
   final List<DueReview> initial;
+
+  /// Kart → benzer hata bilgisi (aynı konu, aynı neden).
+  final Map<String, Recurrence> recurrence;
 
   @override
   ConsumerState<_ReviewSession> createState() => _ReviewSessionState();
@@ -216,6 +229,11 @@ class _ReviewSessionState extends ConsumerState<_ReviewSession> {
             ],
           ),
         ),
+        if (widget.recurrence[card.id]?.isRecurring ?? false)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+            child: _RecurrenceBanner(widget.recurrence[card.id]!),
+          ),
         if (card.reason != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -409,6 +427,42 @@ class _Finished extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "Tekrarlayan hata" şeridi: bu konuda sık yanlış yapıyorsun, önce bu geliyor.
+class _RecurrenceBanner extends StatelessWidget {
+  const _RecurrenceBanner(this.recurrence);
+  final Recurrence recurrence;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final color = dark ? KocumColors.redDark : KocumColors.red;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: dark ? 0.18 : 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.repeat_rounded, size: 20, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: 'Tekrarlayan hata. ', style: TextStyle(fontWeight: FontWeight.w700, color: color)),
+                TextSpan(text: recurrence.message),
+              ]),
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }
