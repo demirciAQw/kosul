@@ -6,7 +6,7 @@ import 'question_card.dart';
 
 /// Dışa aktarılan dosyaların adı nasıl kurulsun.
 enum ExportNaming {
-  label('Etiketlerle'), // TYT_Matematik_Türev_Test_5_S7_Yanlış
+  tags('Etiketlerle'), // TYT_Matematik_Türev_Test_5_S7_Yanlış
   date('Tarihle'), // 2026-10-19_TYT_Matematik_Yanlış
   sequence('Sıra numarasıyla'); // 001_TYT_Matematik
 
@@ -21,7 +21,7 @@ class QuestionExportOptions {
     this.table = true,
     this.fullData = false,
     this.folderBySubject = true,
-    this.naming = ExportNaming.label,
+    this.naming = ExportNaming.tags,
   });
 
   final bool questionPhotos;
@@ -98,7 +98,7 @@ QuestionExportPlan planQuestionExport(
     final topic = topicOf(c);
     final where = c.testLabel ?? c.sourceName;
     final base = switch (o.naming) {
-      ExportNaming.label => safeFileName([
+      ExportNaming.tags => safeFileName([
           c.subject,
           if (topic != null) topic,
           where,

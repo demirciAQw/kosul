@@ -83,9 +83,6 @@ class AppDatabase extends _$AppDatabase {
             }
             await _createV2Indexes();
           }
-          if (from < 9) {
-            await m.createTable(notePhotos);
-          }
           if (from < 8) {
             final cols = await customSelect('PRAGMA table_info(question_cards)').get();
             final names = {for (final c in cols) c.read<String>('name')};
@@ -105,6 +102,10 @@ class AppDatabase extends _$AppDatabase {
             if (!cols.any((c) => c.read<String>('name') == 'topic_text')) {
               await m.addColumn(questionCards, questionCards.topicText);
             }
+          }
+          // Notlar tablosundan (v7) sonra: fotoğraflar ona bağlı.
+          if (from < 9) {
+            await m.createTable(notePhotos);
           }
         },
         beforeOpen: (details) async {

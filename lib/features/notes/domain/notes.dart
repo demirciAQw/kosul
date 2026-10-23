@@ -94,7 +94,7 @@ class SaveNote {
 
     final imported = <String>[];
     final finalPhotos = <String>[];
-    final StudyNote note;
+    late final StudyNote note;
     try {
       for (final p in photos) {
         final stored = p.stored;

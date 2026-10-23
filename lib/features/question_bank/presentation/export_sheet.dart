@@ -177,7 +177,7 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
           const SizedBox(height: 6),
           Text(
             switch (_o.naming) {
-              ExportNaming.label => 'Örn. TYT_Matematik_Türev_Test_5_S7_Yanlış.webp',
+              ExportNaming.tags => 'Örn. TYT_Matematik_Türev_Test_5_S7_Yanlış.webp',
               ExportNaming.date => 'Örn. 2026-10-19_TYT_Matematik_Yanlış.webp',
               ExportNaming.sequence => 'Örn. 001_TYT_Matematik.webp',
             },

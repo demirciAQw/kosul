@@ -101,7 +101,10 @@ class ZipWriter {
   }
 
   static int _dosTime(DateTime t) => (t.hour << 11) | (t.minute << 5) | (t.second ~/ 2);
-  static int _dosDate(DateTime t) => ((t.year - 1980).clamp(0, 127) << 9) | (t.month << 5) | t.day;
+  static int _dosDate(DateTime t) {
+    final y = t.year < 1980 ? 0 : (t.year > 2107 ? 127 : t.year - 1980);
+    return (y << 9) | (t.month << 5) | t.day;
+  }
 }
 
 final List<int> _crcTable = List<int>.generate(256, (n) {
