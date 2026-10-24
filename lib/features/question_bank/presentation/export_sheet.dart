@@ -14,6 +14,8 @@ import '../domain/question_card.dart';
 import '../domain/question_export.dart';
 import '../../curriculum/domain/yks.dart';
 import 'question_pdf.dart';
+import '../../../core/export/xlsx_writer.dart';
+import '../../tools/data/workbook_export.dart';
 
 /// Defter'den dışa aktarma: hangi sorular, hangi dosyalar, nasıl adlandırılsın.
 /// Sonuç tek bir ZIP olarak paylaşılır (Drive, WhatsApp, dosyalar…).
@@ -47,6 +49,9 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
 
   /// Biçim: ZIP (fotoğraflar + tablo) ya da yazdırılabilir PDF (sayfada 4 soru).
   late bool _pdf = widget.startWithPdf;
+
+  /// Tablo (.xlsx): seçili sorular LibreOffice Calc / Excel'de.
+  bool _sheet = false;
   bool _answerKey = true;
 
   List<QuestionCard> get _cards => widget.scopes[_scope] ?? const [];
@@ -89,6 +94,25 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
       await SharePlus.instance.share(ShareParams(files: [XFile(out.path, mimeType: 'application/pdf')]));
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('PDF hazırlanamadı: $e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _exportSheet() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final curriculum = {for (final n in ref.read(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
+    setState(() => _busy = true);
+    try {
+      final now = DateTime.now();
+      final dir = await getTemporaryDirectory();
+      final out = File('${dir.path}/Kocum_Sorular_${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}.xlsx');
+      await out.writeAsBytes(buildXlsx([questionsSheet(_cards, curriculum)], time: now), flush: true);
+      navigator.pop();
+      await SharePlus.instance.share(ShareParams(files: [XFile(out.path, mimeType: xlsxMimeType)]));
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Tablo hazırlanamadı: $e')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -183,16 +207,39 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
               ChoiceChip(
                 label: const Text('PDF (sayfada 4 soru)'),
                 selected: _pdf,
-                onSelected: (_) => setState(() => _pdf = true),
+                onSelected: (_) => setState(() {
+                  _pdf = true;
+                  _sheet = false;
+                }),
+              ),
+              ChoiceChip(
+                label: const Text('Tablo (LibreOffice Calc)'),
+                selected: _sheet,
+                onSelected: (_) => setState(() {
+                  _sheet = true;
+                  _pdf = false;
+                }),
               ),
               ChoiceChip(
                 label: const Text('ZIP (fotoğraflar ve tablo)'),
-                selected: !_pdf,
-                onSelected: (_) => setState(() => _pdf = false),
+                selected: !_pdf && !_sheet,
+                onSelected: (_) => setState(() {
+                  _pdf = false;
+                  _sheet = false;
+                }),
               ),
             ],
           ),
-          if (_pdf) ...[
+          if (_sheet)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'Tek dosya (.xlsx): her soru bir satır; ders, konu, kaynak, test, soru no, şıklar, neden, zorluk. '
+                'LibreOffice Calc, Excel ve Google E-Tablolar açar. Fotoğraflar girmez.',
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else if (_pdf) ...[
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _answerKey,
@@ -268,11 +315,17 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
           ],
           const SizedBox(height: 16),
           FilledButton.icon(
-            onPressed: _busy || _cards.isEmpty || (!_pdf && _o.isEmpty) ? null : (_pdf ? _exportPdf : _export),
+            onPressed: _busy || _cards.isEmpty || (!_pdf && !_sheet && _o.isEmpty)
+                ? null
+                : (_sheet ? _exportSheet : (_pdf ? _exportPdf : _export)),
             icon: _busy
                 ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.ios_share_rounded),
-            label: Text(_busy ? 'Hazırlanıyor…' : (_pdf ? '${_cards.length} soruyla PDF oluştur' : '${_cards.length} soruyu paylaş')),
+            label: Text(_busy
+                ? 'Hazırlanıyor…'
+                : (_pdf
+                    ? '${_cards.length} soruyla PDF oluştur'
+                    : (_sheet ? '${_cards.length} soruyu tabloya aktar' : '${_cards.length} soruyu paylaş'))),
           ),
         ],
       ),

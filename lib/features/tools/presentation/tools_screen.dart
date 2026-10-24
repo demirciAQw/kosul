@@ -31,6 +31,8 @@ import '../../study_session/study_session_providers.dart';
 import '../data/full_export.dart';
 import '../domain/export_log.dart';
 import '../tools_providers.dart';
+import '../../../core/export/xlsx_writer.dart';
+import '../data/workbook_export.dart';
 
 String _two(int n) => n.toString().padLeft(2, '0');
 String _stamp(DateTime d) => '${d.year}-${_two(d.month)}-${_two(d.day)}_${_two(d.hour)}${_two(d.minute)}';
@@ -140,6 +142,38 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
       ));
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Dışa aktarılamadı: $e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// Tüm veri, LibreOffice Calc / Excel'de açılan çok sayfalı tablo (.xlsx).
+  Future<void> _spreadsheet() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    try {
+      final now = ref.read(clockProvider)();
+      final sheets = dataWorkbook(
+        cards: await ref.read(allQuestionsProvider.future),
+        curriculum: {for (final n in ref.read(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n},
+        books: ref.read(libraryProvider).value ?? const <Book>[],
+        progress: ref.read(bookProgressProvider).value ?? const <BookProgress>[],
+        results: ref.read(testResultsProvider).value ?? const {},
+        sessions: await ref.read(studySessionRepositoryProvider).watchHistory(limit: 100000).first,
+        exams: ref.read(mockExamsProvider).value ?? const <MockExam>[],
+        plans: ref.read(plansProvider).value ?? const <StudyPlan>[],
+        notes: ref.read(notesProvider).value ?? const <StudyNote>[],
+        findings: ref.read(deepAnalysisProvider).value?.findings ?? const [],
+      );
+      final out = await _temp(workbookFileName(now));
+      await out.writeAsBytes(buildXlsx(sheets, time: now), flush: true);
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(out.path, mimeType: xlsxMimeType)],
+        subject: 'Koçum verileri',
+        text: [for (final s in sheets) '${s.name}: ${s.rows.length}'].join(', '),
+      ));
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Tablo hazırlanamadı: $e')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -256,6 +290,14 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
                       'Yanlışlarımdan test oluştur',
                       'Ders, konu, zorluk, neden ve soru sayısına göre PDF test',
                       () => context.push(AppRoutes.practiceTest),
+                    ),
+                    const Divider(indent: 72),
+                    tile(
+                      Icons.table_chart_outlined,
+                      KocumColors.green,
+                      'Tablo (LibreOffice Calc / Excel)',
+                      'Sorular, oturumlar, kitap testleri, denemeler… ayrı sayfalarda; filtreli ve sıralanabilir',
+                      _spreadsheet,
                     ),
                     const Divider(indent: 72),
                     tile(
