@@ -76,6 +76,11 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   /// Şıklar: doğru cevap ve öğrencinin işaretlediği ("A"–"E").
   String? _correctAnswer;
   String? _givenAnswer;
+
+  /// Açık uçlu soru: cevaplar şık yerine yazıyla girilir.
+  bool _written = false;
+  final _correctText = TextEditingController();
+  final _givenText = TextEditingController();
   bool _answerError = false;
   int _difficulty = 5;
   bool _starred = false;
@@ -107,7 +112,9 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
               _reasonNote.text.trim().isNotEmpty ||
               _reason != null ||
               _correctAnswer != null ||
-              _givenAnswer != null));
+              _givenAnswer != null ||
+              _correctText.text.trim().isNotEmpty ||
+              _givenText.text.trim().isNotEmpty));
 
   @override
   void initState() {
@@ -196,8 +203,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       _testLabel = card.testLabel;
       _reason = card.reason;
       _reasonNote.text = card.reasonNote ?? '';
-      _correctAnswer = card.correctAnswer;
-      _givenAnswer = card.givenAnswer;
+      _written = card.hasWrittenAnswer;
+      if (_written) {
+        _correctText.text = card.correctAnswer ?? '';
+        _givenText.text = card.givenAnswer ?? '';
+      } else {
+        _correctAnswer = card.correctAnswer;
+        _givenAnswer = card.givenAnswer;
+      }
       _difficulty = card.difficulty;
       _starred = card.isStarred;
       _source.text = card.sourceName == unknownSourceName ? '' : card.sourceName;
@@ -211,7 +224,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
 
   @override
   void dispose() {
-    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note, _questionNo, _reasonNote]) {
+    for (final c in [_solutionText, _source, _testTotal, _avgSeconds, _note, _questionNo, _reasonNote, _correctText, _givenText]) {
       c.dispose();
     }
     // Kaydedilmeden çıkıldıysa geçici dosyaları temizle (kaydedilenler zaten kalıcı depoda).
@@ -320,6 +333,49 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
             }),
           ),
           const _SectionTitle('Cevaplar'),
+          SegmentedButton<bool>(
+            style: const ButtonStyle(visualDensity: VisualDensity.compact),
+            segments: const [
+              ButtonSegment(value: false, label: Text('Şıklı'), icon: Icon(Icons.radio_button_checked_rounded)),
+              ButtonSegment(value: true, label: Text('Yazılı'), icon: Icon(Icons.edit_note_rounded)),
+            ],
+            selected: {_written},
+            onSelectionChanged: (v) => setState(() {
+              _written = v.first;
+              _answerError = false;
+            }),
+          ),
+          const SizedBox(height: 10),
+          if (_written) ...[
+            TextField(
+              controller: _correctText,
+              minLines: 1,
+              maxLines: 3,
+              maxLength: 500,
+              textCapitalization: TextCapitalization.sentences,
+              onChanged: (_) => setState(() => _answerError = false),
+              decoration: InputDecoration(
+                labelText: _status == QuestionStatus.blank ? 'Doğru cevap (isteğe bağlı)' : 'Doğru cevap',
+                hintText: 'Örn. x = 3 ya da kısa açıklama',
+                errorText: _answerError && _status != QuestionStatus.blank && _correctText.text.trim().isEmpty
+                    ? 'Doğru cevabı yaz'
+                    : null,
+              ),
+            ),
+            if (_status == QuestionStatus.wrong)
+              TextField(
+                controller: _givenText,
+                minLines: 1,
+                maxLines: 3,
+                maxLength: 500,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (_) => setState(() => _answerError = false),
+                decoration: InputDecoration(
+                  labelText: 'Senin cevabın',
+                  errorText: _answerError && _givenText.text.trim().isEmpty ? 'Kendi cevabını yaz' : null,
+                ),
+              ),
+          ] else ...[
           _AnswerPicker(
             label: _status == QuestionStatus.blank ? 'Doğru cevap (isteğe bağlı)' : 'Doğru cevap',
             value: _correctAnswer,
@@ -341,6 +397,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                 _answerError = false;
               }),
             ),
+          ],
           ],
           if (_answerError)
             Padding(
@@ -858,8 +915,9 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       avgSecondsPerQuestion: double.tryParse(_avgSeconds.text.trim()),
       reason: _status == QuestionStatus.correct ? null : _reason,
       reasonNote: _reasonNote.text,
-      correctAnswer: _correctAnswer,
-      givenAnswer: _status == QuestionStatus.wrong ? _givenAnswer : null,
+      correctAnswer: _written ? _correctText.text : _correctAnswer,
+      givenAnswer: _status == QuestionStatus.wrong ? (_written ? _givenText.text : _givenAnswer) : null,
+      writtenAnswer: _written,
       difficulty: _difficulty,
       isStarred: _starred,
       note: _note.text,
@@ -868,6 +926,20 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
 
   /// Boş değilse şıklar zorunlu: yanlışta ikisi de (ve farklı), doğruda doğru şık.
   String? _answerProblem() {
+    if (_written) {
+      String norm(String s) => lowerTr(s.trim()).replaceAll(RegExp(r'\s+'), ' ');
+      final c = _correctText.text.trim(), g = _givenText.text.trim();
+      switch (_status) {
+        case QuestionStatus.blank:
+          return null;
+        case QuestionStatus.correct:
+          return c.isEmpty ? 'Doğru cevabı yaz.' : null;
+        case QuestionStatus.wrong:
+          if (c.isEmpty || g.isEmpty) return 'Doğru cevabı ve senin cevabını yaz.';
+          if (norm(c) == norm(g)) return 'Yanlış soruda iki cevap aynı olamaz.';
+          return null;
+      }
+    }
     switch (_status) {
       case QuestionStatus.blank:
         return null;
@@ -941,6 +1013,8 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
           _reason = null;
           _correctAnswer = null;
           _givenAnswer = null;
+          _correctText.clear();
+          _givenText.clear();
           _starred = false;
           _difficulty = 5;
         });

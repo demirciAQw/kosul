@@ -103,11 +103,19 @@ class QuestionCard {
   String? get answerText {
     final dc = correctAnswer;
     if (dc == null) return null;
-    if (status == QuestionStatus.blank) return 'Doğru cevap $dc, boş bıraktın';
+    // Yazılı cevaplar tırnak içinde: "Doğru cevap: "x = 3""
+    final written = !isChoiceAnswer(dc) || (givenAnswer != null && !isChoiceAnswer(givenAnswer));
+    String q(String s) => written ? '"$s"' : s;
+    final sep = written ? ': ' : ' ';
+    if (status == QuestionStatus.blank) return 'Doğru cevap$sep${q(dc)}, boş bıraktın';
     final g = givenAnswer;
-    if (status == QuestionStatus.correct || g == null || g == dc) return 'Doğru cevap $dc';
-    return 'Doğru cevap $dc, senin cevabın $g';
+    if (status == QuestionStatus.correct || g == null || g == dc) return 'Doğru cevap$sep${q(dc)}';
+    return 'Doğru cevap$sep${q(dc)}, senin cevabın$sep${q(g)}';
   }
+
+  /// Cevaplar şık değil, yazılı mı (açık uçlu soru)?
+  bool get hasWrittenAnswer =>
+      (correctAnswer != null && !isChoiceAnswer(correctAnswer)) || (givenAnswer != null && !isChoiceAnswer(givenAnswer));
   final double? avgSecondsPerQuestion;
   final int difficulty; // 1–10
   final bool isStarred; // GK (Güzel Soru)
@@ -288,6 +296,7 @@ class QuestionDraft {
     this.topicText,
     this.correctAnswer,
     this.givenAnswer,
+    this.writtenAnswer = false,
     this.avgSecondsPerQuestion,
     this.difficulty = 5,
     this.isStarred = false,
@@ -316,6 +325,7 @@ class QuestionDraft {
         topicText: c.topicText,
         correctAnswer: c.correctAnswer,
         givenAnswer: c.givenAnswer,
+        writtenAnswer: c.hasWrittenAnswer,
         avgSecondsPerQuestion: c.avgSecondsPerQuestion,
         difficulty: c.difficulty,
         isStarred: c.isStarred,
@@ -343,6 +353,9 @@ class QuestionDraft {
   final String? topicText;
   final String? correctAnswer;
   final String? givenAnswer;
+
+  /// Açık uçlu soru: cevaplar şık (A–E) değil, serbest metin.
+  final bool writtenAnswer;
   final double? avgSecondsPerQuestion;
   final int difficulty;
   final bool isStarred;
@@ -376,6 +389,7 @@ class QuestionDraft {
         topicText: topicText,
         correctAnswer: correctAnswer,
         givenAnswer: givenAnswer,
+        writtenAnswer: writtenAnswer,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
         difficulty: difficulty,
         isStarred: isStarred,
@@ -402,3 +416,6 @@ class QuestionDraftInvalid implements Exception {
 }
 
 const unknownSourceName = 'Kaynak belirtilmemiş';
+
+/// Tek harflik şık mı ("A"–"E")?
+bool isChoiceAnswer(String? s) => s != null && const {'A', 'B', 'C', 'D', 'E'}.contains(s);

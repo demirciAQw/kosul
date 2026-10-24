@@ -55,6 +55,15 @@ String? _answer(String? s) {
   return (t != null && const {'A', 'B', 'C', 'D', 'E'}.contains(t)) ? t : null;
 }
 
+/// Taslağın cevap biçimine göre: şıklıda "A"–"E", yazılıda kırpılmış metin
+/// (en fazla 500 karakter).
+String? _answerOf(QuestionDraft d, String? s) {
+  if (!d.writtenAnswer) return _answer(s);
+  final t = s?.trim();
+  if (t == null || t.isEmpty) return null;
+  return t.length > 500 ? t.substring(0, 500) : t;
+}
+
 String? _clean(String? s) {
   final t = s?.trim();
   return (t == null || t.isEmpty) ? null : t;
@@ -116,12 +125,12 @@ class SaveQuestionCard {
             ? _clean(draft.reasonNote)
             : null,
         topicText: _clean(draft.topicText),
-        correctAnswer: _answer(draft.correctAnswer),
+        correctAnswer: _answerOf(draft, draft.correctAnswer),
         // Doğru çözülen soruda işaretlenen şık doğru cevaptır; boşta işaret yoktur.
         givenAnswer: switch (draft.status) {
-          QuestionStatus.correct => _answer(draft.correctAnswer),
+          QuestionStatus.correct => _answerOf(draft, draft.correctAnswer),
           QuestionStatus.blank => null,
-          QuestionStatus.wrong => _answer(draft.givenAnswer),
+          QuestionStatus.wrong => _answerOf(draft, draft.givenAnswer),
         },
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,
@@ -220,12 +229,12 @@ class UpdateQuestionCard {
             ? _clean(draft.reasonNote)
             : null,
         topicText: _clean(draft.topicText),
-        correctAnswer: _answer(draft.correctAnswer),
+        correctAnswer: _answerOf(draft, draft.correctAnswer),
         // Doğru çözülen soruda işaretlenen şık doğru cevaptır; boşta işaret yoktur.
         givenAnswer: switch (draft.status) {
-          QuestionStatus.correct => _answer(draft.correctAnswer),
+          QuestionStatus.correct => _answerOf(draft, draft.correctAnswer),
           QuestionStatus.blank => null,
-          QuestionStatus.wrong => _answer(draft.givenAnswer),
+          QuestionStatus.wrong => _answerOf(draft, draft.givenAnswer),
         },
         avgSecondsPerQuestion: draft.avgSecondsPerQuestion,
         difficulty: draft.difficulty,

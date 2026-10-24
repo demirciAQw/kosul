@@ -79,7 +79,7 @@ QuestionCard questionCardFromJson(Map<String, dynamic> json, {String path = r'$'
     mockExamId: r.optString('mockExamId'),
     reasonNote: r.optString('reasonNote'),
     topicText: r.optString('topicText'),
-    correctAnswer: r.optString('correctAnswer', maxLength: 1),
-    givenAnswer: r.optString('givenAnswer', maxLength: 1),
+    correctAnswer: r.optString('correctAnswer', maxLength: 500),
+    givenAnswer: r.optString('givenAnswer', maxLength: 500),
   );
 }
