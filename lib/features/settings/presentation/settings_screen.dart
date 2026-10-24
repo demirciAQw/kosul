@@ -121,6 +121,8 @@ class _SettingsBody extends ConsumerWidget {
             ],
           ),
         ),
+        _Section('Haftalık sabit programım'),
+        _FixedScheduleCard(settings: s),
         _Section('Görünüm'),
         Card(
           child: Padding(
@@ -171,4 +173,59 @@ class _Section extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(4, 20, 4, 6),
         child: Text(text, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.primary)),
       );
+}
+
+/// Okul, kurs, dershane saatleri: yapay zekâ raporuna girer; program bu
+/// saatlerin dışına kurulur.
+class _FixedScheduleCard extends ConsumerStatefulWidget {
+  const _FixedScheduleCard({required this.settings});
+  final AppSettings settings;
+
+  @override
+  ConsumerState<_FixedScheduleCard> createState() => _FixedScheduleCardState();
+}
+
+class _FixedScheduleCardState extends ConsumerState<_FixedScheduleCard> {
+  late final _text = TextEditingController(text: widget.settings.fixedSchedule);
+
+  bool get _changed => _text.text.trim() != widget.settings.fixedSchedule.trim();
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final messenger = ScaffoldMessenger.of(context);
+    FocusScope.of(context).unfocus();
+    await ref.read(settingsProvider.notifier).change(widget.settings.copyWith(fixedSchedule: _text.text.trim()));
+    messenger.showSnackBar(const SnackBar(content: Text('Sabit program kaydedildi.')));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextField(
+              controller: _text,
+              minLines: 3,
+              maxLines: 8,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                labelText: 'Okul, kurs, dershane saatleri',
+                hintText: 'Örn.\nPzt–Cum 08:00–15:30 okul\nSalı ve Perşembe 17:00–19:30 dershane\nHer gün 15:40–18:00 etüt',
+                alignLabelWithHint: true,
+              ),
+            ),
+            TextButton(onPressed: _changed ? _save : null, child: const Text('Kaydet')),
+          ],
+        ),
+      ),
+    );
+  }
 }

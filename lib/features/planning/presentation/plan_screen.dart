@@ -13,6 +13,7 @@ import '../../study_session/presentation/session_launcher.dart';
 import '../domain/planning.dart';
 import '../planning_providers.dart';
 import 'create_plan_screen.dart';
+import 'plan_import_dialog.dart';
 
 /// İstediğin kadar plan: süren, tamamlanan ve süresi dolan olarak ayrılır.
 class PlanScreen extends ConsumerWidget {
@@ -24,7 +25,16 @@ class PlanScreen extends ConsumerWidget {
     final now = ref.watch(clockProvider)();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Planlarım')),
+      appBar: AppBar(
+        title: const Text('Planlarım'),
+        actions: [
+          IconButton(
+            tooltip: 'Yapay zekâ programını içe aktar',
+            onPressed: () => showPlanImportDialog(context),
+            icon: const Icon(Icons.download_rounded),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'plan-add',
         onPressed: () => context.push(AppRoutes.newPlan),

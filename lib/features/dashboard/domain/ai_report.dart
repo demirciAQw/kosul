@@ -2,15 +2,24 @@ import '../../../core/export/zip_writer.dart';
 import '../../../core/utils/formatters.dart';
 import '../../curriculum/domain/curriculum.dart';
 import '../../curriculum/domain/yks.dart';
+import '../../library/domain/library.dart';
 import '../../library/domain/progress.dart';
+import '../../planning/domain/plan_import.dart' show planJsonSchema;
 import '../../mock_exam/domain/mock_exam.dart';
 import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/domain/question_export.dart' show ExportMedia;
 import '../../question_bank/domain/recurrence.dart';
+import 'deep_analysis.dart';
 
 /// Yapay zekâ raporunun kapsamı.
 class AiReportOptions {
-  const AiReportOptions({this.days = 30, this.subject, this.maxQuestions = 40, this.photos = false});
+  const AiReportOptions({
+    this.days = 30,
+    this.subject,
+    this.maxQuestions = 40,
+    this.photos = false,
+    this.planRequest = true,
+  });
 
   /// Son kaç günün soruları (null = hepsi).
   final int? days;
@@ -22,12 +31,22 @@ class AiReportOptions {
   /// Soru fotoğrafları da pakete girsin (ZIP).
   final bool photos;
 
-  AiReportOptions copyWith({int? Function()? days, String? Function()? subject, int? maxQuestions, bool? photos}) =>
+  /// Yapay zekâdan uygulamaya aktarılabilir bir çalışma programı (JSON) iste.
+  final bool planRequest;
+
+  AiReportOptions copyWith({
+    int? Function()? days,
+    String? Function()? subject,
+    int? maxQuestions,
+    bool? photos,
+    bool? planRequest,
+  }) =>
       AiReportOptions(
         days: days != null ? days() : this.days,
         subject: subject != null ? subject() : this.subject,
         maxQuestions: maxQuestions ?? this.maxQuestions,
         photos: photos ?? this.photos,
+        planRequest: planRequest ?? this.planRequest,
       );
 }
 
@@ -56,6 +75,9 @@ AiReport buildAiReport({
   required List<BookProgress> books,
   required DateTime now,
   AiReportOptions options = const AiReportOptions(),
+  List<Finding> findings = const [],
+  String fixedSchedule = '',
+  Map<String, TestResult> results = const {},
 }) {
   final o = options;
   final since = o.days == null ? null : now.subtract(Duration(days: o.days!));
@@ -78,7 +100,14 @@ AiReport buildAiReport({
     ..writeln('1. En çok net kaybettiren eksik konuları, nedenleriyle birlikte önem sırasına koy (en fazla 5).')
     ..writeln('2. Tekrarlayan hata örüntülerini açıkla: aynı konu, aynı neden, aynı tür soru.')
     ..writeln('3. Her eksik için somut bir çalışma önerisi ver: hangi konuya dön, kaç soru çöz, hangi sırayla.')
-    ..writeln('4. Bir haftalık kısa ve gerçekçi bir plan öner (günde en fazla 2-3 saat).')
+    ..writeln('4. Eksikler için MEB kitaplarından nokta atışı yer öner: kitap, bölüm ve sayfa (yalnızca aşağıdaki '
+        'içindekilerde olanlar).')
+    ..writeln('5. Derin analiz bulgularına bakarak hangi saatlerde ve hangi hızda daha verimli olduğumu, hangi '
+        'kaynağın bana zor geldiğini yorumla.')
+    ..writeln('6. Bir haftalık kısa ve gerçekçi bir plan öner (günde en fazla 2-3 saat), sabit programımın dışına.')
+    ..writeln()
+    ..writeln('Sohbette günlük notlarımı (uyku, yorgunluk, o günkü durum) yazabilirim; tarihleri eşleştirerek '
+        'o günlerdeki sonuçlarla karşılaştır.')
     ..writeln()
     ..writeln('Verilerde olmayan bir şeyi uydurma; emin olmadığın yerde bunu söyle. '
         '"Neden" sütunu öğrencinin kendi değerlendirmesidir.');
@@ -192,6 +221,67 @@ AiReport buildAiReport({
     }
   }
 
+  // ── Derin analiz ──
+  if (findings.isNotEmpty) {
+    b
+      ..writeln()
+      ..writeln('## Derin analiz bulguları (uygulama hesapladı)')
+      ..writeln()
+      ..writeln('Yalnızca aynı koşullarda (aynı ders, kaynak vb.) tekrar tekrar görülen ve istatistiksel olarak '
+          'güvenilir farklar listelenir.')
+      ..writeln();
+    for (final f in findings) {
+      b.writeln('- ${f.factor.title}: ${f.sentence} (${f.evidence})');
+    }
+  }
+
+  // ── Sabit program ──
+  if (fixedSchedule.trim().isNotEmpty) {
+    b
+      ..writeln()
+      ..writeln('## Haftalık sabit programım (okul, kurs, dershane)')
+      ..writeln()
+      ..writeln(fixedSchedule.trim());
+  }
+
+  // ── Kaynaklar: kalan testler ve MEB içindekiler ──
+  final ownBooks = [for (final p in scopedBooks) if ((p.book.publisher ?? '').trim().toUpperCase() != 'MEB') p.book];
+  final mebBooks = [for (final p in scopedBooks) if ((p.book.publisher ?? '').trim().toUpperCase() == 'MEB') p.book];
+  if (ownBooks.isNotEmpty) {
+    b
+      ..writeln()
+      ..writeln('## Kaynaklarımda kalan testler')
+      ..writeln();
+    for (final book in ownBooks) {
+      b.writeln('### ${book.title}');
+      var lines = 0;
+      for (final unit in book.roots) {
+        for (final konu in unit.children.isEmpty ? [unit] : unit.children) {
+          final leaves = leavesUnder(konu);
+          final left = leaves.where((l) => !results.containsKey(l.id)).length;
+          if (left == 0 || lines >= 40) continue;
+          b.writeln('- ${unit.title} › ${konu.title}: ${leaves.length} testten $left kaldı');
+          lines++;
+        }
+      }
+    }
+  }
+  if (mebBooks.isNotEmpty) {
+    b
+      ..writeln()
+      ..writeln('## MEB kitaplarının içindekileri (sayfalarıyla)')
+      ..writeln();
+    for (final book in mebBooks) {
+      b.writeln('### ${book.title}');
+      for (final unit in book.roots) {
+        b.writeln('- ${unit.title}${_pages(unit)}');
+        for (final konu in unit.children) {
+          b.writeln('  - ${konu.title}${_pages(konu)}');
+        }
+      }
+    }
+  }
+
   // ── Son yanlışlar ──
   final shown = mistakes.take(o.maxQuestions).toList();
   final photos = <ExportMedia>[];
@@ -218,10 +308,31 @@ AiReport buildAiReport({
           '${o.photos ? ' ${file ?? '-'} |' : ''}');
     }
   }
+  if (o.planRequest) {
+    b
+      ..writeln()
+      ..writeln('## Çalışma programı biçimi')
+      ..writeln()
+      ..writeln('Programı, uygulamama aktarabilmem için en sonda tek bir ```json bloğu olarak ver. Biçim:')
+      ..writeln()
+      ..writeln('```json')
+      ..writeln(planJsonSchema)
+      ..writeln('```')
+      ..writeln()
+      ..writeln('Kurallar: kitap ve bölüm adlarını yukarıdaki listelerde yazdığı gibi kullan; sabit programımın '
+          'saatlerine görev koyma; günde en fazla 2-3 saat; her görev en fazla 60 dakika; tarihleri '
+          '${_iso(now)} sonrasından başlat.');
+  }
   if (scoped.isEmpty) {
     b
       ..writeln()
       ..writeln('_Bu kapsamda kayıtlı soru yok._');
   }
   return AiReport(markdown: b.toString(), photos: photos, questionCount: shown.length);
+}
+
+String _pages(ContentNode n) {
+  final a = n.pageStart, z = n.pageEnd;
+  if (a == null) return '';
+  return z == null || z == a ? ' (s. $a)' : ' (s. $a–$z)';
 }

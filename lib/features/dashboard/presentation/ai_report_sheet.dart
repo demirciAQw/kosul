@@ -16,6 +16,8 @@ import '../../mock_exam/domain/mock_exam.dart';
 import '../../mock_exam/mock_exam_providers.dart';
 import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/question_bank_providers.dart';
+import '../../settings/settings_providers.dart';
+import '../dashboard_providers.dart';
 import '../domain/ai_report.dart';
 
 /// "Yapay zekâ raporu": istatistikleri ve yanlışları bir yapay zekâ sohbetine
@@ -45,6 +47,9 @@ class _AiReportSheetState extends ConsumerState<_AiReportSheet> {
         books: ref.read(bookProgressProvider).value ?? const <BookProgress>[],
         now: ref.read(clockProvider)(),
         options: _o,
+        findings: ref.read(deepAnalysisProvider).value?.findings ?? const [],
+        fixedSchedule: ref.read(settingsProvider).value?.fixedSchedule ?? '',
+        results: ref.read(testResultsProvider).value ?? const {},
       );
 
   Future<void> _copy() async {
@@ -151,6 +156,13 @@ class _AiReportSheetState extends ConsumerState<_AiReportSheet> {
                 onSelected: (_) => setState(() => _o = _o.copyWith(maxQuestions: n)),
               ),
           ],
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          value: _o.planRequest,
+          onChanged: (v) => setState(() => _o = _o.copyWith(planRequest: v)),
+          title: const Text('Çalışma programı iste'),
+          subtitle: const Text('Yapay zekâ, Plan › İçe aktar ile eklenebilen bir program (JSON) verir'),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,

@@ -8,6 +8,7 @@ class AppSettings {
     this.studyReminder = false,
     this.studyTime = const TimeOfDay(hour: 17, minute: 30),
     this.themeMode = ThemeMode.system,
+    this.fixedSchedule = '',
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -20,12 +21,17 @@ class AppSettings {
 
   final ThemeMode themeMode;
 
+  /// Okul, kurs, dershane gibi sabit saatler (serbest metin). Yapay zekâ
+  /// programı bu saatlerin dışına kurar.
+  final String fixedSchedule;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
     bool? studyReminder,
     TimeOfDay? studyTime,
     ThemeMode? themeMode,
+    String? fixedSchedule,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -33,6 +39,7 @@ class AppSettings {
         studyReminder: studyReminder ?? this.studyReminder,
         studyTime: studyTime ?? this.studyTime,
         themeMode: themeMode ?? this.themeMode,
+        fixedSchedule: fixedSchedule ?? this.fixedSchedule,
       );
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +48,7 @@ class AppSettings {
         'studyReminder': studyReminder,
         'studyTime': _time(studyTime),
         'themeMode': themeMode.name,
+        'fixedSchedule': fixedSchedule,
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -52,6 +60,7 @@ class AppSettings {
       studyReminder: j['studyReminder'] is bool ? j['studyReminder'] as bool : d.studyReminder,
       studyTime: _parse(j['studyTime']) ?? d.studyTime,
       themeMode: ThemeMode.values.where((m) => m.name == j['themeMode']).firstOrNull ?? d.themeMode,
+      fixedSchedule: j['fixedSchedule'] is String ? j['fixedSchedule'] as String : d.fixedSchedule,
     );
   }
 

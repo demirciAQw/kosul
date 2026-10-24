@@ -9,6 +9,12 @@ import '../question_bank/question_bank_providers.dart';
 import 'data/dashboard_repository_impl.dart';
 import 'domain/dashboard.dart';
 import 'domain/patterns.dart';
+import 'domain/observations.dart';
+import 'domain/deep_analysis.dart';
+import '../study_session/study_session_providers.dart';
+import '../study_session/domain/study_session.dart';
+import '../mock_exam/mock_exam_providers.dart';
+import '../library/library_providers.dart';
 
 final dashboardRepositoryProvider = Provider<DashboardRepository>(
     (ref) => DriftDashboardRepository(ref.watch(appDatabaseProvider)));
@@ -79,4 +85,27 @@ final subjectPatternsProvider = Provider<AsyncValue<List<SubjectPattern>>>((ref)
         since == null ? list : list.where((c) => !c.createdAt.isBefore(since)),
         curriculum,
       ));
+});
+
+/// Analiz için geniş oturum geçmişi (Geçmiş ekranındaki sınırdan bağımsız).
+final _analysisSessionsProvider = StreamProvider<List<StudySession>>(
+    (ref) => ref.watch(studySessionRepositoryProvider).watchHistory(limit: 3000));
+
+/// Derin analiz: koşulları sabit tutarak karşılaştırmalı bulgular.
+final deepAnalysisProvider = Provider<AsyncValue<DeepAnalysis>>((ref) {
+  final sessions = ref.watch(_analysisSessionsProvider);
+  final results = ref.watch(testResultsProvider);
+  final exams = ref.watch(mockExamsProvider);
+  final books = ref.watch(libraryProvider);
+  if (sessions.isLoading || results.isLoading || exams.isLoading || books.isLoading) {
+    return const AsyncLoading();
+  }
+  final error = [sessions, results, exams, books].where((a) => a.hasError).firstOrNull;
+  if (error != null) return AsyncError(error.error!, error.stackTrace ?? StackTrace.empty);
+  return AsyncData(analyze(buildObservations(
+    sessions: sessions.value ?? const [],
+    results: results.value ?? const {},
+    exams: exams.value ?? const [],
+    books: books.value ?? const [],
+  )));
 });
