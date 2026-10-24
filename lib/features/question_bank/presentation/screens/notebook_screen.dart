@@ -16,6 +16,7 @@ import 'question_viewer_screen.dart';
 import '../../../notes/presentation/notes_export.dart';
 import '../../../notes/domain/notes.dart';
 import '../export_sheet.dart';
+import '../../../tools/tools_providers.dart';
 
 /// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
 class NotebookScreen extends ConsumerStatefulWidget {
@@ -34,6 +35,21 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
   }
 
   bool get _onNotes => _tabs.index == 1;
+
+  /// Araçlar'dan "Yanlış defteri (PDF)" istendiyse paylaş paneli PDF'le açılır.
+  bool _pdfScheduled = false;
+
+  void _handlePdfRequest() {
+    if (_pdfScheduled || !ref.read(notebookPdfRequestProvider)) return;
+    _pdfScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notebookPdfRequestProvider.notifier).set(false);
+      _pdfScheduled = false;
+      if (!mounted) return;
+      _tabs.index = 0;
+      _exportQuestions(pdf: true);
+    });
+  }
 
   final _search = TextEditingController();
   Timer? _debounce;
@@ -57,6 +73,8 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(notebookPdfRequestProvider);
+    _handlePdfRequest();
     final theme = Theme.of(context);
     final filter = ref.watch(questionFilterProvider);
     final groupBy = ref.watch(questionGroupByProvider);
@@ -305,7 +323,7 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
   }
 
   /// Sorular: seçili / bu arama / tüm defter kapsamlarıyla dışa aktarma paneli.
-  Future<void> _exportQuestions({Set<String>? selected}) async {
+  Future<void> _exportQuestions({Set<String>? selected, bool pdf = false}) async {
     final filtered = ref.read(filteredQuestionsProvider).value ?? const <QuestionCard>[];
     final all = await ref.read(allQuestionsProvider.future);
     if (!mounted) return;
@@ -315,7 +333,7 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
       if (!filter.isUnfiltered) 'Bu arama ve filtre': filtered,
       'Tüm defter': all,
     };
-    await showQuestionExportSheet(context, scopes: scopes);
+    await showQuestionExportSheet(context, scopes: scopes, pdf: pdf);
   }
 
   /// Notlar: seçili dersin (ya da tüm derslerin) notları ve sayfa fotoğrafları.

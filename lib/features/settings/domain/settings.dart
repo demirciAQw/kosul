@@ -9,6 +9,7 @@ class AppSettings {
     this.studyTime = const TimeOfDay(hour: 17, minute: 30),
     this.themeMode = ThemeMode.system,
     this.fixedSchedule = '',
+    this.booksDeadline,
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -25,6 +26,9 @@ class AppSettings {
   /// programı bu saatlerin dışına kurar.
   final String fixedSchedule;
 
+  /// Hedef: sistemdeki tüm kitapları bu tarihe kadar bitirmek.
+  final DateTime? booksDeadline;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
@@ -32,6 +36,7 @@ class AppSettings {
     TimeOfDay? studyTime,
     ThemeMode? themeMode,
     String? fixedSchedule,
+    DateTime? Function()? booksDeadline,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -40,6 +45,7 @@ class AppSettings {
         studyTime: studyTime ?? this.studyTime,
         themeMode: themeMode ?? this.themeMode,
         fixedSchedule: fixedSchedule ?? this.fixedSchedule,
+        booksDeadline: booksDeadline != null ? booksDeadline() : this.booksDeadline,
       );
 
   Map<String, dynamic> toJson() => {
@@ -49,6 +55,7 @@ class AppSettings {
         'studyTime': _time(studyTime),
         'themeMode': themeMode.name,
         'fixedSchedule': fixedSchedule,
+        if (booksDeadline != null) 'booksDeadline': booksDeadline!.toIso8601String(),
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -61,6 +68,7 @@ class AppSettings {
       studyTime: _parse(j['studyTime']) ?? d.studyTime,
       themeMode: ThemeMode.values.where((m) => m.name == j['themeMode']).firstOrNull ?? d.themeMode,
       fixedSchedule: j['fixedSchedule'] is String ? j['fixedSchedule'] as String : d.fixedSchedule,
+      booksDeadline: j['booksDeadline'] is String ? DateTime.tryParse(j['booksDeadline'] as String) : null,
     );
   }
 

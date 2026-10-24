@@ -9,6 +9,7 @@ import '../../mock_exam/domain/mock_exam.dart';
 import '../../question_bank/domain/question_card.dart';
 import '../../question_bank/domain/question_export.dart' show ExportMedia;
 import '../../question_bank/domain/recurrence.dart';
+import '../../study_session/domain/study_session.dart';
 import 'deep_analysis.dart';
 
 /// Yapay zekâ raporunun kapsamı.
@@ -19,6 +20,8 @@ class AiReportOptions {
     this.maxQuestions = 40,
     this.photos = false,
     this.planRequest = true,
+    this.since,
+    this.label,
   });
 
   /// Son kaç günün soruları (null = hepsi).
@@ -33,6 +36,12 @@ class AiReportOptions {
 
   /// Yapay zekâdan uygulamaya aktarılabilir bir çalışma programı (JSON) iste.
   final bool planRequest;
+
+  /// Verilirse [days] yerine bu andan sonraki kayıtlar (Claude "yeni veriler" paketi).
+  final DateTime? since;
+
+  /// Paket etiketi, ör. "Paket #4".
+  final String? label;
 
   AiReportOptions copyWith({
     int? Function()? days,
@@ -78,9 +87,12 @@ AiReport buildAiReport({
   List<Finding> findings = const [],
   String fixedSchedule = '',
   Map<String, TestResult> results = const {},
+  List<StudySession> sessions = const [],
+  DateTime? deadline,
 }) {
   final o = options;
-  final since = o.days == null ? null : now.subtract(Duration(days: o.days!));
+  final since = o.since ?? (o.days == null ? null : now.subtract(Duration(days: o.days!)));
+  final everything = o.since == null && o.days == null;
   bool inScope(QuestionCard c) =>
       (o.subject == null || c.subject == o.subject) && (since == null || !c.createdAt.isBefore(since));
   final scoped = [for (final c in cards) if (inScope(c)) c];
@@ -91,7 +103,7 @@ AiReport buildAiReport({
   final correct = scoped.length - wrong - blank;
 
   final b = StringBuffer()
-    ..writeln('# Koçum öğrenci raporu (${_iso(now)})')
+    ..writeln('# Koçum öğrenci raporu (${_iso(now)})${o.label == null ? '' : ' — ${o.label}'}')
     ..writeln()
     ..writeln('## Senden istediğim')
     ..writeln()
@@ -122,7 +134,7 @@ AiReport buildAiReport({
     ..writeln()
     ..writeln('## Özet')
     ..writeln()
-    ..writeln('- Kapsam: ${o.days == null ? 'tüm zamanlar' : 'son ${o.days} gün'}, ${o.subject ?? 'tüm dersler'}')
+    ..writeln('- Kapsam: ${o.since != null ? '${_iso(o.since!)} ${_two(o.since!.hour)}:${_two(o.since!.minute)} sonrasındaki yeni veriler' : (o.days == null ? 'tüm zamanlar' : 'son ${o.days} gün')}, ${o.subject ?? 'tüm dersler'}')
     ..writeln('- Defterdeki soru: ${scoped.length} (yanlış $wrong, boş $blank, doğru $correct)');
 
   // ── Ders bazında ──
@@ -188,8 +200,11 @@ AiReport buildAiReport({
   }
 
   // ── Denemeler ──
-  final recentExams = [for (final e in exams) if (o.subject == null || e.section(o.subject!) != null) e]
-    ..sort((x, y) => y.takenOn.compareTo(x.takenOn));
+  final recentExams = [
+    for (final e in exams)
+      if ((o.subject == null || e.section(o.subject!) != null) && (o.since == null || !e.createdAt.isBefore(o.since!))) e,
+  ]..sort((x, y) => y.takenOn.compareTo(x.takenOn));
+  final examLimit = everything ? 60 : 5;
   if (recentExams.isNotEmpty) {
     b
       ..writeln()
@@ -197,7 +212,7 @@ AiReport buildAiReport({
       ..writeln()
       ..writeln('| Tarih | Deneme | Tür | Toplam net | Ders netleri |')
       ..writeln('|---|---|---|---|---|');
-    for (final e in recentExams.take(5)) {
+    for (final e in recentExams.take(examLimit)) {
       final nets = [
         for (final s in e.sections)
           if (o.subject == null || s.subject == o.subject) '${subjectName(s.subject)} ${formatNet(s.net)}',
@@ -218,6 +233,54 @@ AiReport buildAiReport({
       ..writeln();
     for (final p in scopedBooks) {
       b.writeln('- ${p.book.title}: ${p.doneLeaves}/${p.totalLeaves} test çözüldü');
+    }
+  }
+
+  // ── Çalışma oturumları ──
+  final scopedSessions = [
+    for (final s in sessions)
+      if (since == null || !s.startedAt.isBefore(since)) s,
+  ]..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+  if (scopedSessions.isNotEmpty) {
+    b
+      ..writeln()
+      ..writeln('## Çalışma oturumları (${scopedSessions.length})')
+      ..writeln()
+      ..writeln('| Tarih | Başlangıç | Süre (dk) | Blok | Ders | D | Y | B |')
+      ..writeln('|---|---|---|---|---|---|---|---|');
+    var rows = 0;
+    for (final s in scopedSessions) {
+      final minutes = s.endedAt == null ? '-' : '${s.endedAt!.difference(s.startedAt).inMinutes}';
+      for (final i in s.items) {
+        if (o.subject != null && i.subject != o.subject) continue;
+        if (rows++ >= 400) break;
+        b.writeln('| ${_iso(s.startedAt)} | ${_two(s.startedAt.hour)}:${_two(s.startedAt.minute)} | $minutes | '
+            '${_c(i.label)} | ${_c(i.subject == null ? '-' : subjectName(i.subject!))} | '
+            '${i.correct ?? '-'} | ${i.wrong ?? '-'} | ${i.blank ?? '-'} |');
+      }
+    }
+  }
+
+  // ── Hedef: tüm kitapları bitirmek ──
+  if (deadline != null) {
+    final own = [for (final p in books) if ((p.book.publisher ?? '').trim().toUpperCase() != 'MEB') p];
+    final total = own.fold<int>(0, (a, p) => a + p.totalLeaves);
+    final done = own.fold<int>(0, (a, p) => a + p.doneLeaves);
+    final left = total - done;
+    final today = DateTime(now.year, now.month, now.day);
+    final daysLeft = DateTime(deadline.year, deadline.month, deadline.day).difference(today).inDays;
+    final recent = results.values.where((r) => now.difference(r.solvedAt).inDays < 14).length;
+    final pace = recent / 14;
+    b
+      ..writeln()
+      ..writeln('## Hedef: tüm kitapları ${_iso(deadline)} tarihine kadar bitirmek')
+      ..writeln()
+      ..writeln('- Kitaplarda $total testten $done tanesi bitti, $left kaldı.')
+      ..writeln('- Kalan gün: $daysLeft${daysLeft > 0 ? ' (günde ${(left / daysLeft).toStringAsFixed(1)} test gerekiyor)' : ''}')
+      ..writeln('- Son 14 günün hızı: günde ${pace.toStringAsFixed(1)} test.'
+          '${pace > 0 && left > 0 ? ' Bu hızla ${_iso(today.add(Duration(days: (left / pace).ceil())))} tarihinde biter.' : ''}');
+    for (final p in own) {
+      b.writeln('- ${p.book.title}: ${p.doneLeaves}/${p.totalLeaves}');
     }
   }
 

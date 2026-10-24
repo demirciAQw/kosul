@@ -52,4 +52,16 @@ abstract final class KocumColors {
 
   /// Ana ekran kısayollarının renkleri: sırayla dönen dört Google rengi.
   static const accents = [blue, green, amber, red];
+
+  /// Koyu temada doygun renkler göz kamaştırır ve koyu zeminde zor okunur;
+  /// her ana rengin pastel karşılığı kullanılır. Bilinmeyen renk aynen döner.
+  static Color adaptive(Color c, Brightness b) {
+    if (b == Brightness.light) return c;
+    if (c == blue) return blueDark;
+    if (c == red) return redDark;
+    if (c == green) return greenDark;
+    if (c == yellow || c == amber) return yellowDark;
+    if (c == grey700 || c == grey800 || c == grey900) return grey500;
+    return c;
+  }
 }

@@ -5,6 +5,8 @@ abstract final class AppRoutes {
   static const notebook = '/notebook';
   static const mockExams = '/mock';
   static const insights = '/insights';
+  static const tools = '/tools';
+  static const practiceTest = '/tools/test';
 
   // Tam ekran sayfalar
   static const newSession = '/session/new';

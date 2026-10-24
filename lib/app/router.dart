@@ -27,6 +27,8 @@ import '../features/study_session/presentation/screens/session_results_screen.da
 import '../features/study_session/presentation/screens/session_setup_screen.dart';
 import 'app_shell.dart';
 import 'routes.dart';
+import '../features/tools/presentation/tools_screen.dart';
+import '../features/tools/presentation/practice_test_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -48,6 +50,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: AppRoutes.insights, builder: (context, state) => const DashboardScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: AppRoutes.tools, builder: (context, state) => const ToolsScreen()),
           ]),
         ],
       ),
@@ -79,6 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AppRoutes.newPlan, builder: (context, state) => const CreatePlanScreen()),
       GoRoute(path: AppRoutes.sessions, builder: (context, state) => const SessionHistoryScreen()),
       GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
+      GoRoute(path: AppRoutes.practiceTest, builder: (context, state) => const PracticeTestScreen()),
       GoRoute(
         path: AppRoutes.newNote,
         builder: (context, state) => NoteEditorScreen(initialSubject: state.extra as String?),

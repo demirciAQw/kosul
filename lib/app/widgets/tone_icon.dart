@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../palette.dart';
+
 /// Açık renk zemin üstünde renkli simge: Google uygulamalarındaki liste
 /// rozetleri. Rengin %12'si zemin olur; göz yormadan satırları ayırt ettirir.
 class ToneIcon extends StatelessWidget {
@@ -11,15 +13,17 @@ class ToneIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final brightness = Theme.of(context).brightness;
+    final dark = brightness == Brightness.dark;
+    final c = KocumColors.adaptive(color, brightness);
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: dark ? 0.22 : 0.12),
+        color: c.withValues(alpha: dark ? 0.18 : 0.12),
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, size: size * 0.55, color: color),
+      child: Icon(icon, size: size * 0.55, color: c),
     );
   }
 }

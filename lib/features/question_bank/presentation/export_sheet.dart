@@ -12,22 +12,26 @@ import '../../curriculum/curriculum_providers.dart';
 import '../../curriculum/domain/curriculum.dart';
 import '../domain/question_card.dart';
 import '../domain/question_export.dart';
+import '../../curriculum/domain/yks.dart';
+import 'question_pdf.dart';
 
 /// Defter'den dışa aktarma: hangi sorular, hangi dosyalar, nasıl adlandırılsın.
 /// Sonuç tek bir ZIP olarak paylaşılır (Drive, WhatsApp, dosyalar…).
 Future<void> showQuestionExportSheet(
   BuildContext context, {
   required Map<String, List<QuestionCard>> scopes,
+  bool pdf = false,
 }) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (_) => _ExportSheet(scopes: scopes),
+      builder: (_) => _ExportSheet(scopes: scopes, startWithPdf: pdf),
     );
 
 class _ExportSheet extends ConsumerStatefulWidget {
-  const _ExportSheet({required this.scopes});
+  const _ExportSheet({required this.scopes, this.startWithPdf = false});
+  final bool startWithPdf;
 
   /// Kapsam adı → sorular (ör. "Seçili 12 soru", "Bu arama", "Tüm defter").
   final Map<String, List<QuestionCard>> scopes;
@@ -41,7 +45,54 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
   var _o = const QuestionExportOptions();
   bool _busy = false;
 
+  /// Biçim: ZIP (fotoğraflar + tablo) ya da yazdırılabilir PDF (sayfada 4 soru).
+  late bool _pdf = widget.startWithPdf;
+  bool _answerKey = true;
+
   List<QuestionCard> get _cards => widget.scopes[_scope] ?? const [];
+
+  String? _topicOf(QuestionCard c, Map<String, CurriculumNode> curriculum) {
+    final node = c.mebNodeId == null ? null : curriculum[c.mebNodeId];
+    if (node != null) return node.title;
+    final t = c.topicText?.trim();
+    return (t == null || t.isEmpty) ? null : titleCaseTr(t);
+  }
+
+  Future<void> _exportPdf() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final media = ref.read(mediaStorageProvider);
+    final curriculum = {for (final n in ref.read(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
+    setState(() => _busy = true);
+    try {
+      final items = [
+        for (final c in _cards)
+          PdfQuestion(c, [
+            subjectName(c.subject),
+            if (_topicOf(c, curriculum) != null) _topicOf(c, curriculum)!,
+            c.locationText,
+          ].join(' · ')),
+      ];
+      final bytes = await buildQuestionPdf(
+        title: 'Yanlış defterim',
+        subtitle: '$_scope, ${_cards.length} soru',
+        items: items,
+        media: media,
+        answerKey: _answerKey,
+      );
+      final now = DateTime.now();
+      String two(int n) => n.toString().padLeft(2, '0');
+      final dir = await getTemporaryDirectory();
+      final out = File('${dir.path}/Kocum_Yanlis_Defteri_${now.year}-${two(now.month)}-${two(now.day)}.pdf');
+      await out.writeAsBytes(bytes, flush: true);
+      navigator.pop();
+      await SharePlus.instance.share(ShareParams(files: [XFile(out.path, mimeType: 'application/pdf')]));
+    } on Exception catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('PDF hazırlanamadı: $e')));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   Future<void> _export() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -124,6 +175,37 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
             ],
           ),
           const SizedBox(height: 12),
+          Text('Biçim', style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: [
+              ChoiceChip(
+                label: const Text('PDF (sayfada 4 soru)'),
+                selected: _pdf,
+                onSelected: (_) => setState(() => _pdf = true),
+              ),
+              ChoiceChip(
+                label: const Text('ZIP (fotoğraflar ve tablo)'),
+                selected: !_pdf,
+                onSelected: (_) => setState(() => _pdf = false),
+              ),
+            ],
+          ),
+          if (_pdf) ...[
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _answerKey,
+              onChanged: (v) => setState(() => _answerKey = v),
+              title: const Text('Sonda cevap anahtarı'),
+              subtitle: const Text('Kendini test etmek için sorular önce, cevaplar en sonda'),
+            ),
+            Text(
+              'Her kutuda ders, konu ve kaynak yazar; fotoğrafı olmayan soruların yerine konumu yazılır.',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ] else ...[
+          const SizedBox(height: 12),
           Text('Pakete neler girsin', style: theme.textTheme.titleSmall),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,
@@ -183,13 +265,14 @@ class _ExportSheetState extends ConsumerState<_ExportSheet> {
             },
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           ),
+          ],
           const SizedBox(height: 16),
           FilledButton.icon(
-            onPressed: _busy || _o.isEmpty || _cards.isEmpty ? null : _export,
+            onPressed: _busy || _cards.isEmpty || (!_pdf && _o.isEmpty) ? null : (_pdf ? _exportPdf : _export),
             icon: _busy
                 ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
                 : const Icon(Icons.ios_share_rounded),
-            label: Text(_busy ? 'Hazırlanıyor…' : '${_cards.length} soruyu paylaş'),
+            label: Text(_busy ? 'Hazırlanıyor…' : (_pdf ? '${_cards.length} soruyla PDF oluştur' : '${_cards.length} soruyu paylaş')),
           ),
         ],
       ),

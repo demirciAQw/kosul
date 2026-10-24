@@ -53,6 +53,11 @@ class AppShell extends ConsumerWidget {
             selectedIcon: Icon(Icons.insights_rounded),
             label: 'Analiz',
           ),
+          const NavigationDestination(
+            icon: Icon(Icons.handyman_outlined),
+            selectedIcon: Icon(Icons.handyman_rounded),
+            label: 'Araçlar',
+          ),
         ],
       ),
     );
