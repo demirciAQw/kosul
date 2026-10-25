@@ -1,7 +1,7 @@
 name: kocum
 description: "Koçum: YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi."
 publish_to: 'none'
-version: 7.5.0+23
+version: 7.6.0+24
 
 environment:
   sdk: ^3.8.0
@@ -38,6 +38,8 @@ dependencies:
 
   # Bildirimde Android'in yerel kronometresi (arka planda Dart kodu çalıştırmadan)
   flutter_local_notifications: ^19.0.0
+  # Fotoğraftaki metni telefonda okuma (Latin modeli gömülü, internetsiz)
+  google_mlkit_text_recognition: ^0.15.0
   # Zamanlanmış hatırlatıcılar için (flutter_local_notifications da bunu kullanır)
   timezone: any
 

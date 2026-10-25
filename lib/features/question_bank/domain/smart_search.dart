@@ -23,7 +23,17 @@ class SmartSearchResult {
 }
 
 /// Alan ağırlıkları: konuda eşleşen, notta eşleşenden önemlidir.
-const fieldWeights = (topic: 1.0, subject: 0.9, source: 0.8, test: 0.8, reason: 0.7, note: 0.6, status: 0.5);
+const fieldWeights = (
+  topic: 1.0,
+  subject: 0.9,
+  source: 0.8,
+  test: 0.8,
+  reason: 0.7,
+  note: 0.6,
+  status: 0.5,
+  // Fotoğraftan okunan metin: içerik araması için; etiketlerin önüne geçmesin.
+  ocr: 0.5,
+);
 
 List<String> searchTokens(String text) =>
     [for (final t in normalizeTr(text).split(RegExp(r'\s+'))) if (t.length >= 2 || RegExp(r'^\d+$').hasMatch(t)) t];

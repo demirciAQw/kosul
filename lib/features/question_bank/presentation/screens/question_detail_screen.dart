@@ -11,6 +11,10 @@ import '../../domain/question_card.dart';
 import '../../question_bank_providers.dart';
 import '../widgets/media_image.dart';
 import '../../../../app/palette.dart';
+import '../../../settings/settings_providers.dart';
+import '../../../ocr/ocr_providers.dart';
+import '../../../ocr/domain/ocr.dart';
+import '../../../../app/widgets/tone_icon.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.cardId});
@@ -138,6 +142,10 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                 child: SelectableText(card.solutionText!, style: theme.textTheme.bodyLarge),
               ),
           ],
+          if (card.questionImage != null) ...[
+            const SizedBox(height: 24),
+            _OcrSection(card: card),
+          ],
           if (card.note != null) ...[
             const SizedBox(height: 20),
             Text('Not', style: theme.textTheme.titleSmall),
@@ -165,5 +173,116 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     final router = GoRouter.of(context);
     await ref.read(deleteQuestionCardProvider).call(card.id);
     if (router.canPop()) router.pop();
+  }
+}
+
+/// Fotoğraftaki metin: arka planda okunan kök ve şıklar; doğru şık ve senin
+/// şıkkın işaretli. Sırada / okunamadı durumları ve "Yeniden oku".
+class _OcrSection extends ConsumerWidget {
+  const _OcrSection({required this.card});
+  final QuestionCard card;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final enabled = ref.watch(settingsProvider).value?.ocrEnabled ?? true;
+    final record = ref.watch(ocrRecordsProvider).value?[OcrJob.questionId(card.id)];
+    final current = record != null && record.imagePath == card.questionImage ? record : null;
+    final job = OcrJob(
+      id: OcrJob.questionId(card.id),
+      ownerType: 'question',
+      ownerId: card.id,
+      imagePath: card.questionImage!,
+    );
+    Widget retry() => TextButton.icon(
+          onPressed: () => ref.read(ocrQueueProvider).retry(job),
+          icon: const Icon(Icons.refresh_rounded, size: 18),
+          label: const Text('Yeniden oku'),
+        );
+    final muted = theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant);
+
+    final Widget body;
+    if (current == null) {
+      body = Text(
+        enabled
+            ? 'Sırada: fotoğraftaki metin arka planda okunacak.'
+            : 'Kapalı: Ayarlar › Fotoğraftaki metin ile açabilirsin.',
+        style: muted,
+      );
+    } else if (!current.ok) {
+      body = Text('Okunamadı${current.error == null ? '' : ': ${current.error}'}', style: muted);
+    } else if (current.fullText.trim().isEmpty) {
+      body = Text('Fotoğrafta okunabilir metin bulunamadı.', style: muted);
+    } else {
+      final p = current.parsed;
+      final options = p?.options ?? const <String, String>{};
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (p?.number != null) Text('Soru ${p!.number}', style: theme.textTheme.labelLarge),
+          SelectableText(
+            (p != null && p.stem.isNotEmpty) ? p.stem : current.fullText,
+            style: theme.textTheme.bodyMedium,
+          ),
+          for (final e in options.entries)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: e.key == card.correctAnswer
+                          ? KocumColors.correct
+                          : (e.key == card.givenAnswer ? KocumColors.wrong : scheme.surfaceContainerHighest),
+                    ),
+                    child: Text(
+                      e.key,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: (e.key == card.correctAnswer || e.key == card.givenAnswer) ? Colors.white : null,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: SelectableText(e.value, style: theme.textTheme.bodyMedium)),
+                ],
+              ),
+            ),
+          const SizedBox(height: 6),
+          Text(
+            'Telefonda otomatik okundu${current.durationMs == null ? '' : ' (${current.durationMs} ms)'}. '
+            'Formüllerde ve el yazısında hata olabilir.',
+            style: muted,
+          ),
+        ],
+      );
+    }
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const ToneIcon(Icons.document_scanner_outlined, color: KocumColors.green, size: 32),
+                const SizedBox(width: 10),
+                Expanded(child: Text('Fotoğraftaki metin', style: theme.textTheme.titleSmall)),
+                if (enabled && (current == null || !current.ok || current.fullText.trim().isEmpty)) retry(),
+                if (current != null && current.ok && current.fullText.trim().isNotEmpty) retry(),
+              ],
+            ),
+            const SizedBox(height: 8),
+            body,
+          ],
+        ),
+      ),
+    );
   }
 }

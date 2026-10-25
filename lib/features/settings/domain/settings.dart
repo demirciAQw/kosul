@@ -12,6 +12,7 @@ class AppSettings {
     this.booksDeadline,
     this.fastPhotos = false,
     this.smartSearch = true,
+    this.ocrEnabled = true,
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -37,6 +38,9 @@ class AppSettings {
   /// Akıllı arama: yazım hatalarını düzeltir, benzerliğe göre sıralar.
   final bool smartSearch;
 
+  /// Fotoğraflardaki metni arka planda oku (ML Kit, telefonda).
+  final bool ocrEnabled;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
@@ -47,6 +51,7 @@ class AppSettings {
     DateTime? Function()? booksDeadline,
     bool? fastPhotos,
     bool? smartSearch,
+    bool? ocrEnabled,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -58,6 +63,7 @@ class AppSettings {
         booksDeadline: booksDeadline != null ? booksDeadline() : this.booksDeadline,
         fastPhotos: fastPhotos ?? this.fastPhotos,
         smartSearch: smartSearch ?? this.smartSearch,
+        ocrEnabled: ocrEnabled ?? this.ocrEnabled,
       );
 
   Map<String, dynamic> toJson() => {
@@ -70,6 +76,7 @@ class AppSettings {
         if (booksDeadline != null) 'booksDeadline': booksDeadline!.toIso8601String(),
         'fastPhotos': fastPhotos,
         'smartSearch': smartSearch,
+        'ocrEnabled': ocrEnabled,
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -85,6 +92,7 @@ class AppSettings {
       booksDeadline: j['booksDeadline'] is String ? DateTime.tryParse(j['booksDeadline'] as String) : null,
       fastPhotos: j['fastPhotos'] == true,
       smartSearch: j['smartSearch'] != false,
+      ocrEnabled: j['ocrEnabled'] != false,
     );
   }
 

@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/di/core_providers.dart';
 import '../features/question_bank/question_bank_providers.dart';
+import '../features/notes/notes_providers.dart';
+import '../features/ocr/ocr_providers.dart';
 import '../features/settings/domain/settings.dart';
 import '../features/settings/settings_providers.dart';
 import '../features/study_session/domain/study_session.dart';
@@ -55,6 +57,24 @@ class _KocumAppState extends ConsumerState<KocumApp> {
 
     ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
       if (previous?.hasValue != true && next.hasValue) refreshReminders();
+    }, fireImmediately: true);
+
+    // Fotoğraflardaki metin: sorular, notlar ya da kayıtlar değişince eksikler
+    // arka plan kuyruğuna alınır (yeni soru eklenince kendiliğinden başlar).
+    void syncOcr() {
+      final cards = ref.read(allQuestionsProvider).value;
+      final notes = ref.read(notesProvider).value;
+      final records = ref.read(ocrRecordsProvider).value;
+      if (cards == null || notes == null || records == null) return;
+      unawaited(ref.read(ocrQueueProvider).sync(ocrJobsFor(cards, notes), records).catchError((_) {}));
+    }
+
+    ref.listenManual(allQuestionsProvider, (previous, next) => syncOcr());
+    ref.listenManual(notesProvider, (previous, next) => syncOcr());
+    ref.listenManual(ocrRecordsProvider, (previous, next) => syncOcr(), fireImmediately: true);
+    ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
+      final settings = next.value;
+      if (settings != null) ref.read(ocrQueueProvider).enabled = settings.ocrEnabled;
     }, fireImmediately: true);
 
     // Hızlı fotoğraf modu: fotoğraf servisi ayarı izler.

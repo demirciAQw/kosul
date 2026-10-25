@@ -26,6 +26,7 @@ Map<String, dynamic> fullDataJson({
   required List<MockExam> exams,
   required List<StudyPlan> plans,
   required List<StudyNote> notes,
+  List<Map<String, Object?>> ocr = const [],
 }) =>
     {
       'format': 'kocum.backup',
@@ -39,6 +40,7 @@ Map<String, dynamic> fullDataJson({
         'mockExams': exams.length,
         'plans': plans.length,
         'notes': notes.length,
+        'ocr': ocr.length,
       },
       'questions': [for (final c in cards) c.toJson()],
       'books': [
@@ -126,6 +128,8 @@ Map<String, dynamic> fullDataJson({
             ],
           },
       ],
+      // Fotoğraflardan okunan metinler (soru, çözüm, not sayfası), sahibine bağlı.
+      'ocr': ocr,
       'notes': [
         for (final n in notes)
           {

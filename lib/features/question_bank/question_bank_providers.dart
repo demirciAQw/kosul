@@ -15,6 +15,8 @@ import 'data/search_store.dart';
 import '../settings/settings_providers.dart';
 import '../curriculum/domain/yks.dart';
 import '../../core/text/turkish_text.dart';
+import '../ocr/ocr_providers.dart';
+import '../ocr/domain/ocr.dart';
 
 final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
     (ref) => DriftQuestionCardRepository(ref.watch(appDatabaseProvider)));
@@ -95,7 +97,10 @@ final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref)
   if (!_smartActive(ref)) return base.whenData<SmartSearchResult?>((_) => null);
   final text = ref.watch(questionFilterProvider).text!;
   final curriculum = {for (final n in ref.watch(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
+  // Fotoğraftan okunan soru metni (kök ve şıklar) de aranır.
+  final ocr = ref.watch(ocrRecordsProvider).value ?? const <String, OcrRecord>{};
   return base.whenData((cards) => smartSearch(cards, text, (c) {
+        final read = ocr[OcrJob.questionId(c.id)];
         final node = c.mebNodeId == null ? null : curriculum[c.mebNodeId];
         final topic = node?.title ?? (c.topicText == null ? null : titleCaseTr(c.topicText!));
         return [
@@ -106,6 +111,7 @@ final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref)
           if (c.reasonText != null) SearchField(c.reasonText!, fieldWeights.reason),
           if (c.note != null) SearchField(c.note!, fieldWeights.note),
           SearchField(c.status.label, fieldWeights.status),
+          if (read != null && read.ok && read.searchable.isNotEmpty) SearchField(read.searchable, fieldWeights.ocr),
         ];
       }));
 });

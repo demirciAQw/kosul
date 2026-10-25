@@ -33,6 +33,7 @@ import '../domain/export_log.dart';
 import '../tools_providers.dart';
 import '../../../core/export/xlsx_writer.dart';
 import '../data/workbook_export.dart';
+import '../../ocr/ocr_providers.dart';
 
 String _two(int n) => n.toString().padLeft(2, '0');
 String _stamp(DateTime d) => '${d.year}-${_two(d.month)}-${_two(d.day)}_${_two(d.hour)}${_two(d.minute)}';
@@ -77,6 +78,7 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
         findings: ref.read(deepAnalysisProvider).value?.findings ?? const [],
         fixedSchedule: settings?.fixedSchedule ?? '',
         results: ref.read(testResultsProvider).value ?? const {},
+        questionTexts: ocrQuestionTexts(ref.read(ocrRecordsProvider).value ?? const {}),
         sessions: sessions,
         deadline: settings?.booksDeadline,
       );
@@ -126,11 +128,13 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
         exams: ref.read(mockExamsProvider).value ?? const <MockExam>[],
         plans: ref.read(plansProvider).value ?? const <StudyPlan>[],
         notes: notes,
+        ocr: [for (final r in (ref.read(ocrRecordsProvider).value ?? const {}).values) r.toDatasetJson()],
       );
       // Arama veri seti (varsa) de pakete girer.
       final extra = <String, List<int>>{};
       final log = await ref.read(searchLogProvider).file();
-      for (final f in [log, File('${log.path}.1')]) {
+      final ocrLog = await ref.read(ocrLogProvider).file();
+      for (final f in [log, File('${log.path}.1'), ocrLog, File('${ocrLog.path}.1')]) {
         if (await f.exists()) extra['veri/${f.uri.pathSegments.last}'] = await f.readAsBytes();
       }
       final zip = await buildFullExportZip(

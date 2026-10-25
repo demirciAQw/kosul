@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/palette.dart';
 import '../../../app/widgets/tone_icon.dart';
+import '../../ocr/ocr_providers.dart';
 import '../domain/settings.dart';
 import '../settings_providers.dart';
 
@@ -147,6 +148,8 @@ class _SettingsBody extends ConsumerWidget {
             onChanged: (on) => _change(context, ref, s.copyWith(smartSearch: on)),
           ),
         ),
+        _Section('Fotoğraftaki metin'),
+        const _OcrCard(),
         _Section('Haftalık sabit programım'),
         _FixedScheduleCard(settings: s),
         _Section('Görünüm'),
@@ -251,6 +254,48 @@ class _FixedScheduleCardState extends ConsumerState<_FixedScheduleCard> {
             TextButton(onPressed: _changed ? _save : null, child: const Text('Kaydet')),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Fotoğraftaki metni okuma: açma/kapama ve ilerleme.
+class _OcrCard extends ConsumerWidget {
+  const _OcrCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final settings = ref.watch(settingsProvider).value;
+    final records = ref.watch(ocrRecordsProvider).value ?? const {};
+    final done = records.values.where((r) => r.ok).length;
+    final failed = records.values.where((r) => !r.ok).length;
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: const ToneIcon(Icons.document_scanner_outlined, color: KocumColors.green),
+            title: const Text('Fotoğraflardaki metni oku'),
+            subtitle: const Text(
+              'Soru ve not fotoğrafları arka planda, telefonda okunur (internet gerekmez). '
+              'Soru, şıklar ve metin her soruya bağlı saklanır; arama ve raporlar bunu da kullanır.',
+            ),
+            value: settings?.ocrEnabled ?? true,
+            onChanged: settings == null
+                ? null
+                : (on) => ref.read(settingsProvider.notifier).change(settings.copyWith(ocrEnabled: on)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '$done fotoğraf okundu${failed > 0 ? ', $failed okunamadı' : ''}.',
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

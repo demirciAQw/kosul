@@ -89,6 +89,8 @@ AiReport buildAiReport({
   Map<String, TestResult> results = const {},
   List<StudySession> sessions = const [],
   DateTime? deadline,
+  /// Kart → fotoğraftan okunan soru metni (kök ve şıklar).
+  Map<String, String> questionTexts = const {},
 }) {
   final o = options;
   final since = o.since ?? (o.days == null ? null : now.subtract(Duration(days: o.days!)));
@@ -121,6 +123,8 @@ AiReport buildAiReport({
     ..writeln('Sohbette günlük notlarımı (uyku, yorgunluk, o günkü durum) yazabilirim; tarihleri eşleştirerek '
         'o günlerdeki sonuçlarla karşılaştır.')
     ..writeln()
+    ..writeln('"Soru metni" sütunu fotoğraftan telefonda otomatik okundu; formüller ve el yazısı bozuk '
+        'olabilir. Doğru cevap ve öğrencinin cevabıyla karşılaştırarak hatanın nerede olduğunu yorumla.')
     ..writeln('Verilerde olmayan bir şeyi uydurma; emin olmadığın yerde bunu söyle. '
         '"Neden" sütunu öğrencinin kendi değerlendirmesidir.');
   if (o.photos) {
@@ -353,8 +357,9 @@ AiReport buildAiReport({
       ..writeln()
       ..writeln('## Son yanlış ve boş sorular (en yeni ${shown.length})')
       ..writeln()
-      ..writeln('| # | Tarih | Ders | Konu | Kaynak | Soru | Durum | Neden | Cevap | Not |${o.photos ? ' Dosya |' : ''}')
-      ..writeln('|---|---|---|---|---|---|---|---|---|---|${o.photos ? '---|' : ''}');
+      ..writeln('| # | Tarih | Ders | Konu | Kaynak | Soru | Durum | Neden | Cevap | Not | Soru metni (fotoğraftan) |'
+          '${o.photos ? ' Dosya |' : ''}')
+      ..writeln('|---|---|---|---|---|---|---|---|---|---|---|${o.photos ? '---|' : ''}');
     for (final (i, c) in shown.indexed) {
       final topic = topicOfCard(c, curriculum)?.label;
       String? file;
@@ -367,7 +372,8 @@ AiReport buildAiReport({
       }
       b.writeln('| ${i + 1} | ${_iso(c.createdAt)} | ${_c(subjectName(c.subject))} | ${_c(topic ?? '-')} | '
           '${_c(c.testLabel ?? c.sourceName)} | ${c.questionNo ?? '-'} | ${c.status.label} | '
-          '${_c(c.reasonText ?? '-')} | ${_c(c.answerText ?? '-')} | ${_c(c.note ?? '')} |'
+          '${_c(c.reasonText ?? '-')} | ${_c(c.answerText ?? '-')} | ${_c(c.note ?? '')} | '
+          '${_c(_clip(questionTexts[c.id]))} |'
           '${o.photos ? ' ${file ?? '-'} |' : ''}');
     }
   }
@@ -398,4 +404,11 @@ String _pages(ContentNode n) {
   final a = n.pageStart, z = n.pageEnd;
   if (a == null) return '';
   return z == null || z == a ? ' (s. $a)' : ' (s. $a–$z)';
+}
+
+/// Tablo hücresi için kısaltılmış metin (yoksa "-").
+String _clip(String? s, {int max = 320}) {
+  if (s == null || s.trim().isEmpty) return '-';
+  final t = s.replaceAll(RegExp(r'\s+'), ' ').trim();
+  return t.length > max ? '${t.substring(0, max)}…' : t;
 }

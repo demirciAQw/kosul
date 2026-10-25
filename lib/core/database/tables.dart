@@ -257,6 +257,31 @@ class NotePhotos extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Fotoğraftaki metin (v10): ML Kit ile telefonda okunur. Her kayıt bir
+/// fotoğrafa (soru, çözüm ya da not sayfası) bağlıdır; fotoğraf değişirse
+/// yeniden okunur. Soru kökü ve şıklar ayrıştırılmış olarak da saklanır.
+@DataClassName('OcrRow')
+class OcrResults extends Table {
+  /// "question:<kart>", "solution:<kart>" ya da "note:<not>:<sıra>".
+  TextColumn get id => text()();
+  TextColumn get ownerType => text()(); // question | solution | note
+  TextColumn get ownerId => text()();
+  TextColumn get imagePath => text()(); // okunan fotoğraf (değişirse yeniden okunur)
+  TextColumn get status => text()(); // done | failed
+  TextColumn get fullText => text().withDefault(const Constant(''))();
+  TextColumn get stem => text().nullable()(); // soru kökü
+  TextColumn get optionsJson => text().nullable()(); // {"A": "...", ...}
+  IntColumn get detectedNumber => integer().nullable()();
+  TextColumn get linesJson => text().nullable()(); // satırlar ve konumları
+  TextColumn get engine => text().withDefault(const Constant('mlkit-latin'))();
+  IntColumn get durationMs => integer().nullable()();
+  TextColumn get error => text().nullable()();
+  DateTimeColumn get processedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // ───────────────────────── Kitap ilerlemesi (v4) ─────────────────────────
 
 /// Bir testin (ya da kitap ağacındaki bir yaprak başlığın) çözüldü kaydı.

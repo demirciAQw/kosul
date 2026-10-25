@@ -44,10 +44,13 @@ List<String> pushHistory(List<String> items, String query) {
 /// bilgisayara USB ile bağlanınca kopyalanabilir, tüm veri dışa aktarımına da girer.
 /// 5 MB'ı aşınca eski dosya ".1" olarak bir yana alınır.
 class SearchLog {
-  SearchLog({Future<Directory> Function()? baseDir}) : _baseDir = baseDir;
+  SearchLog({Future<Directory> Function()? baseDir, this.name = fileName}) : _baseDir = baseDir;
 
   final Future<Directory> Function()? _baseDir;
   static const fileName = 'arama_kayitlari.jsonl';
+
+  /// Dosya adı: aynı yazıcı başka veri setleri için de kullanılır (ör. okuma sonuçları).
+  final String name;
   static const _maxBytes = 5 * 1024 * 1024;
   Future<void> _tail = Future<void>.value();
 
@@ -57,7 +60,7 @@ class SearchLog {
         : (await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory());
     final dir = Directory('${base.path}/kocum_veri');
     if (!await dir.exists()) await dir.create(recursive: true);
-    return File('${dir.path}/$fileName');
+    return File('${dir.path}/$name');
   }
 
   /// Satırlar sırayla yazılır (eşzamanlı yazmalar birbirine karışmaz). Hata
