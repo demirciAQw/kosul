@@ -134,6 +134,19 @@ class _SettingsBody extends ConsumerWidget {
             onChanged: (on) => _change(context, ref, s.copyWith(fastPhotos: on)),
           ),
         ),
+        _Section('Arama'),
+        Card(
+          child: SwitchListTile(
+            secondary: const ToneIcon(Icons.manage_search_rounded, color: KocumColors.blue),
+            title: const Text('Akıllı arama'),
+            subtitle: const Text(
+              'Yazım hatalarını tolere eder ("türv" → Türev), tek kelimesi benzeyen soruyu da '
+              'bulur ve sonuçları benzerliğe göre sıralar. Kapalıyken birebir metin aranır.',
+            ),
+            value: s.smartSearch,
+            onChanged: (on) => _change(context, ref, s.copyWith(smartSearch: on)),
+          ),
+        ),
         _Section('Haftalık sabit programım'),
         _FixedScheduleCard(settings: s),
         _Section('Görünüm'),

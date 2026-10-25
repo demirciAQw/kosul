@@ -127,11 +127,18 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
         plans: ref.read(plansProvider).value ?? const <StudyPlan>[],
         notes: notes,
       );
+      // Arama veri seti (varsa) de pakete girer.
+      final extra = <String, List<int>>{};
+      final log = await ref.read(searchLogProvider).file();
+      for (final f in [log, File('${log.path}.1')]) {
+        if (await f.exists()) extra['veri/${f.uri.pathSegments.last}'] = await f.readAsBytes();
+      }
       final zip = await buildFullExportZip(
         data: data,
         cards: cards,
         notes: notes,
         media: ref.read(mediaStorageProvider),
+        extraFiles: extra,
       );
       final out = await _temp('Kocum_Tum_Veri_${_stamp(now)}.zip');
       await out.writeAsBytes(zip.bytes, flush: true);

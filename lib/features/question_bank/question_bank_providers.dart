@@ -10,6 +10,11 @@ import 'domain/question_bank.dart';
 import 'domain/question_card.dart';
 import 'domain/question_grouping.dart';
 import 'domain/quick_mark.dart';
+import 'domain/smart_search.dart';
+import 'data/search_store.dart';
+import '../settings/settings_providers.dart';
+import '../curriculum/domain/yks.dart';
+import '../../core/text/turkish_text.dart';
 
 final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
     (ref) => DriftQuestionCardRepository(ref.watch(appDatabaseProvider)));
@@ -70,8 +75,71 @@ class GroupByNotifier extends Notifier<GroupBy> {
 
 final questionGroupByProvider = NotifierProvider<GroupByNotifier, GroupBy>(GroupByNotifier.new);
 
-final filteredQuestionsProvider = StreamProvider<List<QuestionCard>>((ref) =>
-    ref.watch(questionCardRepositoryProvider).watch(ref.watch(questionFilterProvider)));
+/// Akıllı arama açık mı (Ayarlar › Arama).
+final smartSearchEnabledProvider = Provider<bool>((ref) => ref.watch(settingsProvider).value?.smartSearch ?? true);
+
+bool _smartActive(Ref ref) =>
+    ref.watch(smartSearchEnabledProvider) && (ref.watch(questionFilterProvider).text?.trim().isNotEmpty ?? false);
+
+/// Veritabanı sonucu: akıllı aramada metin süzgeci veritabanında değil
+/// [smartSearchResultProvider]'da uygulanır (öteki filtreler burada).
+final _searchBaseProvider = StreamProvider<List<QuestionCard>>((ref) {
+  final filter = ref.watch(questionFilterProvider);
+  final repo = ref.watch(questionCardRepositoryProvider);
+  return repo.watch(_smartActive(ref) ? filter.copyWith(text: () => null) : filter);
+});
+
+/// Akıllı arama sonucu (puanlar ve "bunu mu demek istedin"); arama yoksa null.
+final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref) {
+  final base = ref.watch(_searchBaseProvider);
+  if (!_smartActive(ref)) return base.whenData<SmartSearchResult?>((_) => null);
+  final text = ref.watch(questionFilterProvider).text!;
+  final curriculum = {for (final n in ref.watch(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
+  return base.whenData((cards) => smartSearch(cards, text, (c) {
+        final node = c.mebNodeId == null ? null : curriculum[c.mebNodeId];
+        final topic = node?.title ?? (c.topicText == null ? null : titleCaseTr(c.topicText!));
+        return [
+          if (topic != null) SearchField(topic, fieldWeights.topic),
+          SearchField(subjectName(c.subject), fieldWeights.subject),
+          SearchField(c.sourceName, fieldWeights.source),
+          if (c.testLabel != null) SearchField(c.testLabel!, fieldWeights.test),
+          if (c.reasonText != null) SearchField(c.reasonText!, fieldWeights.reason),
+          if (c.note != null) SearchField(c.note!, fieldWeights.note),
+          SearchField(c.status.label, fieldWeights.status),
+        ];
+      }));
+});
+
+/// Defter'de gösterilen sorular: akıllı aramada alaka sırasıyla.
+final filteredQuestionsProvider = Provider<AsyncValue<List<QuestionCard>>>((ref) {
+  final smart = ref.watch(smartSearchResultProvider);
+  final result = smart.value;
+  if (result != null) return AsyncData(result.cards);
+  return ref.watch(_searchBaseProvider);
+});
+
+final searchHistoryRepositoryProvider = Provider((ref) => SearchHistoryRepository(ref.watch(appDatabaseProvider)));
+final searchLogProvider = Provider<SearchLog>((ref) => SearchLog());
+
+/// Arama geçmişi: tarayıcıdaki gibi en yeni başta.
+class SearchHistoryNotifier extends AsyncNotifier<List<String>> {
+  @override
+  Future<List<String>> build() => ref.watch(searchHistoryRepositoryProvider).load();
+
+  Future<void> add(String query) async {
+    final current = state.value ?? await future;
+    state = AsyncData(await ref.read(searchHistoryRepositoryProvider).save(pushHistory(current, query)));
+  }
+
+  Future<void> remove(String query) async {
+    final current = state.value ?? const <String>[];
+    state = AsyncData(await ref.read(searchHistoryRepositoryProvider).save([for (final e in current) if (e != query) e]));
+  }
+
+  Future<void> clear() async => state = AsyncData(await ref.read(searchHistoryRepositoryProvider).save(const []));
+}
+
+final searchHistoryProvider = AsyncNotifierProvider<SearchHistoryNotifier, List<String>>(SearchHistoryNotifier.new);
 
 /// Filtresiz bütün defter (dışa aktarma "Tüm defter" için).
 final allQuestionsProvider = StreamProvider<List<QuestionCard>>(

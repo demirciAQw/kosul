@@ -149,8 +149,13 @@ Future<({Uint8List bytes, int photos, int missing})> buildFullExportZip({
   required List<StudyNote> notes,
   required MediaStorage media,
   bool withPhotos = true,
+  Map<String, List<int>> extraFiles = const {},
 }) async {
   final zip = ZipWriter()..addText('kocum_yedek.json', const JsonEncoder.withIndent(' ').convert(data));
+  // Uygulamanın kendi tuttuğu veri setleri (ör. arama kayıtları).
+  for (final e in extraFiles.entries) {
+    zip.add(e.key, e.value);
+  }
   var photos = 0, missing = 0;
   if (withPhotos) {
     final paths = <String>{

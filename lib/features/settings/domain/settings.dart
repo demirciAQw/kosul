@@ -11,6 +11,7 @@ class AppSettings {
     this.fixedSchedule = '',
     this.booksDeadline,
     this.fastPhotos = false,
+    this.smartSearch = true,
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -33,6 +34,9 @@ class AppSettings {
   /// Hızlı fotoğraf modu: daha küçük çözünürlük; kırpma ve kayıt daha hızlı.
   final bool fastPhotos;
 
+  /// Akıllı arama: yazım hatalarını düzeltir, benzerliğe göre sıralar.
+  final bool smartSearch;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
@@ -42,6 +46,7 @@ class AppSettings {
     String? fixedSchedule,
     DateTime? Function()? booksDeadline,
     bool? fastPhotos,
+    bool? smartSearch,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -52,6 +57,7 @@ class AppSettings {
         fixedSchedule: fixedSchedule ?? this.fixedSchedule,
         booksDeadline: booksDeadline != null ? booksDeadline() : this.booksDeadline,
         fastPhotos: fastPhotos ?? this.fastPhotos,
+        smartSearch: smartSearch ?? this.smartSearch,
       );
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +69,7 @@ class AppSettings {
         'fixedSchedule': fixedSchedule,
         if (booksDeadline != null) 'booksDeadline': booksDeadline!.toIso8601String(),
         'fastPhotos': fastPhotos,
+        'smartSearch': smartSearch,
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -77,6 +84,7 @@ class AppSettings {
       fixedSchedule: j['fixedSchedule'] is String ? j['fixedSchedule'] as String : d.fixedSchedule,
       booksDeadline: j['booksDeadline'] is String ? DateTime.tryParse(j['booksDeadline'] as String) : null,
       fastPhotos: j['fastPhotos'] == true,
+      smartSearch: j['smartSearch'] != false,
     );
   }
 

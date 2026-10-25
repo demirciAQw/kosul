@@ -17,6 +17,8 @@ import '../../../notes/presentation/notes_export.dart';
 import '../../../notes/domain/notes.dart';
 import '../export_sheet.dart';
 import '../../../tools/tools_providers.dart';
+import '../../../curriculum/domain/yks.dart';
+import '../../../../core/text/turkish_text.dart';
 
 /// Hata / Boş / GK defteri: arama, açılır menü filtreleri ve ağaç yapılı liste.
 class NotebookScreen extends ConsumerStatefulWidget {
@@ -52,14 +54,29 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
   }
 
   final _search = TextEditingController();
+  final _searchFocus = FocusNode();
   Timer? _debounce;
+
+  /// Yazmayı bıraktıktan bir süre sonra arama veri setine yazılır.
+  Timer? _logTimer;
+  String? _loggedQuery;
+  String? _searchId;
+  DateTime? _searchAt;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchFocus.addListener(() => setState(() {}));
+  }
 
   @override
   void dispose() {
     _tabs.removeListener(_onTab);
     _tabs.dispose();
     _debounce?.cancel();
+    _logTimer?.cancel();
     _search.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -68,7 +85,81 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
     _debounce = Timer(const Duration(milliseconds: 250), () {
       if (mounted) ref.read(questionFilterProvider.notifier).setText(value);
     });
+    _logTimer?.cancel();
+    _logTimer = Timer(const Duration(milliseconds: 1500), _logSearch);
     setState(() {}); // temizle butonunu göster/gizle
+  }
+
+  /// Aramayı uygula (geçmişten ya da öneriden), klavyeyi kapat, geçmişe ekle.
+  void _applyQuery(String q, {String? via}) {
+    _search.text = q;
+    _search.selection = TextSelection.collapsed(offset: q.length);
+    _debounce?.cancel();
+    ref.read(questionFilterProvider.notifier).setText(q);
+    _searchFocus.unfocus();
+    unawaited(ref.read(searchHistoryProvider.notifier).add(q));
+    if (via != null) {
+      unawaited(ref.read(searchLogProvider).append({
+        'type': 'query_from_$via',
+        'at': DateTime.now().toIso8601String(),
+        'from': _loggedQuery,
+        'to': q,
+      }));
+    }
+    _logTimer?.cancel();
+    _logTimer = Timer(const Duration(milliseconds: 600), _logSearch);
+    setState(() {});
+  }
+
+  String _labelOf(QuestionCard c) =>
+      [subjectName(c.subject), c.topicText, c.testLabel ?? c.sourceName, if (c.questionNo != null) 'S${c.questionNo}']
+          .whereType<String>()
+          .join(' · ');
+
+  /// Veri seti: arama metni, akıllı arama durumu, öneri ve ilk 20 sonuç.
+  void _logSearch() {
+    if (!mounted) return;
+    final q = _search.text.trim();
+    if (q.isEmpty || q == _loggedQuery) return;
+    final smart = ref.read(smartSearchResultProvider).value;
+    final cards = ref.read(filteredQuestionsProvider).value ?? const <QuestionCard>[];
+    _loggedQuery = q;
+    _searchAt = DateTime.now();
+    _searchId = 's${_searchAt!.microsecondsSinceEpoch}';
+    unawaited(ref.read(searchLogProvider).append({
+      'type': 'search',
+      'id': _searchId,
+      'at': _searchAt!.toIso8601String(),
+      'query': q,
+      'normalized': normalizeTr(q),
+      'smart': ref.read(smartSearchEnabledProvider),
+      'suggestion': smart?.suggestion,
+      'count': cards.length,
+      'results': [
+        for (final (i, c) in cards.take(20).indexed)
+          {'rank': i + 1, 'id': c.id, 'score': smart?.scores[c.id], 'label': _labelOf(c)},
+      ],
+    }));
+  }
+
+  /// Arama sonuçlarından birine gidildi: hangi aramadan, kaçıncı sonuç.
+  void _logOpen(QuestionCard card, int index) {
+    final q = _search.text.trim();
+    if (q.isEmpty) return;
+    if (q != _loggedQuery) _logSearch();
+    final smart = ref.read(smartSearchResultProvider).value;
+    unawaited(ref.read(searchLogProvider).append({
+      'type': 'open',
+      'search': _searchId,
+      'at': DateTime.now().toIso8601String(),
+      'query': q,
+      'card': card.id,
+      'rank': index + 1,
+      'score': smart?.scores[card.id],
+      'label': _labelOf(card),
+      'msAfterSearch': _searchAt == null ? null : DateTime.now().difference(_searchAt!).inMilliseconds,
+    }));
+    unawaited(ref.read(searchHistoryProvider.notifier).add(q));
   }
 
   @override
@@ -180,7 +271,11 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                     child: TextField(
                       controller: _search,
+                      focusNode: _searchFocus,
                       onChanged: _onChanged,
+                      onSubmitted: (q) {
+                        if (q.trim().isNotEmpty) _applyQuery(q.trim());
+                      },
                       textInputAction: TextInputAction.search,
                       decoration: InputDecoration(
                         hintText: 'Kaynak, konu, neden ya da not ara',
@@ -192,12 +287,18 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
                                 icon: const Icon(Icons.close_rounded),
                                 onPressed: () {
                                   _search.clear();
+                                  _loggedQuery = null;
                                   ref.read(questionFilterProvider.notifier).setText(null);
                                   setState(() {});
                                 },
                               ),
                       ),
                     ),
+                  ),
+                  _SearchAssist(
+                    query: _search.text,
+                    focused: _searchFocus.hasFocus,
+                    onApply: (q, via) => _applyQuery(q, via: via),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -347,7 +448,10 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
                     itemBuilder: (context, i) => QuestionTile(
                       key: ValueKey(list[i].id),
                       card: list[i],
-                      onOpen: () => QuestionViewerScreen.open(context, list, i),
+                      onOpen: () {
+                        _logOpen(list[i], i);
+                        QuestionViewerScreen.open(context, list, i);
+                      },
                     ),
                   ),
                 ),
@@ -389,7 +493,18 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
                 childAspectRatio: 3 / 4,
               ),
               itemCount: g.cards.length,
-              itemBuilder: (context, i) => QuestionTile(key: ValueKey(g.cards[i].id), card: g.cards[i]),
+              itemBuilder: (context, i) {
+                final card = g.cards[i];
+                return QuestionTile(
+                  key: ValueKey(card.id),
+                  card: card,
+                  onOpen: () {
+                    final all = ref.read(filteredQuestionsProvider).value ?? const <QuestionCard>[];
+                    _logOpen(card, all.indexWhere((c) => c.id == card.id));
+                    context.push(AppRoutes.question(card.id));
+                  },
+                );
+              },
             ),
           ),
       ],
@@ -498,6 +613,81 @@ class _EmptyState extends ConsumerWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Arama kutusunun altı: yazım hatasında öneri, odaktayken son aramalar.
+class _SearchAssist extends ConsumerWidget {
+  const _SearchAssist({required this.query, required this.focused, required this.onApply});
+  final String query;
+  final bool focused;
+
+  /// Seçilen arama ve nereden geldiği ("history" ya da "suggestion").
+  final void Function(String query, String via) onApply;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final q = query.trim();
+    final history = ref.watch(searchHistoryProvider).value ?? const <String>[];
+    final suggestion = q.isEmpty ? null : ref.watch(smartSearchResultProvider).value?.suggestion;
+    final nq = normalizeTr(q);
+    final matches = [
+      for (final h in history)
+        if (h != q && (q.isEmpty || normalizeTr(h).contains(nq))) h,
+    ].take(6).toList();
+    final showHistory = focused && matches.isNotEmpty;
+    if (suggestion == null && !showHistory) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (suggestion != null)
+            ActionChip(
+              avatar: Icon(Icons.auto_fix_high_rounded, size: 18, color: scheme.primary),
+              label: Text('Bunu mu demek istedin: $suggestion'),
+              onPressed: () => onApply(suggestion, 'suggestion'),
+            ),
+          if (showHistory)
+            Card(
+              margin: const EdgeInsets.only(top: 4),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 4, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text('Son aramalar',
+                              style: theme.textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
+                        ),
+                        TextButton(
+                          onPressed: () => ref.read(searchHistoryProvider.notifier).clear(),
+                          child: const Text('Temizle'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  for (final h in matches)
+                    ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.history_rounded),
+                      title: Text(h, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      trailing: IconButton(
+                        tooltip: 'Geçmişten sil',
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                        onPressed: () => ref.read(searchHistoryProvider.notifier).remove(h),
+                      ),
+                      onTap: () => onApply(h, 'history'),
+                    ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }
