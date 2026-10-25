@@ -50,7 +50,18 @@ class _CropScreenState extends State<CropScreen> {
   static const _minCropPx = 48.0;
   static const _padding = 20.0;
 
+  /// Ekranda gösterilen KÜÇÜK önizleme: hızlı açılır, döndürme anında olur.
   ui.Image? _image;
+
+  /// Tam çözünürlüklü görüntü arka planda açılır; yalnızca son kırpmada kullanılır.
+  Future<ui.Image>? _full;
+
+  /// Önizlemeye uygulanan 90° saat yönü dönüş sayısı (0–3); tam görüntüye
+  /// kırpmada tek seferde uygulanır.
+  int _turns = 0;
+
+  /// Önizlemenin en uzun kenarı: telefon ekranındaki kırpma alanı için yeterli.
+  static const _previewSide = 1600;
   Object? _error;
   bool _busy = false;
 
@@ -71,23 +82,66 @@ class _CropScreenState extends State<CropScreen> {
   @override
   void dispose() {
     _image?.dispose();
+    _full?.then((img) => img.dispose(), onError: (_) {});
     super.dispose();
   }
 
   Future<void> _load() async {
     try {
       final bytes = await File(widget.sourcePath).readAsBytes();
-      final codec = await ui.instantiateImageCodec(bytes);
-      final frame = await codec.getNextFrame();
-      codec.dispose();
+      final preview = await _decode(bytes, maxSide: _previewSide);
+      // Tam görüntü arkada açılır; kullanıcı bu sırada kırpmaya başlayabilir.
+      _full = _decode(bytes)..ignore();
       if (!mounted) {
-        frame.image.dispose();
+        preview.dispose();
         return;
       }
-      setState(() => _image = frame.image);
+      setState(() => _image = preview);
     } catch (e) {
       if (mounted) setState(() => _error = e);
     }
+  }
+
+  /// [maxSide] verilirse görüntü daha küçük çözülür (JPEG çözücü küçültmeyi
+  /// çözerken yapar: hem hızlı hem bellek dostu).
+  static Future<ui.Image> _decode(Uint8List bytes, {int? maxSide}) async {
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+    final descriptor = await ui.ImageDescriptor.encoded(buffer);
+    int? targetWidth, targetHeight;
+    if (maxSide != null && math.max(descriptor.width, descriptor.height) > maxSide) {
+      if (descriptor.width >= descriptor.height) {
+        targetWidth = maxSide;
+      } else {
+        targetHeight = maxSide;
+      }
+    }
+    final codec = await descriptor.instantiateCodec(targetWidth: targetWidth, targetHeight: targetHeight);
+    final frame = await codec.getNextFrame();
+    codec.dispose();
+    descriptor.dispose();
+    buffer.dispose();
+    return frame.image;
+  }
+
+  /// [turns] kez 90° saat yönünde döndürülmüş kopya (önizlemedeki dönüşle aynı).
+  static Future<ui.Image> _rotated(ui.Image src, int turns) async {
+    final w = src.width.toDouble(), h = src.height.toDouble();
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    switch (turns) {
+      case 1:
+        canvas.translate(h, 0);
+      case 2:
+        canvas.translate(w, h);
+      case 3:
+        canvas.translate(0, w);
+    }
+    canvas.rotate(turns * math.pi / 2);
+    canvas.drawImage(src, Offset.zero, Paint()..filterQuality = FilterQuality.high);
+    final picture = recorder.endRecording();
+    final out = turns.isOdd ? await picture.toImage(src.height, src.width) : await picture.toImage(src.width, src.height);
+    picture.dispose();
+    return out;
   }
 
   // ───────────────────────── Koordinat dönüşümleri ─────────────────────────
@@ -216,6 +270,7 @@ class _CropScreenState extends State<CropScreen> {
       final r = _crop;
       setState(() {
         _image = rotated;
+        _turns = (_turns + 1) % 4;
         // (x, y) → (1 − y, x)
         _crop = Rect.fromLTRB(1 - r.bottom, r.left, 1 - r.top, r.right);
         _busy = false;
@@ -229,10 +284,16 @@ class _CropScreenState extends State<CropScreen> {
   }
 
   Future<void> _finish() async {
-    final image = _image;
-    if (image == null || _busy) return;
+    final full = _full;
+    if (_image == null || full == null || _busy) return;
     setState(() => _busy = true);
+    ui.Image? turned;
     try {
+      // Önizlemedeki dönüş tam görüntüye tek seferde uygulanır; seçim normalize
+      // olduğu için iki görüntüde de aynı yere düşer.
+      final source = await full;
+      turned = _turns == 0 ? null : await _rotated(source, _turns);
+      final image = turned ?? source;
       final src = Rect.fromLTRB(
         _crop.left * image.width,
         _crop.top * image.height,
@@ -259,10 +320,13 @@ class _CropScreenState extends State<CropScreen> {
       // Ham pikseller: GPU'dan okumak hızlıdır; PNG kodlaması (saniyeler) yok.
       final data = await cropped.toByteData(format: ui.ImageByteFormat.rawRgba);
       cropped.dispose();
+      turned?.dispose();
+      turned = null;
       if (!mounted) return;
       if (data == null) throw StateError('görüntü üretilemedi');
       Navigator.of(context).pop(CropOutput(data.buffer.asUint8List(), w, h));
     } catch (e) {
+      turned?.dispose();
       if (!mounted) return;
       setState(() => _busy = false);
       _snack('Kırpılamadı: $e');

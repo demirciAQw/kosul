@@ -169,150 +169,121 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
       body: TabBarView(
         controller: _tabs,
         children: [
-      Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-            child: TextField(
-              controller: _search,
-              onChanged: _onChanged,
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                hintText: 'Kaynak, konu, neden ya da not ara',
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _search.text.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Aramayı temizle',
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () {
-                          _search.clear();
-                          ref.read(questionFilterProvider.notifier).setText(null);
-                          setState(() {});
-                        },
+      CustomScrollView(
+        // Üst kısım (arama, filtreler, görünüm) aşağı kaydırınca yukarı çekilir;
+        // sorular bütün ekranı kullanır.
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    child: TextField(
+                      controller: _search,
+                      onChanged: _onChanged,
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: 'Kaynak, konu, neden ya da not ara',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        suffixIcon: _search.text.isEmpty
+                            ? null
+                            : IconButton(
+                                tooltip: 'Aramayı temizle',
+                                icon: const Icon(Icons.close_rounded),
+                                onPressed: () {
+                                  _search.clear();
+                                  ref.read(questionFilterProvider.notifier).setText(null);
+                                  setState(() {});
+                                },
+                              ),
                       ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SegmentedButton<bool>(
-                    showSelectedIcon: false,
-                    segments: const [
-                      ButtonSegment(value: false, label: Text('Tümü')),
-                      ButtonSegment(value: true, label: Text('Güzel Sorular'), icon: Icon(Icons.star_rounded)),
-                    ],
-                    selected: {filter.starredOnly},
-                    onSelectionChanged: (s) =>
-                        ref.read(questionFilterProvider.notifier).setStarredOnly(s.first),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: FilledButton.tonalIcon(
-                    onPressed: () => context.push(AppRoutes.review),
-                    icon: const Icon(Icons.replay_rounded),
-                    label: Text(due > 0 ? 'Tekrar ($due)' : 'Tekrar'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => context.push(AppRoutes.incompleteQuestions),
-                    icon: Badge(
-                      isLabelVisible: incomplete > 0,
-                      smallSize: 8,
-                      child: const Icon(Icons.pending_actions_outlined),
                     ),
-                    label: Text(incomplete > 0 ? 'Eksikler ($incomplete)' : 'Eksikler'),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Row(
-              children: [
-                SegmentedButton<bool>(
-                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                  segments: const [
-                    ButtonSegment(value: true, label: Text('Galeri'), icon: Icon(Icons.grid_view_rounded)),
-                    ButtonSegment(value: false, label: Text('Gruplu'), icon: Icon(Icons.account_tree_outlined)),
-                  ],
-                  selected: {gallery},
-                  onSelectionChanged: (s) => ref.read(notebookGalleryProvider.notifier).set(s.first),
-                ),
-                const Spacer(),
-                if (gallery)
-                  Text(
-                    '${cards.value?.length ?? 0} soru',
-                    style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-              ],
-            ),
-          ),
-          if (!gallery)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-              child: SizedBox(
-                width: double.infinity,
-                child: SegmentedButton<GroupBy>(
-                  style: const ButtonStyle(visualDensity: VisualDensity.compact),
-                  segments: [for (final g in GroupBy.values) ButtonSegment(value: g, label: Text(g.label))],
-                  selected: {groupBy},
-                  onSelectionChanged: (s) => ref.read(questionGroupByProvider.notifier).set(s.first),
-                ),
-              ),
-            ),
-          Expanded(
-            child: gallery
-                // Galeri: arama ve filtrelerin sonucu doğrudan sorular; dokununca tam
-                // ekran açılır ve sonuçlar arasında kaydırılır.
-                ? cards.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
-                    data: (list) => list.isEmpty
-                        ? _EmptyState(filtered: !filter.isUnfiltered)
-                        : GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-                            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 220,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 3 / 4,
-                            ),
-                            itemCount: list.length,
-                            itemBuilder: (context, i) => QuestionTile(
-                              key: ValueKey(list[i].id),
-                              card: list[i],
-                              onOpen: () => QuestionViewerScreen.open(context, list, i),
-                            ),
-                          ),
-                  )
-                : groups.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Sorular yüklenemedi: $e')),
-                    data: (list) => list.isEmpty
-                        ? _EmptyState(filtered: !filter.isUnfiltered)
-                        : ListView(
-                            padding: const EdgeInsets.only(bottom: 96),
-                            children: [
-                              for (final g in list)
-                                _GroupTile(group: g, path: g.title, depth: 0, expanded: list.length <= 3),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SegmentedButton<bool>(
+                            showSelectedIcon: false,
+                            segments: const [
+                              ButtonSegment(value: false, label: Text('Tümü')),
+                              ButtonSegment(value: true, label: Text('Güzel Sorular'), icon: Icon(Icons.star_rounded)),
                             ],
+                            selected: {filter.starredOnly},
+                            onSelectionChanged: (s) =>
+                                ref.read(questionFilterProvider.notifier).setStarredOnly(s.first),
                           ),
+                        ),
+                      ],
+                    ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton.tonalIcon(
+                            onPressed: () => context.push(AppRoutes.review),
+                            icon: const Icon(Icons.replay_rounded),
+                            label: Text(due > 0 ? 'Tekrar ($due)' : 'Tekrar'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () => context.push(AppRoutes.incompleteQuestions),
+                            icon: Badge(
+                              isLabelVisible: incomplete > 0,
+                              smallSize: 8,
+                              child: const Icon(Icons.pending_actions_outlined),
+                            ),
+                            label: Text(incomplete > 0 ? 'Eksikler ($incomplete)' : 'Eksikler'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    child: Row(
+                      children: [
+                        SegmentedButton<bool>(
+                          style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                          segments: const [
+                            ButtonSegment(value: true, label: Text('Galeri'), icon: Icon(Icons.grid_view_rounded)),
+                            ButtonSegment(value: false, label: Text('Gruplu'), icon: Icon(Icons.account_tree_outlined)),
+                          ],
+                          selected: {gallery},
+                          onSelectionChanged: (s) => ref.read(notebookGalleryProvider.notifier).set(s.first),
+                        ),
+                        const Spacer(),
+                        if (gallery)
+                          Text(
+                            '${cards.value?.length ?? 0} soru',
+                            style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (!gallery)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: SegmentedButton<GroupBy>(
+                          style: const ButtonStyle(visualDensity: VisualDensity.compact),
+                          segments: [for (final g in GroupBy.values) ButtonSegment(value: g, label: Text(g.label))],
+                          selected: {groupBy},
+                          onSelectionChanged: (s) => ref.read(questionGroupByProvider.notifier).set(s.first),
+                        ),
+                      ),
+                    ),
+              ],
+            ),
           ),
+          ..._contentSlivers(gallery: gallery, cards: cards, groups: groups, filter: filter),
+          const SliverToBoxAdapter(child: SizedBox(height: 96)),
         ],
       ),
       const NotesView(),
@@ -344,6 +315,87 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
     await exportNotes(context, ref, list, title: subject == null ? 'Tüm notlar' : '$subject defteri');
   }
 
+  /// Grupların açık/kapalı durumu (yol → açık mı). Yoksa varsayılan kullanılır.
+  final _expanded = <String, bool>{};
+
+  List<Widget> _contentSlivers({
+    required bool gallery,
+    required AsyncValue<List<QuestionCard>> cards,
+    required AsyncValue<List<QuestionGroup>> groups,
+    required QuestionFilter filter,
+  }) {
+    Widget fill(Widget child) => SliverFillRemaining(hasScrollBody: false, child: child);
+    if (gallery) {
+      // Galeri: arama ve filtrelerin sonucu doğrudan sorular; dokununca tam
+      // ekran açılır ve sonuçlar arasında kaydırılır.
+      return cards.when(
+        loading: () => [fill(const Center(child: CircularProgressIndicator()))],
+        error: (e, _) => [fill(Center(child: Text('Sorular yüklenemedi: $e')))],
+        data: (list) => list.isEmpty
+            ? [fill(_EmptyState(filtered: !filter.isUnfiltered))]
+            : [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  sliver: SliverGrid.builder(
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 220,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 3 / 4,
+                    ),
+                    itemCount: list.length,
+                    itemBuilder: (context, i) => QuestionTile(
+                      key: ValueKey(list[i].id),
+                      card: list[i],
+                      onOpen: () => QuestionViewerScreen.open(context, list, i),
+                    ),
+                  ),
+                ),
+              ],
+      );
+    }
+    return groups.when(
+      loading: () => [fill(const Center(child: CircularProgressIndicator()))],
+      error: (e, _) => [fill(Center(child: Text('Sorular yüklenemedi: $e')))],
+      data: (list) => list.isEmpty
+          ? [fill(_EmptyState(filtered: !filter.isUnfiltered))]
+          : [for (final g in list) ..._groupSlivers(g, g.title, 0, defaultOpen: list.length <= 3)],
+    );
+  }
+
+  /// Grup başlığı + (açıksa) alt gruplar ve kartlar. Izgara tembel: yalnızca
+  /// ekrandaki kartlar çizilir.
+  List<Widget> _groupSlivers(QuestionGroup g, String path, int depth, {bool defaultOpen = false}) {
+    final open = _expanded[path] ?? defaultOpen;
+    return [
+      SliverToBoxAdapter(
+        child: _GroupHeader(
+          group: g,
+          depth: depth,
+          open: open,
+          onTap: () => setState(() => _expanded[path] = !open),
+        ),
+      ),
+      if (open) ...[
+        for (final child in g.children) ..._groupSlivers(child, '$path/${child.title}', depth + 1),
+        if (g.cards.isNotEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            sliver: SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 3 / 4,
+              ),
+              itemCount: g.cards.length,
+              itemBuilder: (context, i) => QuestionTile(key: ValueKey(g.cards[i].id), card: g.cards[i]),
+            ),
+          ),
+      ],
+    ];
+  }
+
   Future<void> _deleteSelected(Set<String> ids) async {
     final messenger = ScaffoldMessenger.of(context);
     final ok = await showDialog<bool>(
@@ -364,84 +416,51 @@ class _NotebookScreenState extends ConsumerState<NotebookScreen> with SingleTick
   }
 }
 
-class _GroupTile extends StatelessWidget {
-  const _GroupTile({required this.group, required this.path, required this.depth, this.expanded = false});
-
+/// Grup başlığı: dokununca açılır/kapanır. Kartlar başlığın altında ayrı,
+/// tembel bir ızgarada çizilir (iç içe kaydırma yok).
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader({required this.group, required this.depth, required this.open, required this.onTap});
   final QuestionGroup group;
-  final String path;
   final int depth;
-  final bool expanded;
+  final bool open;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ExpansionTile(
-      key: PageStorageKey<String>(path),
-      initiallyExpanded: expanded,
-      maintainState: false, // kapalı grubun kartları çizilmez: binlerce soruda bile akıcı
-      shape: const Border(),
-      collapsedShape: const Border(),
-      tilePadding: EdgeInsetsDirectional.only(start: 16 + depth * 14.0, end: 16),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              group.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: depth == 0 ? theme.textTheme.titleMedium : theme.textTheme.titleSmall,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text('${group.total}', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
-        ],
-      ),
-      subtitle: group.subtitle == null ? null : Text(group.subtitle!),
-      children: [
-        for (final child in group.children)
-          _GroupTile(group: child, path: '$path/${child.title}', depth: depth + 1),
-        if (group.cards.isNotEmpty) _CardGrid(cards: group.cards),
-      ],
-    );
-  }
-}
-
-class _CardGrid extends StatefulWidget {
-  const _CardGrid({required this.cards});
-  final List<QuestionCard> cards;
-
-  @override
-  State<_CardGrid> createState() => _CardGridState();
-}
-
-class _CardGridState extends State<_CardGrid> {
-  static const _page = 30;
-  int _shown = _page;
-
-  @override
-  Widget build(BuildContext context) {
-    final total = widget.cards.length;
-    final visible = total < _shown ? total : _shown;
-    return Column(
-      children: [
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 3 / 4,
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsetsDirectional.fromSTEB(16 + depth * 14.0, 12, 12, 12),
+        child: Row(
           children: [
-            for (final card in widget.cards.take(visible)) QuestionTile(key: ValueKey(card.id), card: card),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    group.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: depth == 0 ? theme.textTheme.titleMedium : theme.textTheme.titleSmall,
+                  ),
+                  if (group.subtitle != null)
+                    Text(group.subtitle!,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text('${group.total}', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+            const SizedBox(width: 4),
+            AnimatedRotation(
+              turns: open ? 0.5 : 0,
+              duration: const Duration(milliseconds: 180),
+              child: const Icon(Icons.expand_more_rounded),
+            ),
           ],
         ),
-        if (visible < total)
-          TextButton(
-            onPressed: () => setState(() => _shown += _page),
-            child: Text('Daha fazla göster (${total - visible})'),
-          ),
-      ],
+      ),
     );
   }
 }
