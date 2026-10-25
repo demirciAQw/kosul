@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+
+import 'bmp_encoder.dart';
 
 enum PhotoSource { camera, gallery }
 
@@ -17,12 +20,28 @@ class ImageCompressionException implements Exception {
 /// Kayda hazır fotoğraf + yeniden kırpma için saklanan orijinal.
 /// İkisi de önbellekte (geçici) durur; kayıt anında yalnızca [path] kalıcı depoya kopyalanır.
 class CapturedPhoto {
-  const CapturedPhoto({required this.originalPath, required this.path});
+  CapturedPhoto({required this.originalPath, required this.path, Future<void>? ready})
+      : ready = ready ?? Future<void>.value() {
+    // Kimse beklemeden hata olursa "yakalanmamış hata" sayılmasın; bekleyen yine hatayı alır.
+    this.ready.ignore();
+  }
 
-  final String originalPath; // kırpılmamış (en uzun kenar en fazla 4096 px)
-  final String path; // kırpılmış + WebP
+  final String originalPath; // kırpılmamış
+  final String path; // kırpılmış + WebP (arka planda yazılıyor olabilir)
+
+  /// Sıkıştırma arka planda sürer; [path] bu tamamlanınca diskte olur.
+  /// Kaydetmeden önce beklenir. Hata olursa [ImageCompressionException].
+  final Future<void> ready;
 
   List<String> get tempFiles => [originalPath, path];
+}
+
+/// Kırpma ekranının çıktısı: ham RGBA pikseller (PNG kodlaması beklenmez).
+class CropOutput {
+  const CropOutput(this.rgba, this.width, this.height);
+  final Uint8List rgba;
+  final int width;
+  final int height;
 }
 
 /// Fotoğraf hattının platform tarafı: seç → (uygulama içi kırpma ekranı) → sıkıştır.
@@ -46,13 +65,22 @@ class PhotoCaptureService {
   /// 1440 px hedefinin çok üstünde olduğu için netlik kaybettirmez.
   static const maxSourceSide = 4096.0;
 
+  /// Ayarlar › Hızlı fotoğraf modu: daha küçük kaynak ve çıktı, biraz düşük
+  /// kalite. Kırpma ekranı daha çabuk açılır, kayıt daha çabuk biter.
+  bool fast = false;
+
+  double get sourceSide => fast ? 2560 : maxSourceSide;
+  double get outputSide => fast ? 1920 : 2880;
+  int get targetShortSide => fast ? 1200 : shortSide;
+  int get webpQuality => fast ? 72 : quality;
+
   /// Seçilen/çekilen fotoğrafı uygulama önbelleğine alır. Vazgeçilirse null.
   Future<String?> pickToTemp(PhotoSource source) async {
     final picked = await _picker.pickImage(
       source: source == PhotoSource.camera ? ImageSource.camera : ImageSource.gallery,
-      maxWidth: maxSourceSide,
-      maxHeight: maxSourceSide,
-      imageQuality: 95,
+      maxWidth: sourceSide,
+      maxHeight: sourceSide,
+      imageQuality: fast ? 88 : 95,
       requestFullMetadata: false,
     );
     if (picked == null) return null;
@@ -85,6 +113,31 @@ class PhotoCaptureService {
     final target = p.join(temp.path, 'kocum_${_stamp()}.webp');
     await File(target).writeAsBytes(out, flush: true);
     return target;
+  }
+
+  /// Arka plan kodlaması için hedef dosya yolu (henüz yazılmaz).
+  Future<String> reserveTarget() async =>
+      p.join((await getTemporaryDirectory()).path, 'kocum_${_stamp()}.webp');
+
+  /// Kırpılan ham görüntüyü arka planda WebP'ye çevirip [target]'a yazar.
+  /// PNG yerine BMP ara biçimi: baytları dizmek PNG kodlamasından çok hızlıdır.
+  Future<void> encodeCrop(CropOutput crop, String target) async {
+    final Uint8List out;
+    try {
+      final bmp = await compute(rgbaToBmpTask, (crop.rgba, crop.width, crop.height));
+      out = await FlutterImageCompress.compressWithList(
+        bmp,
+        minWidth: targetShortSide,
+        minHeight: targetShortSide,
+        quality: webpQuality,
+        format: CompressFormat.webp,
+        keepExif: false,
+      );
+    } catch (_) {
+      throw const ImageCompressionException();
+    }
+    if (out.isEmpty) throw const ImageCompressionException();
+    await File(target).writeAsBytes(out, flush: true);
   }
 
   static String _stamp() => '${DateTime.now().microsecondsSinceEpoch}';

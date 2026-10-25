@@ -130,6 +130,7 @@ class _IncompleteTileState extends ConsumerState<_IncompleteTile> {
     try {
       final photo = await capturePhoto(context, capture, source, title: 'Soruyu kırp');
       if (photo == null) return;
+      await photo.ready; // sıkıştırma bitmeden kaydedilmez
       await ref
           .read(updateQuestionCardProvider)
           .call(_card, QuestionDraft.fromCard(_card).copyWith(questionImagePath: () => photo.path));

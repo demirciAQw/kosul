@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'photo_capture_service.dart' show CropOutput;
 
 /// Sürüklenen parça: köşe, kenar ya da tüm seçim.
 enum _Drag { move, left, top, right, bottom, corner }
@@ -16,17 +17,26 @@ enum _Drag { move, left, top, right, bottom, corner }
 /// değişse de seçim bozulmaz. Çıktı, kırpılmış bölgenin PNG baytlarıdır;
 /// WebP'ye sıkıştırma çağıran tarafta (PhotoCaptureService) yapılır.
 class CropScreen extends StatefulWidget {
-  const CropScreen({super.key, required this.sourcePath, required this.title});
+  const CropScreen({super.key, required this.sourcePath, required this.title, this.maxOutputSide = 2880});
 
   final String sourcePath;
   final String title;
 
-  /// Vazgeçilirse null döner.
-  static Future<Uint8List?> open(BuildContext context, {required String sourcePath, required String title}) {
-    return Navigator.of(context, rootNavigator: true).push<Uint8List>(
+  /// Çıktının en uzun kenarı (hızlı modda daha küçük).
+  final double maxOutputSide;
+
+  /// Ham RGBA çıktı döner (PNG kodlaması yok: ekran anında kapanır, sıkıştırma
+  /// arka planda yapılır). Vazgeçilirse null.
+  static Future<CropOutput?> open(
+    BuildContext context, {
+    required String sourcePath,
+    required String title,
+    double maxOutputSide = 2880,
+  }) {
+    return Navigator.of(context, rootNavigator: true).push<CropOutput>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (_) => CropScreen(sourcePath: sourcePath, title: title),
+        builder: (_) => CropScreen(sourcePath: sourcePath, title: title, maxOutputSide: maxOutputSide),
       ),
     );
   }
@@ -36,9 +46,6 @@ class CropScreen extends StatefulWidget {
 }
 
 class _CropScreenState extends State<CropScreen> {
-  /// Çıktının en uzun kenarı. Kısa kenar 1440 hedefi için fazlasıyla yeterli,
-  /// PNG kodlaması da hızlı kalır.
-  static const _maxOutputSide = 2880.0;
   static const _hitRadius = 30.0; // köşe/kenar yakalama mesafesi (px)
   static const _minCropPx = 48.0;
   static const _padding = 20.0;
@@ -233,7 +240,8 @@ class _CropScreenState extends State<CropScreen> {
         _crop.bottom * image.height,
       );
       final longest = math.max(src.width, src.height);
-      final scale = longest > _maxOutputSide ? _maxOutputSide / longest : 1.0;
+      final maxSide = widget.maxOutputSide;
+      final scale = longest > maxSide ? maxSide / longest : 1.0;
       final w = math.max(1, (src.width * scale).round());
       final h = math.max(1, (src.height * scale).round());
 
@@ -248,11 +256,12 @@ class _CropScreenState extends State<CropScreen> {
       final picture = recorder.endRecording();
       final cropped = await picture.toImage(w, h);
       picture.dispose();
-      final data = await cropped.toByteData(format: ui.ImageByteFormat.png);
+      // Ham pikseller: GPU'dan okumak hızlıdır; PNG kodlaması (saniyeler) yok.
+      final data = await cropped.toByteData(format: ui.ImageByteFormat.rawRgba);
       cropped.dispose();
       if (!mounted) return;
       if (data == null) throw StateError('görüntü üretilemedi');
-      Navigator.of(context).pop(data.buffer.asUint8List());
+      Navigator.of(context).pop(CropOutput(data.buffer.asUint8List(), w, h));
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);

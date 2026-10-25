@@ -47,6 +47,9 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   final _originals = <String>[]; // yeni çekimlerin kırpılmamış hâlleri (temizlik için)
   bool _capturing = false;
 
+  /// Arka planda sıkıştırılan sayfalar: yol → bitince tamamlanan iş.
+  final _ready = <String, Future<void>>{};
+
   /// dispose içinde ref kullanılamaz; medya deposu bir kez alınır.
   late final MediaStorage _media;
 
@@ -104,6 +107,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
       setState(() {
         _photos.add(NotePhotoDraft.fresh(photo.path));
         _originals.add(photo.originalPath);
+        _ready[photo.path] = photo.ready;
       });
     } on Exception catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Fotoğraf eklenemedi: $e')));
@@ -115,7 +119,10 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   void _removePhoto(int i) {
     final p = _photos.removeAt(i);
     final temp = p.temp;
-    if (temp != null) unawaited(_media.discardTemp(temp));
+    if (temp != null) {
+      final ready = _ready.remove(temp) ?? Future<void>.value();
+      unawaited(ready.then((_) => _media.discardTemp(temp), onError: (_) {}));
+    }
     setState(() {});
   }
 
@@ -135,8 +142,15 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
 
   @override
   void dispose() {
-    for (final path in [..._originals, for (final p in _photos) if (p.temp != null) p.temp!]) {
+    for (final path in _originals) {
       unawaited(_media.discardTemp(path));
+    }
+    // Yeni sayfalar: sıkıştırma sürüyorsa bitince silinir.
+    for (final p in _photos) {
+      final temp = p.temp;
+      if (temp == null) continue;
+      final ready = _ready[temp] ?? Future<void>.value();
+      unawaited(ready.then((_) => _media.discardTemp(temp), onError: (_) {}));
     }
     _title.dispose();
     _body.dispose();
@@ -165,9 +179,20 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   }
 
   Future<void> _save() async {
-    setState(() => _saving = true);
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
+    setState(() => _saving = true);
+    // Arka planda sıkıştırılan sayfalar bitmeden kaydedilmez (yalnızca notta kalanlar).
+    try {
+      await Future.wait([
+        for (final p in _photos)
+          if (p.temp != null && _ready[p.temp] != null) _ready[p.temp]!,
+      ]);
+    } on Exception {
+      if (mounted) setState(() => _saving = false);
+      messenger.showSnackBar(const SnackBar(content: Text('Bir sayfa hazırlanamadı; çıkarıp yeniden ekle.')));
+      return;
+    }
     try {
       final note = await ref.read(saveNoteProvider).call(
             existing: _original,
@@ -331,6 +356,7 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                       padding: const EdgeInsets.only(right: 10),
                       child: _PhotoThumb(
                         photo: p,
+                        ready: p.temp == null ? null : _ready[p.temp],
                         number: i + 1,
                         onOpen: () => _openPhoto(p),
                         onRemove: () => _removePhoto(i),
@@ -374,8 +400,11 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
 }
 
 class _PhotoThumb extends StatelessWidget {
-  const _PhotoThumb({required this.photo, required this.number, required this.onOpen, required this.onRemove});
+  const _PhotoThumb({required this.photo, required this.number, required this.onOpen, required this.onRemove, this.ready});
   final NotePhotoDraft photo;
+
+  /// Arka plan sıkıştırması (yeni çekilen sayfalar için).
+  final Future<void>? ready;
   final int number;
   final VoidCallback onOpen;
   final VoidCallback onRemove;
@@ -397,7 +426,14 @@ class _PhotoThumb extends StatelessWidget {
                 onTap: onOpen,
                 child: stored != null
                     ? MediaImage(stored, cacheWidth: 300)
-                    : Image.file(File(photo.temp!), fit: BoxFit.cover, cacheWidth: 300),
+                    : FutureBuilder<void>(
+                        future: ready ?? Future<void>.value(),
+                        builder: (context, snap) => snap.connectionState != ConnectionState.done
+                            ? const Center(child: SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+                            : (snap.hasError
+                                ? const Center(child: Icon(Icons.broken_image_outlined))
+                                : Image.file(File(photo.temp!), fit: BoxFit.cover, cacheWidth: 300)),
+                      ),
               ),
             ),
           ),

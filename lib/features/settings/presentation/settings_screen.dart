@@ -121,6 +121,19 @@ class _SettingsBody extends ConsumerWidget {
             ],
           ),
         ),
+        _Section('Performans'),
+        Card(
+          child: SwitchListTile(
+            secondary: const ToneIcon(Icons.bolt_rounded, color: KocumColors.amber),
+            title: const Text('Hızlı fotoğraf modu'),
+            subtitle: const Text(
+              'Fotoğraflar daha küçük çözünürlükte işlenir: kırpma ekranı daha çabuk açılır, '
+              'kayıt daha çabuk biter. Çok küçük yazılı sorularda netlik biraz azalabilir.',
+            ),
+            value: s.fastPhotos,
+            onChanged: (on) => _change(context, ref, s.copyWith(fastPhotos: on)),
+          ),
+        ),
         _Section('Haftalık sabit programım'),
         _FixedScheduleCard(settings: s),
         _Section('Görünüm'),

@@ -228,8 +228,10 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       c.dispose();
     }
     // Kaydedilmeden çıkıldıysa geçici dosyaları temizle (kaydedilenler zaten kalıcı depoda).
-    for (final path in [...?_question?.tempFiles, ...?_solution?.tempFiles]) {
-      unawaited(_media.discardTemp(path));
+    // Kaydedilmeden çıkıldıysa geçici dosyalar silinir; sıkıştırma sürüyorsa bitince.
+    for (final photo in [_question, _solution].whereType<CapturedPhoto>()) {
+      unawaited(_media.discardTemp(photo.originalPath));
+      unawaited(photo.ready.then((_) => _media.discardTemp(photo.path), onError: (_) {}));
     }
     super.dispose();
   }
@@ -529,6 +531,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                 child: PhotoSlot(
                   label: 'Soru',
                   path: _displayPath(solution: false),
+                  ready: _question?.ready,
                   canCrop: _question != null,
                   busy: _pickingQuestion,
                   onPick: () => _pickPhoto(solution: false),
@@ -541,6 +544,7 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
                 child: PhotoSlot(
                   label: 'Doğru çözüm',
                   path: _displayPath(solution: true),
+                  ready: _solution?.ready,
                   canCrop: _solution != null,
                   busy: _pickingSolution,
                   onPick: () => _pickPhoto(solution: true),
@@ -863,7 +867,8 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
   void _replacePhoto({required bool solution, required CapturedPhoto? next}) {
     final old = solution ? _solution : _question;
     if (old != null) {
-      unawaited(_media.discardTemp(old.path));
+      // Sıkıştırma sürüyorsa bitince sil (yarım dosya kalmasın).
+      unawaited(old.ready.then((_) => _media.discardTemp(old.path), onError: (_) {}));
       // Yeniden kırpmada orijinal ortaktır; yalnızca gerçekten değiştiyse sil.
       if (old.originalPath != next?.originalPath) unawaited(_media.discardTemp(old.originalPath));
     }
@@ -963,6 +968,14 @@ class _AddQuestionScreenState extends ConsumerState<AddQuestionScreen> {
       _snack('Önce kitabı seç.');
       return;
     }
+    // Fotoğraflar arka planda sıkıştırılıyor olabilir: kaydetmeden önce bitsin.
+    try {
+      await Future.wait([if (_question != null) _question!.ready, if (_solution != null) _solution!.ready]);
+    } on Exception {
+      _snack('Fotoğraf hazırlanamadı; yeniden çekmeyi dene.');
+      return;
+    }
+    if (!mounted) return;
     final draft = _buildDraft();
     final issues = draft.validate();
     if (issues.isNotEmpty) {

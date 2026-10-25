@@ -27,8 +27,9 @@ Future<PhotoSource?> askPhotoSource(BuildContext context) => showModalBottomShee
       ),
     );
 
-/// Çek/seç → uygulama içi kırpma → WebP. Herhangi bir adımda vazgeçilirse
-/// null döner ve geçici dosya bırakmaz.
+/// Çek/seç → uygulama içi kırpma → WebP. Kırpma bitince hemen döner;
+/// sıkıştırma arka planda sürer ([CapturedPhoto.ready]). Vazgeçilirse null
+/// döner ve geçici dosya bırakmaz.
 Future<CapturedPhoto?> capturePhoto(
   BuildContext context,
   PhotoCaptureService service,
@@ -41,18 +42,12 @@ Future<CapturedPhoto?> capturePhoto(
     await PhotoCaptureService.deleteQuietly(original);
     return null;
   }
-  final png = await CropScreen.open(context, sourcePath: original, title: title);
-  if (png == null) {
+  final crop = await CropScreen.open(context, sourcePath: original, title: title, maxOutputSide: service.outputSide);
+  if (crop == null) {
     await PhotoCaptureService.deleteQuietly(original);
     return null;
   }
-  try {
-    final path = await service.compressToWebp(png);
-    return CapturedPhoto(originalPath: original, path: path);
-  } catch (_) {
-    await PhotoCaptureService.deleteQuietly(original);
-    rethrow;
-  }
+  return _queue(service, original, crop);
 }
 
 /// Her zaman orijinalden yeniden kırpar; vazgeçilirse null (mevcut fotoğraf geçerli kalır).
@@ -62,8 +57,18 @@ Future<CapturedPhoto?> recropPhoto(
   CapturedPhoto photo, {
   required String title,
 }) async {
-  final png = await CropScreen.open(context, sourcePath: photo.originalPath, title: title);
-  if (png == null) return null;
-  final path = await service.compressToWebp(png);
-  return CapturedPhoto(originalPath: photo.originalPath, path: path);
+  final crop = await CropScreen.open(
+    context,
+    sourcePath: photo.originalPath,
+    title: title,
+    maxOutputSide: service.outputSide,
+  );
+  if (crop == null) return null;
+  return _queue(service, photo.originalPath, crop);
+}
+
+/// Sıkıştırmayı arka plana alır; kullanıcı beklemeden forma döner.
+Future<CapturedPhoto> _queue(PhotoCaptureService service, String original, CropOutput crop) async {
+  final target = await service.reserveTarget();
+  return CapturedPhoto(originalPath: original, path: target, ready: service.encodeCrop(crop, target));
 }

@@ -17,6 +17,7 @@ class PhotoSlot extends StatelessWidget {
     this.hasError = false,
     this.busy = false,
     this.canCrop = true,
+    this.ready,
   });
 
   final String label;
@@ -28,6 +29,9 @@ class PhotoSlot extends StatelessWidget {
   final bool hasError;
   final bool busy;
   final bool canCrop;
+
+  /// Arka planda sıkıştırılıyorsa: bitene kadar "hazırlanıyor" gösterilir.
+  final Future<void>? ready;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +72,29 @@ class PhotoSlot extends StatelessWidget {
                       children: [
                         // cacheWidth: 1440 px'lik görsel yerine ~600 px çözülür; binlerce
                         // kartlı listelerde de bellek ve kaydırma akıcılığı korunur.
-                        Image.file(File(path!), fit: BoxFit.cover, cacheWidth: 600, gaplessPlayback: true),
+                        FutureBuilder<void>(
+                          // Aynı fotoğrafta yeniden kurulduğunda bekleme baştan başlamasın.
+                          key: ValueKey(path),
+                          future: ready ?? Future<void>.value(),
+                          builder: (context, snap) {
+                            if (snap.connectionState != ConnectionState.done) {
+                              return const Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2)),
+                                    SizedBox(height: 8),
+                                    Text('Hazırlanıyor'),
+                                  ],
+                                ),
+                              );
+                            }
+                            if (snap.hasError) {
+                              return Center(child: Icon(Icons.broken_image_outlined, color: scheme.error, size: 32));
+                            }
+                            return Image.file(File(path!), fit: BoxFit.cover, cacheWidth: 600, gaplessPlayback: true);
+                          },
+                        ),
                         Positioned(
                           left: 8,
                           bottom: 8,

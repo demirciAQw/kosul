@@ -56,6 +56,12 @@ class _KocumAppState extends ConsumerState<KocumApp> {
     ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
       if (previous?.hasValue != true && next.hasValue) refreshReminders();
     }, fireImmediately: true);
+
+    // Hızlı fotoğraf modu: fotoğraf servisi ayarı izler.
+    ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
+      final settings = next.value;
+      if (settings != null) ref.read(photoCaptureProvider).fast = settings.fastPhotos;
+    }, fireImmediately: true);
     ref.listenManual<AsyncValue<int>>(dueCountProvider, (previous, next) {
       if (next.hasValue && previous?.value != next.value) refreshReminders();
     });

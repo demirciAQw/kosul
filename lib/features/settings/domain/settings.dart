@@ -10,6 +10,7 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.fixedSchedule = '',
     this.booksDeadline,
+    this.fastPhotos = false,
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -29,6 +30,9 @@ class AppSettings {
   /// Hedef: sistemdeki tüm kitapları bu tarihe kadar bitirmek.
   final DateTime? booksDeadline;
 
+  /// Hızlı fotoğraf modu: daha küçük çözünürlük; kırpma ve kayıt daha hızlı.
+  final bool fastPhotos;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
@@ -37,6 +41,7 @@ class AppSettings {
     ThemeMode? themeMode,
     String? fixedSchedule,
     DateTime? Function()? booksDeadline,
+    bool? fastPhotos,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -46,6 +51,7 @@ class AppSettings {
         themeMode: themeMode ?? this.themeMode,
         fixedSchedule: fixedSchedule ?? this.fixedSchedule,
         booksDeadline: booksDeadline != null ? booksDeadline() : this.booksDeadline,
+        fastPhotos: fastPhotos ?? this.fastPhotos,
       );
 
   Map<String, dynamic> toJson() => {
@@ -56,6 +62,7 @@ class AppSettings {
         'themeMode': themeMode.name,
         'fixedSchedule': fixedSchedule,
         if (booksDeadline != null) 'booksDeadline': booksDeadline!.toIso8601String(),
+        'fastPhotos': fastPhotos,
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -69,6 +76,7 @@ class AppSettings {
       themeMode: ThemeMode.values.where((m) => m.name == j['themeMode']).firstOrNull ?? d.themeMode,
       fixedSchedule: j['fixedSchedule'] is String ? j['fixedSchedule'] as String : d.fixedSchedule,
       booksDeadline: j['booksDeadline'] is String ? DateTime.tryParse(j['booksDeadline'] as String) : null,
+      fastPhotos: j['fastPhotos'] == true,
     );
   }
 
