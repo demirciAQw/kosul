@@ -103,6 +103,11 @@ class QuickMarkQuestions {
     return Future.value(const <QuestionCard>[]);
   }
 
+  /// Bu bağlamda [no] numaralı soru kartı (varsa). Optiğin görüntüleme
+  /// modunda numaraya dokununca kartı açmak için.
+  Future<QuestionCard?> cardAt(QuickMarkContext ctx, int no) async =>
+      (await _linked(ctx)).where((c) => c.questionNo == no).firstOrNull;
+
   /// Formu önceki işaretlerle açmak için.
   Future<Map<int, QuestionStatus>> existingMarks(QuickMarkContext ctx) async => {
         for (final c in await _linked(ctx))

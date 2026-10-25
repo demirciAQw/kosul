@@ -239,6 +239,8 @@ class _SectionCard extends ConsumerWidget {
     final result = await openQuickMark(
       context,
       ref,
+      // Önce görüntüleme: numaraya dokununca soru ekranı; işaretleme için Düzenle.
+      viewFirst: true,
       parts: [
         QuickMarkPart(
           key: section.id,

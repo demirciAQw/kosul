@@ -153,10 +153,14 @@ abstract final class AppTheme {
         backgroundColor: dark ? scheme.surfaceContainerLow : Colors.white,
         selectedColor: scheme.primaryContainer,
         checkmarkColor: scheme.onPrimaryContainer,
-        labelStyle: WidgetStateTextStyle.resolveWith(
-          (s) => (text.labelLarge ?? const TextStyle()).copyWith(
-            color: s.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurfaceVariant,
-            fontWeight: s.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
+        // Flutter, çip yazısında stilin yalnızca RENGİNİ duruma göre çözer; bu yüzden
+        // durum stili değil, durum rengi verilir (yoksa yazı rengi boş kalıp kaybolur).
+        labelStyle: (text.labelLarge ?? const TextStyle()).copyWith(
+          fontWeight: FontWeight.w600,
+          color: WidgetStateColor.resolveWith(
+            (s) => s.contains(WidgetState.disabled)
+                ? scheme.onSurface.withValues(alpha: 0.38)
+                : (s.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurfaceVariant),
           ),
         ),
       ),

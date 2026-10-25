@@ -3,8 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../domain/question_card.dart';
 import '../domain/quick_mark.dart';
 import '../question_bank_providers.dart';
+import 'question_prefill.dart';
+import 'screens/add_question_screen.dart';
 import 'screens/optic_form_screen.dart';
 
 /// Optik formun bir bölümü ve o bölümün işaretlerinin bağlanacağı yer.
@@ -41,6 +44,8 @@ Future<OpticFormResult?> openQuickMark(
   String? subtitle,
   bool totalEditable = true,
   bool showNet = false,
+  /// Önce görüntüleme modu: numaraya dokununca soru ekranı açılır.
+  bool viewFirst = false,
 }) async {
   final messenger = ScaffoldMessenger.of(context);
   final quick = ref.read(quickMarkProvider);
@@ -60,11 +65,47 @@ Future<OpticFormResult?> openQuickMark(
   }
   if (!context.mounted) return null;
 
+  final navigator = Navigator.of(context, rootNavigator: true);
+
+  /// Görüntüleme modunda numaraya dokunulunca: kart varsa düzenleme, yoksa
+  /// kaynak, ders, soru no ve durumla dolu ekleme ekranı. Dönüşte güncel durum.
+  Future<QuestionStatus?> openQuestion(OpticSection section, int number, QuestionStatus? mark) async {
+    final part = parts.firstWhere((p) => p.key == section.key);
+    final ctx = part.markContext;
+    final existing = await quick.cardAt(ctx, number);
+    await navigator.push<void>(MaterialPageRoute(
+      builder: (_) => existing != null
+          ? AddQuestionScreen(editCardId: existing.id)
+          : AddQuestionScreen(
+              prefill: QuestionPrefill(
+                origin: ctx.origin,
+                status: mark ?? QuestionStatus.wrong,
+                sourceName: ctx.sourceName,
+                bookId: ctx.bookId,
+                contentNodeId: ctx.contentNodeId,
+                sessionId: ctx.sessionId,
+                sessionItemId: ctx.sessionItemId,
+                mockExamId: ctx.mockExamId,
+                mebNodeId: ctx.mebNodeId,
+                subject: ctx.subject,
+                testTotalQuestions: part.total,
+                avgSecondsPerQuestion: ctx.avgSecondsPerQuestion,
+                testLabel: ctx.testLabel,
+                questionNo: number,
+              ),
+            ),
+    ));
+    final after = await quick.cardAt(ctx, number);
+    if (after == null) return existing == null ? mark : null;
+    return after.status == QuestionStatus.correct ? null : after.status;
+  }
+
   final result = await OpticFormScreen.open(
     context,
     title: title,
     subtitle: subtitle,
     sections: sections,
+    onOpenQuestion: viewFirst ? openQuestion : null,
     totalEditable: totalEditable && parts.length == 1,
     showNet: showNet,
   );

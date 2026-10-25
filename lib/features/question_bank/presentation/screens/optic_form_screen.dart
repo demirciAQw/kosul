@@ -114,6 +114,7 @@ class OpticFormScreen extends StatefulWidget {
     this.subtitle,
     this.totalEditable = true,
     this.showNet = false,
+    this.onOpenQuestion,
   });
 
   final String title;
@@ -123,6 +124,11 @@ class OpticFormScreen extends StatefulWidget {
   /// Yalnızca tek bölümlü formda soru sayısı değiştirilebilir.
   final bool totalEditable;
   final bool showNet;
+
+  /// Verilirse form önce GÖRÜNTÜLEME modunda açılır: numaraya dokunmak o
+  /// sorunun ekranını açar (dönüşte sorunun güncel durumu döner; doğruysa
+  /// null). İşaretlemek için sağ üstteki "Düzenle".
+  final Future<QuestionStatus?> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion;
 
   static const maxTotal = 200;
 
@@ -134,6 +140,7 @@ class OpticFormScreen extends StatefulWidget {
     String? subtitle,
     bool totalEditable = true,
     bool showNet = false,
+    Future<QuestionStatus?> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion,
   }) =>
       Navigator.of(context, rootNavigator: true).push<OpticFormResult>(MaterialPageRoute(
         fullscreenDialog: true,
@@ -143,6 +150,7 @@ class OpticFormScreen extends StatefulWidget {
           sections: sections,
           totalEditable: totalEditable,
           showNet: showNet,
+          onOpenQuestion: onOpenQuestion,
         ),
       ));
 
@@ -156,6 +164,31 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
   /// Dokununca uygulanacak işaret. Uzun basış diğerini koyar.
   QuestionStatus _mode = QuestionStatus.wrong;
   bool _dirty = false;
+
+  /// Görüntüleme modu: numaraya dokunmak sorunun ekranını açar; işaretleme
+  /// için "Düzenle"ye basılır.
+  late bool _viewing = widget.onOpenQuestion != null;
+  bool _opening = false;
+
+  Future<void> _open(_SectionState section, int number) async {
+    final open = widget.onOpenQuestion;
+    if (open == null || _opening) return;
+    _opening = true;
+    try {
+      final original = widget.sections.firstWhere((x) => x.key == section.key);
+      final status = await open(original, number, section.marks[number]);
+      if (!mounted) return;
+      setState(() {
+        if (status == null || status == QuestionStatus.correct) {
+          section.marks.remove(number);
+        } else {
+          section.marks[number] = status;
+        }
+      });
+    } finally {
+      _opening = false;
+    }
+  }
 
   bool get _multi => _sections.length > 1;
 
@@ -221,6 +254,13 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
         appBar: AppBar(
           title: Text(widget.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
+            if (_viewing)
+              TextButton.icon(
+                onPressed: () => setState(() => _viewing = false),
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                label: const Text('Düzenle'),
+              )
+            else
             TextButton(
               onPressed: _sections.every((s) => s.marks.isEmpty)
                   ? null
@@ -287,7 +327,9 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
                 width: double.infinity,
-                child: SegmentedButton<QuestionStatus>(
+                child: _viewing
+                    ? const SizedBox.shrink()
+                    : SegmentedButton<QuestionStatus>(
                   showSelectedIcon: false,
                   segments: const [
                     ButtonSegment(
@@ -309,7 +351,10 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
               child: Text(
-                _multi
+                _viewing
+                    ? 'Bir soruya dokun: ekleme ekranı kaynak, soru no ve durumuyla açılır; karneden geldiyse '
+                        'doğru cevap ve senin cevabın işaretlidir. İşaretlemek için sağ üstte Düzenle.'
+                    : _multi
                     ? 'Her test kendi numarasıyla başlar. Çözmediğin testi kapat; sayılara katılmaz.'
                     : 'Yanlış ya da boş bıraktığın numaralara dokun; işaretsizler doğru sayılır. '
                         'Uzun basınca öteki işaret konur.',
@@ -345,8 +390,8 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
                             return _Bubble(
                               number: number,
                               status: section.marks[number],
-                              onTap: () => _tap(section, number),
-                              onLongPress: () => _tap(section, number, alternate: true),
+                              onTap: () => _viewing ? _open(section, number) : _tap(section, number),
+                              onLongPress: _viewing ? null : () => _tap(section, number, alternate: true),
                             );
                           },
                         ),
@@ -370,8 +415,9 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
                       if (widget.showNet) _Count(value: formatNet(result.net), label: 'net', color: scheme.primary),
                       const Spacer(),
                       FilledButton(
-                        onPressed: () => Navigator.of(context).pop(result),
-                        child: const Text('Kaydet'),
+                        // Görüntülemede değişiklikler soru ekranlarında zaten kaydedildi.
+                        onPressed: () => _viewing ? Navigator.of(context).pop() : Navigator.of(context).pop(result),
+                        child: Text(_viewing ? 'Bitti' : 'Kaydet'),
                       ),
                     ],
                   ),
@@ -467,12 +513,12 @@ class _TotalDialogState extends State<_TotalDialog> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.number, required this.status, required this.onTap, required this.onLongPress});
+  const _Bubble({required this.number, required this.status, required this.onTap, this.onLongPress});
 
   final int number;
   final QuestionStatus? status;
   final VoidCallback onTap;
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
