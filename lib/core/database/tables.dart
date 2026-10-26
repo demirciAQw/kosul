@@ -276,6 +276,7 @@ class OcrResults extends Table {
   TextColumn get engine => text().withDefault(const Constant('mlkit-latin'))();
   IntColumn get durationMs => integer().nullable()();
   TextColumn get error => text().nullable()();
+  TextColumn get structureJson => text().nullable()(); // v11: sayfa yapısı ve şekiller
   DateTimeColumn get processedAt => dateTime()();
 
   @override

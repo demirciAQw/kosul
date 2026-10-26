@@ -217,6 +217,13 @@ class _OcrSection extends ConsumerWidget {
     } else {
       final p = current.parsed;
       final options = p?.options ?? const <String, String>{};
+      // Şekil, grafik, tablo, fotoğraf (el yazısı işaretleri hariç), birer kez.
+      final figures = {
+        for (final f in current.figures)
+          if (f['kind'] != 'annotation')
+            switch (f['kind']) { 'photo' => 'Fotoğraf', 'table' => 'Tablo', 'chart' => 'Grafik', _ => 'Şekil' },
+      }.toList();
+      final questionCount = (current.structure?['questions'] as List?)?.length ?? 1;
       body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -254,6 +261,26 @@ class _OcrSection extends ConsumerWidget {
                 ],
               ),
             ),
+          if (figures.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final f in figures)
+                  Chip(
+                    visualDensity: VisualDensity.compact,
+                    avatar: Icon(_figureIcon(f), size: 16),
+                    label: Text(f),
+                  ),
+              ],
+            ),
+          ],
+          if (questionCount > 1)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text('Fotoğrafta $questionCount soru bulundu; asıl soru gösteriliyor.', style: muted),
+            ),
           const SizedBox(height: 6),
           Text(
             'Telefonda otomatik okundu${current.durationMs == null ? '' : ' (${current.durationMs} ms)'}. '
@@ -286,3 +313,10 @@ class _OcrSection extends ConsumerWidget {
     );
   }
 }
+
+IconData _figureIcon(String label) => switch (label) {
+      'Fotoğraf' => Icons.photo_outlined,
+      'Tablo' => Icons.table_chart_outlined,
+      'Grafik' => Icons.show_chart_rounded,
+      _ => Icons.category_outlined,
+    };

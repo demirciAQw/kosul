@@ -21,6 +21,20 @@ class MlKitOcrEngine implements OcrEngine {
             left: line.boundingBox.left,
             top: line.boundingBox.top,
             height: line.boundingBox.height,
+            width: line.boundingBox.width,
+            confidence: line.confidence ?? 1,
+            angle: line.angle ?? 0,
+            words: [
+              for (final e in line.elements)
+                OcrWord(
+                  e.text,
+                  left: e.boundingBox.left,
+                  top: e.boundingBox.top,
+                  width: e.boundingBox.width,
+                  height: e.boundingBox.height,
+                  confidence: e.confidence ?? 1,
+                ),
+            ],
           ),
     ];
   }

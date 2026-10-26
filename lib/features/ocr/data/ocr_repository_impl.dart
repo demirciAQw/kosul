@@ -26,7 +26,9 @@ class DriftOcrRepository implements OcrRepository {
             OcrLine('${l['t']}',
                 left: (l['x'] as num?)?.toDouble() ?? 0,
                 top: (l['y'] as num?)?.toDouble() ?? 0,
-                height: (l['h'] as num?)?.toDouble() ?? 0),
+                height: (l['h'] as num?)?.toDouble() ?? 0,
+                width: (l['w'] as num?)?.toDouble() ?? 0,
+                confidence: (l['c'] as num?)?.toDouble() ?? 1),
         ];
       } catch (_) {}
     }
@@ -43,7 +45,19 @@ class DriftOcrRepository implements OcrRepository {
       durationMs: r.durationMs,
       error: r.error,
       processedAt: r.processedAt,
+      engine: r.engine,
+      structure: _structure(r.structureJson),
     );
+  }
+
+  static Map<String, Object?>? _structure(String? json) {
+    if (json == null) return null;
+    try {
+      final v = jsonDecode(json);
+      return v is Map ? v.cast<String, Object?>() : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -64,6 +78,8 @@ class DriftOcrRepository implements OcrRepository {
         linesJson: Value(o.lines.isEmpty ? null : jsonEncode([for (final l in o.lines) l.toJson()])),
         durationMs: Value(o.durationMs),
         error: Value(o.error),
+        engine: Value(o.engine),
+        structureJson: Value(o.structure == null ? null : jsonEncode(o.structure)),
         processedAt: o.processedAt,
       ));
 

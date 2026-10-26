@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/core_providers.dart';
@@ -8,8 +9,10 @@ import '../question_bank/data/search_store.dart';
 import '../question_bank/domain/question_card.dart';
 import 'data/mlkit_ocr_engine.dart';
 import 'data/ocr_queue.dart';
+import 'data/page_image_tools.dart';
 import 'data/ocr_repository_impl.dart';
 import 'domain/ocr.dart';
+import 'domain/reader/figure_detector.dart';
 
 final ocrRepositoryProvider = Provider<OcrRepository>((ref) => DriftOcrRepository(ref.watch(appDatabaseProvider)));
 
@@ -29,6 +32,9 @@ final ocrQueueProvider = Provider<OcrQueue>((ref) {
     resolve: (rel) => media.resolve(rel).path,
     // Veri seti: her sonuç telefonda kocum_veri/ocr_kayitlari.jsonl dosyasına.
     onRecord: (r) => unawaited(ref.read(ocrLogProvider).append(r.toDatasetJson())),
+    // Yan/ters sayfayı döndürme ve şekil bulma (ayrı iş parçacığında).
+    images: FlutterPageImageTools(),
+    figures: (job) => compute(detectFiguresTask, job),
   );
 });
 
@@ -36,7 +42,14 @@ final ocrQueueProvider = Provider<OcrQueue>((ref) {
 List<OcrJob> ocrJobsFor(List<QuestionCard> cards, List<StudyNote> notes) => [
       for (final c in cards)
         if (c.questionImage != null)
-          OcrJob(id: OcrJob.questionId(c.id), ownerType: 'question', ownerId: c.id, imagePath: c.questionImage!),
+          OcrJob(
+            id: OcrJob.questionId(c.id),
+            ownerType: 'question',
+            ownerId: c.id,
+            imagePath: c.questionImage!,
+            // Fotoğrafta birden çok soru varsa kartın numarası asıl olanı seçer.
+            preferredNumber: c.questionNo,
+          ),
       for (final n in notes)
         for (final (i, p) in n.photos.indexed)
           OcrJob(id: OcrJob.noteId(n.id, i), ownerType: 'note', ownerId: n.id, imagePath: p),

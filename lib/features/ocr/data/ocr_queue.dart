@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import '../domain/ocr.dart';
 import '../domain/question_text.dart';
+import '../domain/reader/figure_detector.dart';
+import '../domain/reader/page_reader.dart';
+import 'page_image_tools.dart';
 
 /// Arka plan okuma kuyruğu: fotoğraflar tek tek, aralarında kısa bir mola
 /// verilerek okunur; kullanıcı arayüzü yavaşlamaz. Yeni soru eklenince ya da
@@ -15,7 +19,11 @@ class OcrQueue {
     DateTime Function()? clock,
     this.gap = const Duration(milliseconds: 700),
     this.onRecord,
-  })  : _engine = engine,
+    PageImageTools? images,
+    Future<List<FigureRegion>> Function(FigureJob job)? figures,
+  })  : _images = images,
+        _figures = figures,
+        _engine = engine,
         _repository = repository,
         _resolve = resolve,
         _clock = clock ?? DateTime.now;
@@ -25,6 +33,15 @@ class OcrQueue {
   final String Function(String) _resolve;
   final DateTime Function() _clock;
   final Duration gap;
+
+  /// Okuyucu sürümü: değişince eski kayıtlar arka planda yeniden okunur.
+  static const engineVersion = 'kocum-okuyucu-2';
+
+  /// Döndürme ve görüntü örnekleme (telefonda); testlerde verilmez.
+  final PageImageTools? _images;
+
+  /// Şekil bulucu (telefonda ayrı iş parçacığında).
+  final Future<List<FigureRegion>> Function(FigureJob job)? _figures;
 
   /// Her okuma sonucu (başarılı ya da değil) kaydedildikten sonra: veri seti dosyası için.
   final void Function(OcrRecord record)? onRecord;
@@ -48,7 +65,7 @@ class OcrQueue {
   Future<void> sync(List<OcrJob> wanted, Map<String, OcrRecord> existing) async {
     final orphans = orphanIds(wanted: wanted, existing: existing);
     if (orphans.isNotEmpty) await _repository.deleteIds(orphans);
-    for (final job in pendingJobs(wanted: wanted, existing: existing)) {
+    for (final job in pendingJobs(wanted: wanted, existing: existing, engine: engineVersion)) {
       if (_queued.add(job.id)) _queue.add(job);
     }
     unawaited(_pump());
@@ -95,28 +112,77 @@ class OcrQueue {
 
   Future<void> _process(OcrJob job) async {
     final watch = Stopwatch()..start();
+    String? temp;
     try {
-      final lines = await _engine.recognize(_resolve(job.imagePath));
+      final path = _resolve(job.imagePath);
+      var lines = await _engine.recognize(path);
+      final rotation = dominantRotation(lines);
+      var source = path;
+      final tools = _images;
+      // Yan ya da ters sayfa: döndürülüp yeniden okunur. Döndürme yönü cihaza göre
+      // değişebileceği için iki yön denenir; düz okunan kabul edilir.
+      if (rotation != 0 && tools != null) {
+        for (final degrees in {(360 - rotation) % 360, rotation}) {
+          final rotated = await tools.rotate(path, degrees);
+          if (rotated == null) continue;
+          final again = await _engine.recognize(rotated);
+          if (again.isNotEmpty && dominantRotation(again) == 0) {
+            lines = again;
+            source = rotated;
+            temp = rotated;
+            break;
+          }
+          await _deleteQuietly(rotated);
+        }
+      }
+      final image = tools == null ? null : await tools.sample(source);
+      final words = withWords(lines);
+      final width = image?.fullWidth.toDouble() ??
+          words.fold<double>(1, (m, l) => l.left + l.width > m ? l.left + l.width : m);
+      final height = image?.fullHeight.toDouble() ??
+          words.fold<double>(1, (m, l) => l.top + l.height > m ? l.top + l.height : m);
+      final reading = readPage(words, width, height, preferredNumber: job.preferredNumber);
+
+      var figures = const <FigureRegion>[];
+      final detect = _figures;
+      if (image != null && detect != null) {
+        final sx = image.width / width, sy = image.height / height;
+        figures = await detect(FigureJob(image.rgba, image.width, image.height, [
+          for (final l in words) TextBox(l.text, l.left * sx, l.top * sy, l.width * sx, l.height * sy),
+        ]));
+      }
+
       final ordered = readingOrder(lines);
-      final full = ordered.map((l) => l.text).join('\n');
+      final main = reading.main;
       final record = OcrRecord(
         id: job.id,
         ownerType: job.ownerType,
         ownerId: job.ownerId,
         imagePath: job.imagePath,
         status: 'done',
-        fullText: full,
-        // Soru fotoğraflarında kök ve şıklar ayrılır; not sayfaları düz metin.
-        parsed: job.ownerType == 'question' ? parseQuestion(lines) : null,
+        fullText: ordered.map((l) => l.text).join('\n'),
+        // Soru fotoğraflarında asıl sorunun kökü (maddeler, öncüller ve soru
+        // cümlesiyle) ve şıkları; not ve çözüm sayfalarında yalnızca yapı.
+        parsed: job.ownerType == 'question' && main != null
+            ? ParsedQuestion(stem: main.fullStem, number: main.number, options: main.options)
+            : null,
         lines: ordered,
         durationMs: watch.elapsedMilliseconds,
         processedAt: _clock(),
+        engine: engineVersion,
+        structure: {
+          'rotation': rotation,
+          'width': width.round(),
+          'height': height.round(),
+          ...reading.toJson(),
+          'figures': [for (final f in figures) f.toJson()],
+        },
       );
       await _repository.save(record);
       onRecord?.call(record);
     } catch (e) {
       // Başarısız okuma da kaydedilir: aynı fotoğraf her açılışta boşuna
-      // denenmez (fotoğraf değişirse ya da "Yeniden oku" ile tekrar denenir).
+      // denenmez (fotoğraf ya da okuyucu sürümü değişirse, "Yeniden oku" ile tekrar).
       final record = OcrRecord(
         id: job.id,
         ownerType: job.ownerType,
@@ -126,9 +192,18 @@ class OcrQueue {
         error: '$e',
         durationMs: watch.elapsedMilliseconds,
         processedAt: _clock(),
+        engine: engineVersion,
       );
       await _repository.save(record);
       onRecord?.call(record);
+    } finally {
+      if (temp != null) await _deleteQuietly(temp);
     }
+  }
+
+  static Future<void> _deleteQuietly(String path) async {
+    try {
+      await File(path).delete();
+    } catch (_) {}
   }
 }

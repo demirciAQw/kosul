@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
   /// v7: ders notları (study_notes).
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -111,7 +111,10 @@ class AppDatabase extends _$AppDatabase {
           }
           // Fotoğraflardaki metin (ML Kit).
           if (from < 10) {
-            await m.createTable(ocrResults);
+            await m.createTable(ocrResults); // yeni sütunlarla birlikte oluşur
+          }
+          if (from == 10) {
+            await m.addColumn(ocrResults, ocrResults.structureJson);
           }
         },
         beforeOpen: (details) async {

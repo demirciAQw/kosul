@@ -14,6 +14,8 @@ class OcrRecord {
     this.lines = const [],
     this.durationMs,
     this.error,
+    this.engine = 'mlkit-latin',
+    this.structure,
   });
 
   final String id;
@@ -28,7 +30,19 @@ class OcrRecord {
   final String? error;
   final DateTime processedAt;
 
+  /// Hangi okuyucu sürümüyle okundu (sürüm değişince yeniden okunur).
+  final String engine;
+
+  /// Sayfa yapısı: yön, sorular (kök, öncüller, şıklar, kesik mi), şekiller.
+  final Map<String, Object?>? structure;
+
   bool get ok => status == 'done';
+
+  /// Bulunan şekil/grafik/fotoğraf bölgeleri (türleriyle).
+  List<Map<String, Object?>> get figures => [
+        for (final f in (structure?['figures'] as List?) ?? const [])
+          if (f is Map) f.cast<String, Object?>(),
+      ];
 
   /// Veri seti satırı: kimlikle soruya/nota bağlı; konumlarıyla satırlar.
   Map<String, Object?> toDatasetJson() => {
@@ -46,6 +60,8 @@ class OcrRecord {
         'text': fullText,
         'lines': [for (final l in lines) l.toJson()],
         if (error != null) 'error': error,
+        'engine': engine,
+        if (structure != null) 'structure': structure,
       };
 
   /// Arama ve rapor için tek metin: kök + şıklar (yoksa ham metin).
@@ -58,11 +74,20 @@ class OcrRecord {
 
 /// Okunacak bir fotoğraf.
 class OcrJob {
-  const OcrJob({required this.id, required this.ownerType, required this.ownerId, required this.imagePath});
+  const OcrJob({
+    required this.id,
+    required this.ownerType,
+    required this.ownerId,
+    required this.imagePath,
+    this.preferredNumber,
+  });
   final String id;
   final String ownerType;
   final String ownerId;
   final String imagePath; // medya köküne göre göreli
+
+  /// Kartın soru numarası: fotoğrafta birden çok soru varsa asıl olan bu.
+  final int? preferredNumber;
 
   static String questionId(String cardId) => 'question:$cardId';
   static String solutionId(String cardId) => 'solution:$cardId';
@@ -86,11 +111,15 @@ abstract interface class OcrRepository {
 List<OcrJob> pendingJobs({
   required List<OcrJob> wanted,
   required Map<String, OcrRecord> existing,
+  String? engine,
 }) {
   int rank(String type) => switch (type) { 'question' => 0, 'note' => 1, _ => 2 };
   final out = [
     for (final j in wanted)
-      if (existing[j.id] == null || existing[j.id]!.imagePath != j.imagePath) j,
+      if (existing[j.id] == null ||
+          existing[j.id]!.imagePath != j.imagePath ||
+          (engine != null && existing[j.id]!.engine != engine))
+        j,
   ];
   // Kararlı sıralama: tür önceliği; aynı türde verilen sıra (en yeni önce) korunur.
   final indexed = [for (final (i, j) in out.indexed) (i, j)]

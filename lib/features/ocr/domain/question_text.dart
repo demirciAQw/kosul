@@ -1,12 +1,55 @@
 /// Fotoğraftan okunan bir satır ve ekrandaki konumu (piksel).
+/// Okunan bir kelime ve sayfadaki kutusu (piksel).
+class OcrWord {
+  const OcrWord(this.text, {this.left = 0, this.top = 0, this.width = 0, this.height = 0, this.confidence = 1});
+  final String text;
+  final double left;
+  final double top;
+  final double width;
+  final double height;
+
+  /// 0–1 (ML Kit); el yazısı ve bozuk okumalar düşük çıkar.
+  final double confidence;
+
+  OcrWord moved(double left, double top) =>
+      OcrWord(text, left: left, top: top, width: width, height: height, confidence: confidence);
+}
+
 class OcrLine {
-  const OcrLine(this.text, {this.left = 0, this.top = 0, this.height = 0});
+  const OcrLine(
+    this.text, {
+    this.left = 0,
+    this.top = 0,
+    this.height = 0,
+    this.width = 0,
+    this.confidence = 1,
+    this.angle = 0,
+    this.words = const [],
+  });
   final String text;
   final double left;
   final double top;
   final double height;
+  final double width;
 
-  Map<String, Object> toJson() => {'t': text, 'x': left.round(), 'y': top.round(), 'h': height.round()};
+  /// 0–1 (ML Kit); el yazısı ve bozuk okumalar düşük çıkar.
+  final double confidence;
+
+  /// Satırın eğimi (derece, ML Kit); sayfa yönü ve eğim düzeltmesi için.
+  final double angle;
+  final List<OcrWord> words;
+
+  OcrLine moved(double left, double top, List<OcrWord> words) => OcrLine(text,
+      left: left, top: top, height: height, width: width, confidence: confidence, angle: angle, words: words);
+
+  Map<String, Object> toJson() => {
+        't': text,
+        'x': left.round(),
+        'y': top.round(),
+        'h': height.round(),
+        'w': width.round(),
+        'c': (confidence * 100).round() / 100,
+      };
 }
 
 /// Okunan metnin ayrıştırılmış hâli: soru numarası, kök ve şıklar.
