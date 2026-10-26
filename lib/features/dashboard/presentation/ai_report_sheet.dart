@@ -20,6 +20,7 @@ import '../../settings/settings_providers.dart';
 import '../dashboard_providers.dart';
 import '../domain/ai_report.dart';
 import '../../ocr/ocr_providers.dart';
+import '../../ocr/auto_tag_providers.dart';
 
 /// "Yapay zekâ raporu": istatistikleri ve yanlışları bir yapay zekâ sohbetine
 /// (Claude, ChatGPT…) yapıştırılacak metne çevirir. API anahtarı gerekmez.
@@ -51,7 +52,8 @@ class _AiReportSheetState extends ConsumerState<_AiReportSheet> {
         findings: ref.read(deepAnalysisProvider).value?.findings ?? const [],
         fixedSchedule: ref.read(settingsProvider).value?.fixedSchedule ?? '',
         results: ref.read(testResultsProvider).value ?? const {},
-        questionTexts: ocrQuestionTextsWithFigures(ref.read(ocrRecordsProvider).value ?? const {}),
+        questionTexts: ocrQuestionTextsWithFigures(ref.read(ocrRecordsProvider).value ?? const {},
+            tags: ref.read(autoTagsProvider)),
         stems: ref.read(stemReportProvider),
       );
 

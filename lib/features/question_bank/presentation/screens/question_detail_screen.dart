@@ -15,6 +15,7 @@ import '../../../settings/settings_providers.dart';
 import '../../../ocr/ocr_providers.dart';
 import '../../../ocr/domain/ocr.dart';
 import '../../../../app/widgets/tone_icon.dart';
+import '../../../ocr/auto_tag_providers.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.cardId});
@@ -224,6 +225,7 @@ class _OcrSection extends ConsumerWidget {
             switch (f['kind']) { 'photo' => 'Fotoğraf', 'table' => 'Tablo', 'chart' => 'Grafik', _ => 'Şekil' },
       }.toList();
       final questionCount = (current.structure?['questions'] as List?)?.length ?? 1;
+      final tags = ref.watch(autoTagsProvider)[card.id];
       body = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -282,6 +284,45 @@ class _OcrSection extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 6),
                 child: Text('${_kindLabel(f['kind'])}: ${f['description']}  (Gemini Nano, İngilizce)', style: muted),
               ),
+          if (tags != null && !tags.isEmpty) ...[
+            const SizedBox(height: 10),
+            Text('Otomatik etiketler', style: theme.textTheme.labelLarge),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                if (tags.topic != null)
+                  Chip(
+                    visualDensity: VisualDensity.compact,
+                    avatar: const Icon(Icons.topic_outlined, size: 16),
+                    label: Text(tags.topic!),
+                  ),
+                for (final t in tags.types) Chip(visualDensity: VisualDensity.compact, label: Text(t)),
+              ],
+            ),
+            if (tags.topic == null && tags.candidates.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text('Olası konu: ${tags.candidates.join(' / ')} (kesin değil)', style: muted),
+              ),
+            if (tags.topic != null && card.mebNodeId == null && (card.topicText ?? '').trim().isEmpty)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    await ref.read(questionCardRepositoryProvider).update(card.copyWith(
+                          topicText: () => tags.topic,
+                          mebNodeId: () => tags.curriculumId,
+                        ));
+                    messenger.showSnackBar(SnackBar(content: Text('Konu: ${tags.topic}')));
+                  },
+                  icon: const Icon(Icons.check_rounded, size: 18),
+                  label: const Text('Konu olarak uygula'),
+                ),
+              ),
+          ],
           if (questionCount > 1)
             Padding(
               padding: const EdgeInsets.only(top: 6),

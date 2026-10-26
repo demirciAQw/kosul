@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "note": "Otomatik konu etiketi için anahtar kelimeler. Kelimeler katlanmış yazılır (ı→i, ş→s, ğ→g, ü→u, ö→o, ç→c; küçük harf). 4 harf ve üstü kelimeler kelime başında eşleşir (türev → türevinin); daha kısalar yalnızca tam eşleşir. Boşluklu ifadeler iki kat sayılır.",
+  "subjects": {
+    "matematik": ["mat", "geo"],
+    "geometri": ["geo"],
+    "fizik": ["fiz"],
+    "kimya": ["kim"],
+    "biyoloji": ["bio"],
+    "turkce": ["tur"],
+    "edebiyat": ["edb", "tur"],
+    "tarih": ["tar"],
+    "cografya": ["cog"]
+  },
+  "families": {
+    "mat": {
+      "Türev": ["turev", "teget", "artan", "azalan", "ekstremum", "yerel maksimum", "yerel minimum", "degisim orani", "egim"],
+      "İntegral": ["integral", "ters turev", "belirli integral", "riemann"],
+      "Limit ve Süreklilik": ["limit", "sureklilik", "surekli", "sagdan limit", "soldan limit"],
+      "Fonksiyonlar": ["tanim kumesi", "goruntu kumesi", "bileske", "ters fonksiyon", "birebir", "orten"],
+      "Polinomlar": ["polinom", "katsayi", "kalan", "carpanlarina"],
+      "Denklemler ve Eşitsizlikler": ["denklem", "esitsizlik", "cozum kumesi", "ikinci dereceden", "diskriminant", "kokler"],
+      "Logaritma ve Üstel Fonksiyon": ["logaritma", "log", "ln", "ustel"],
+      "Diziler": ["dizi", "aritmetik dizi", "geometrik dizi", "genel terim", "ortak fark", "ortak carpan"],
+      "Trigonometri": ["sin", "cos", "tan", "cot", "trigonometri", "radyan", "sinus", "kosinus", "tanjant"],
+      "Permütasyon ve Kombinasyon": ["permutasyon", "kombinasyon", "kac farkli", "siralanabilir", "secilebilir", "faktoriyel"],
+      "Olasılık": ["olasilik", "rastgele", "zar", "madeni para", "torbada"],
+      "Sayı Problemleri": ["yas", "yasinda", "havuz", "musluk", "isci", "yuzde", "kar", "zarar", "faiz", "karisim", "tuz orani", "km hizla", "saatte"],
+      "Temel Kavramlar ve Sayılar": ["asal", "bolen", "ebob", "ekok", "basamak", "rasyonel", "irrasyonel", "tek sayi", "cift sayi", "bolunebilme", "mutlak deger", "uslu", "koklu"],
+      "Kümeler ve Mantık": ["kume", "alt kume", "kesisim", "birlesim", "onerme", "ancak ve ancak"]
+    },
+    "geo": {
+      "Üçgenler": ["ucgen", "ikizkenar", "eskenar", "dik ucgen", "kenarortay", "aciortay", "pisagor", "benzerlik", "benzer ucgen"],
+      "Dörtgenler ve Çokgenler": ["dortgen", "kare", "dikdortgen", "yamuk", "paralelkenar", "eskenar dortgen", "deltoid", "ucurtma", "cokgen", "besgen", "altigen"],
+      "Çember ve Daire": ["cember", "daire", "yay", "kiris", "yaricap", "cap", "merkez aci", "cevre aci"],
+      "Analitik Geometri": ["koordinat", "dogru denklemi", "orijin", "analitik", "dogrunun egimi"],
+      "Katı Cisimler": ["prizma", "silindir", "koni", "kure", "kup", "piramit", "hacim", "yuzey alani"],
+      "Dönüşümler": ["oteleme", "dondurme", "yansima", "simetri", "saat yonunde"]
+    },
+    "fiz": {
+      "Vektörler": ["vektor", "bileske", "bilesen"],
+      "Kuvvet ve Hareket": ["kuvvet", "ivme", "newton", "surtunme", "hareket", "konum", "yer degistirme", "serbest dusme", "egik atis"],
+      "İş, Güç ve Enerji": ["enerji", "kinetik", "potansiyel", "guc", "mekanik enerji"],
+      "İtme ve Momentum": ["itme", "momentum", "carpisma"],
+      "Elektrik": ["akim", "direnc", "gerilim", "devre", "ampermetre", "voltmetre", "ohm", "uretec", "sigac"],
+      "Manyetizma": ["manyetik", "bobin", "induksiyon", "miknatis", "manyetik alan"],
+      "Optik": ["ayna", "mercek", "isik", "kirilma", "yansima", "golge", "odak", "prizma"],
+      "Dalgalar": ["dalga", "frekans", "periyot", "genlik", "dalga boyu", "girisim", "ses"],
+      "Basınç ve Kaldırma Kuvveti": ["basinc", "kaldirma kuvveti", "yogunluk", "akiskan", "batmis", "yuzen"],
+      "Isı ve Sıcaklık": ["isi", "sicaklik", "genlesme", "hal degisimi", "erime", "kaynama", "oz isi"],
+      "Modern Fizik": ["foton", "fotoelektrik", "atom modeli", "radyoaktif", "yari omur", "relativite"]
+    },
+    "kim": {
+      "Atom ve Periyodik Sistem": ["atom", "proton", "notron", "elektron", "periyodik", "atom numarasi", "iyonlasma", "orbital", "izotop"],
+      "Kimyasal Türler Arası Etkileşimler": ["iyonik bag", "kovalent", "hidrojen bagi", "polar", "apolar", "van der waals", "bag"],
+      "Maddenin Halleri ve Gazlar": ["gaz", "ideal gaz", "kismi basinc", "difuzyon", "buhar basinci"],
+      "Mol Kavramı ve Hesaplamalar": ["mol", "avogadro", "molekul kutlesi", "mol sayisi", "kutle"],
+      "Kimyasal Tepkimeler": ["tepkime", "denklestir", "verim", "sinirlayici", "artan madde"],
+      "Kimyasal Tepkimelerde Enerji": ["entalpi", "ekzotermik", "endotermik", "olusum isisi", "aciga cikan enerji", "kj", "hess"],
+      "Tepkime Hızı ve Kimyasal Denge": ["tepkime hizi", "katalizor", "denge", "denge sabiti", "aktiflesme", "le chatelier"],
+      "Asitler, Bazlar ve Tuzlar": ["asit", "baz", "ph", "poh", "notrallesme", "tampon", "titrasyon", "tuz"],
+      "Çözeltiler": ["cozelti", "derisim", "molarite", "cozunurluk", "cozunen", "cozucu", "doymus"],
+      "Elektrokimya": ["pil", "elektrot", "anot", "katot", "elektroliz", "yukseltgenme", "indirgenme"],
+      "Organik Kimya": ["karbon", "hidrokarbon", "alkan", "alken", "alkin", "alkol", "fonksiyonel grup", "ester", "aldehit", "keton"]
+    },
+    "bio": {
+      "Hücre": ["hucre", "organel", "mitokondri", "ribozom", "hucre zari", "golgi", "lizozom", "cekirdek"],
+      "Kalıtım": ["kalitim", "gen", "alel", "baskin", "cekinik", "mendel", "genotip", "fenotip", "capraz"],
+      "Ekoloji": ["ekosistem", "besin zinciri", "populasyon", "ekoloji", "uretici", "tuketici", "ayristirici"],
+      "İnsan Fizyolojisi": ["sindirim", "dolasim", "solunum sistemi", "bosaltim", "sinir sistemi", "hormon", "endokrin", "bobrek", "kalp"],
+      "Fotosentez ve Solunum": ["fotosentez", "klorofil", "atp", "oksijenli solunum", "fermantasyon", "kemosentez"],
+      "Hücre Bölünmeleri": ["mitoz", "mayoz", "kromozom", "krossing over", "eseyli ureme", "eseysiz ureme"],
+      "Genetik Şifre ve Protein Sentezi": ["dna", "rna", "protein sentezi", "replikasyon", "nukleotit", "kodon"],
+      "Canlıların Sınıflandırılması": ["siniflandirma", "alem", "tur", "bakteri", "mantar", "virus"]
+    },
+    "tur": {
+      "Paragraf": ["paragraf", "bu parcada", "parcanin", "ana dusunce", "yardimci dusunce", "asil anlatilmak istenen", "parcaya gore"],
+      "Cümlede Anlam": ["cumlede", "cumlesinde", "anlam iliskisi", "neden sonuc", "amac sonuc", "kosul"],
+      "Sözcükte Anlam": ["sozcuk", "kelime", "mecaz", "deyim", "es anlamli", "zit anlamli", "terim anlam", "yan anlam"],
+      "Ses Bilgisi": ["ses olayi", "unlu", "unsuz", "ses dusmesi", "benzesme", "yumusama"],
+      "Yazım Kuralları": ["yazim", "yazim yanlisi", "buyuk harf", "kesme isareti"],
+      "Noktalama İşaretleri": ["noktalama", "virgul", "noktali virgul", "iki nokta", "unlem"],
+      "Sözcük Türleri": ["isim", "sifat", "zamir", "zarf", "edat", "baglac", "fiil", "fiilimsi"],
+      "Cümlenin Ögeleri": ["ozne", "yuklem", "nesne", "dolayli tumlec", "zarf tumleci"],
+      "Anlatım Bozukluğu": ["anlatim bozuklugu", "anlatim bozuklugu vardir"]
+    },
+    "edb": {
+      "Şiir Bilgisi": ["siir", "olcu", "uyak", "redif", "nazim", "dize", "kita", "hece olcusu", "aruz"],
+      "Edebi Sanatlar": ["tesbih", "istiare", "kisilestirme", "tezat", "mubalaga", "telmih", "tecahul"],
+      "Edebiyat Akımları ve Dönemleri": ["divan", "halk edebiyati", "tanzimat", "servetifunun", "fecriati", "milli edebiyat", "cumhuriyet donemi"],
+      "Anlatmaya Bağlı Türler": ["roman", "hikaye", "oyku", "masal", "destan", "tiyatro"]
+    },
+    "tar": {
+      "İlk Türk Devletleri": ["gokturk", "uygur", "hun", "orhun", "kutadgu"],
+      "Türk-İslam Devletleri": ["karahanli", "gazneli", "selcuklu", "abbasi", "emevi"],
+      "Osmanlı Devleti": ["osmanli", "padisah", "timar", "yeniceri", "divani humayun", "lale devri", "tanzimat fermani"],
+      "Kurtuluş Savaşı": ["kurtulus savasi", "kongre", "misakimilli", "tbmm", "mondros", "sevr", "lozan"],
+      "Atatürk İlke ve İnkılapları": ["inkilap", "laiklik", "cumhuriyetcilik", "halkcilik", "devletcilik", "harf inkilabi"],
+      "Çağdaş Türk ve Dünya Tarihi": ["soguk savas", "nato", "birlesmis milletler", "ikinci dunya savasi", "birinci dunya savasi"]
+    },
+    "cog": {
+      "İklim ve Atmosfer": ["iklim", "yagis", "basinc", "ruzgar", "sicaklik", "nem", "cephe"],
+      "Harita Bilgisi": ["harita", "olcek", "izohips", "enlem", "boylam", "koordinat"],
+      "Nüfus ve Yerleşme": ["nufus", "goc", "yerlesme", "kentlesme", "nufus piramidi"],
+      "Yer Şekilleri": ["dag", "ova", "plato", "akarsu", "delta", "karst", "buzul"],
+      "Ekonomik Faaliyetler": ["tarim", "sanayi", "maden", "turizm", "hayvancilik", "enerji kaynaklari"],
+      "Doğal Afetler": ["deprem", "sel", "heyelan", "cig", "erozyon"]
+    }
+  }
+}

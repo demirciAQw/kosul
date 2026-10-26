@@ -17,6 +17,7 @@ import '../curriculum/domain/yks.dart';
 import '../../core/text/turkish_text.dart';
 import '../ocr/ocr_providers.dart';
 import '../ocr/domain/ocr.dart';
+import '../ocr/auto_tag_providers.dart';
 
 final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
     (ref) => DriftQuestionCardRepository(ref.watch(appDatabaseProvider)));
@@ -99,6 +100,7 @@ final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref)
   final curriculum = {for (final n in ref.watch(curriculumProvider).value ?? const <CurriculumNode>[]) n.id: n};
   // Fotoğraftan okunan soru metni (kök ve şıklar) de aranır.
   final ocr = ref.watch(ocrRecordsProvider).value ?? const <String, OcrRecord>{};
+  final tags = ref.watch(autoTagsProvider);
   return base.whenData((cards) => smartSearch(cards, text, (c) {
         final read = ocr[OcrJob.questionId(c.id)];
         final node = c.mebNodeId == null ? null : curriculum[c.mebNodeId];
@@ -112,6 +114,8 @@ final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref)
           if (c.note != null) SearchField(c.note!, fieldWeights.note),
           SearchField(c.status.label, fieldWeights.status),
           if (read != null && read.ok && read.searchable.isNotEmpty) SearchField(read.searchable, fieldWeights.ocr),
+          // Otomatik konu ve soru türü ("grafik yorumlama", "paragraf" …).
+          if (tags[c.id] != null) SearchField(tags[c.id]!.summary, fieldWeights.reason),
         ];
       }));
 });
@@ -156,11 +160,13 @@ final questionGroupsProvider = Provider<AsyncValue<List<QuestionGroup>>>((ref) {
   final by = ref.watch(questionGroupByProvider);
   final curriculum = ref.watch(curriculumProvider).value ?? const <CurriculumNode>[];
   final books = ref.watch(libraryProvider).value ?? const <Book>[];
+  final tags = ref.watch(autoTagsProvider);
   return cards.whenData((list) => groupQuestions(
         list,
         by,
         curriculum: {for (final n in curriculum) n.id: n},
         bookTitles: {for (final b in books) b.id: b.title},
+        fallbackTopics: fallbackTopicsFor(list, tags),
       ));
 });
 

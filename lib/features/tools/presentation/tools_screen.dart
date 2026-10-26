@@ -34,6 +34,7 @@ import '../tools_providers.dart';
 import '../../../core/export/xlsx_writer.dart';
 import '../data/workbook_export.dart';
 import '../../ocr/ocr_providers.dart';
+import '../../ocr/auto_tag_providers.dart';
 
 String _two(int n) => n.toString().padLeft(2, '0');
 String _stamp(DateTime d) => '${d.year}-${_two(d.month)}-${_two(d.day)}_${_two(d.hour)}${_two(d.minute)}';
@@ -78,7 +79,8 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
         findings: ref.read(deepAnalysisProvider).value?.findings ?? const [],
         fixedSchedule: settings?.fixedSchedule ?? '',
         results: ref.read(testResultsProvider).value ?? const {},
-        questionTexts: ocrQuestionTextsWithFigures(ref.read(ocrRecordsProvider).value ?? const {}),
+        questionTexts: ocrQuestionTextsWithFigures(ref.read(ocrRecordsProvider).value ?? const {},
+            tags: ref.read(autoTagsProvider)),
         stems: ref.read(stemReportProvider),
         sessions: sessions,
         deadline: settings?.booksDeadline,

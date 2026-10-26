@@ -34,6 +34,9 @@ List<QuestionGroup> groupQuestions(
   GroupBy by, {
   required Map<String, CurriculumNode> curriculum,
   required Map<String, String> bookTitles,
+  /// MEB konusu olmayan kartlar için konu: elle yazılan ya da otomatik
+  /// ("Türev (otomatik)"). Yoksa "Konu belirtilmemiş".
+  Map<String, String> fallbackTopics = const {},
 }) {
   final top = <String, QuestionGroup>{};
   final sub = <String, QuestionGroup>{};
@@ -50,18 +53,21 @@ List<QuestionGroup> groupQuestions(
 
   for (final card in cards) {
     final node = card.mebNodeId == null ? null : curriculum[card.mebNodeId];
+    final fallback = node == null ? fallbackTopics[card.id] : null;
+    final topicKey = node?.id ?? (fallback == null ? '-' : 'txt:${normalizeTr(fallback)}');
+    final topicTitle = node?.title ?? fallback ?? noTopicTitle;
     switch (by) {
       case GroupBy.subject:
         final parent = topGroup(card.subject, card.subject);
-        subGroup(card.subject, parent, node?.id ?? '-', node?.title ?? noTopicTitle).cards.add(card);
+        subGroup(card.subject, parent, topicKey, topicTitle).cards.add(card);
       case GroupBy.book:
         final bookTitle = card.bookId == null ? null : bookTitles[card.bookId];
         final key = card.bookId ?? 'src:${normalizeTr(card.sourceName)}';
         final parent = topGroup(key, bookTitle ?? card.sourceName);
-        subGroup(key, parent, node?.id ?? '-', node?.title ?? noTopicTitle).cards.add(card);
+        subGroup(key, parent, topicKey, topicTitle).cards.add(card);
       case GroupBy.topic:
         if (node == null) {
-          topGroup('-', noTopicTitle).cards.add(card);
+          topGroup(topicKey, topicTitle).cards.add(card);
         } else {
           final root = _rootOf(node, curriculum);
           final parent = topGroup(root.id, root.title, subtitle: root.subjectLabel);

@@ -12,6 +12,7 @@ import 'data/genai_describer.dart';
 import 'data/ocr_queue.dart';
 import 'data/page_image_tools.dart';
 import 'data/ocr_repository_impl.dart';
+import 'domain/auto_tags.dart';
 import 'domain/ocr.dart';
 import 'domain/reader/figure_detector.dart';
 
@@ -71,10 +72,13 @@ Map<String, String> ocrQuestionTexts(Map<String, OcrRecord> records) => {
     };
 
 /// Kart → okunan soru metni ve (varsa) grafik/şekil açıklamaları: rapor için.
-Map<String, String> ocrQuestionTextsWithFigures(Map<String, OcrRecord> records) => {
+Map<String, String> ocrQuestionTextsWithFigures(Map<String, OcrRecord> records,
+        {Map<String, AutoTags> tags = const {}}) =>
+    {
       for (final r in records.values)
         if (r.ownerType == 'question' && r.ok && r.searchable.isNotEmpty)
           r.ownerId: [
+            if (tags[r.ownerId] != null) '[Otomatik etiket: ${tags[r.ownerId]!.summary}]',
             r.searchable,
             for (final f in r.figures)
               if (f['description'] is String) '[${f['kind']}: ${f['description']}]',

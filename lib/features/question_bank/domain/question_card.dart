@@ -162,7 +162,13 @@ class QuestionCard {
     return questionNo == null ? where : '$where, $questionNo. soru';
   }
 
-  QuestionCard copyWith({bool? isStarred, QuestionStatus? status}) => QuestionCard(
+  QuestionCard copyWith({
+    bool? isStarred,
+    QuestionStatus? status,
+    String? Function()? topicText,
+    String? Function()? mebNodeId,
+  }) =>
+      QuestionCard(
         id: id,
         status: status ?? this.status,
         origin: origin,
@@ -173,12 +179,12 @@ class QuestionCard {
         bookId: bookId,
         contentNodeId: contentNodeId,
         sessionId: sessionId,
-        mebNodeId: mebNodeId,
+        mebNodeId: mebNodeId != null ? mebNodeId() : this.mebNodeId,
         subject: subject,
         testTotalQuestions: testTotalQuestions,
         reason: reason,
         reasonNote: reasonNote,
-        topicText: topicText,
+        topicText: topicText != null ? topicText() : this.topicText,
         correctAnswer: correctAnswer,
         givenAnswer: givenAnswer,
         avgSecondsPerQuestion: avgSecondsPerQuestion,
