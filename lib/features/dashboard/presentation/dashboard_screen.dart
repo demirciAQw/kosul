@@ -9,6 +9,7 @@ import '../domain/dashboard.dart';
 import '../domain/patterns.dart';
 import 'ai_report_sheet.dart';
 import 'deep_analysis_section.dart';
+import 'stem_analysis_section.dart';
 
 /// "En çok hangi konuda/nedenden yanlış yapıyorum ve ne kadar süre kaybediyorum?"
 class DashboardScreen extends ConsumerWidget {
@@ -48,6 +49,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           const DeepAnalysisSection(),
+          const StemAnalysisSection(),
           const SizedBox(height: 28),
           Text('Derslere göre örüntüler', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),

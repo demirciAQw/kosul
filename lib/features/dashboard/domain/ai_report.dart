@@ -11,6 +11,7 @@ import '../../question_bank/domain/question_export.dart' show ExportMedia;
 import '../../question_bank/domain/recurrence.dart';
 import '../../study_session/domain/study_session.dart';
 import 'deep_analysis.dart';
+import 'stem_analysis.dart';
 
 /// Yapay zekâ raporunun kapsamı.
 class AiReportOptions {
@@ -91,6 +92,8 @@ AiReport buildAiReport({
   DateTime? deadline,
   /// Kart → fotoğraftan okunan soru metni (kök ve şıklar).
   Map<String, String> questionTexts = const {},
+  /// Soru kökü analizi (olumsuz, öncüllü, "en …" kökler; tekrar eden kalıplar).
+  StemReport? stems,
 }) {
   final o = options;
   final since = o.since ?? (o.days == null ? null : now.subtract(Duration(days: o.days!)));
@@ -286,6 +289,24 @@ AiReport buildAiReport({
     for (final p in own) {
       b.writeln('- ${p.book.title}: ${p.doneLeaves}/${p.totalLeaves}');
     }
+  }
+
+  // ── Soru kökleri ──
+  if (stems != null && stems.mistakes > 0) {
+    b
+      ..writeln()
+      ..writeln('## Soru kökleri (fotoğraftan okunan ${stems.mistakes} yanlış/boş soru)')
+      ..writeln()
+      ..writeln('- Sonuç: ${stems.verdict}')
+      ..writeln('- Dağılım: ${[for (final e in stems.counts.entries) if (e.value > 0) '${e.key.label} ${e.value}'].join(', ')}');
+    for (final t in stems.trends.skip(1)) {
+      b.writeln('- ${t.text}');
+    }
+    for (final t in stems.templates) {
+      b.writeln('- Tekrar eden kalıp "${_c(t.example)}": ${t.count} kez (${t.wrong} yanlış, ${t.blank} boş, '
+          '${t.careless} dikkatsizlik)');
+    }
+    b.writeln('- Not: Defterde çoğunlukla yanlışlar olduğundan oranlar yanlışların içindeki paylardır.');
   }
 
   // ── Derin analiz ──

@@ -79,6 +79,7 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
         fixedSchedule: settings?.fixedSchedule ?? '',
         results: ref.read(testResultsProvider).value ?? const {},
         questionTexts: ocrQuestionTexts(ref.read(ocrRecordsProvider).value ?? const {}),
+        stems: ref.read(stemReportProvider),
         sessions: sessions,
         deadline: settings?.booksDeadline,
       );

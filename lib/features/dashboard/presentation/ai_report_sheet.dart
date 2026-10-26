@@ -52,6 +52,7 @@ class _AiReportSheetState extends ConsumerState<_AiReportSheet> {
         fixedSchedule: ref.read(settingsProvider).value?.fixedSchedule ?? '',
         results: ref.read(testResultsProvider).value ?? const {},
         questionTexts: ocrQuestionTexts(ref.read(ocrRecordsProvider).value ?? const {}),
+        stems: ref.read(stemReportProvider),
       );
 
   Future<void> _copy() async {

@@ -15,6 +15,9 @@ import '../study_session/study_session_providers.dart';
 import '../study_session/domain/study_session.dart';
 import '../mock_exam/mock_exam_providers.dart';
 import '../library/library_providers.dart';
+import '../ocr/ocr_providers.dart';
+import '../ocr/domain/ocr.dart';
+import 'domain/stem_analysis.dart';
 
 final dashboardRepositoryProvider = Provider<DashboardRepository>(
     (ref) => DriftDashboardRepository(ref.watch(appDatabaseProvider)));
@@ -108,4 +111,43 @@ final deepAnalysisProvider = Provider<AsyncValue<DeepAnalysis>>((ref) {
     exams: exams.value ?? const [],
     books: books.value ?? const [],
   )));
+});
+
+/// Okuma kaydından asıl sorunun soru cümlesi (kökü) ve öncüllü olup olmadığı.
+/// Eski kayıtlarda kökün son "?"li satırı.
+({String prompt, bool hasStatements})? questionPromptOf(OcrRecord r) {
+  final questions = r.structure?['questions'];
+  final primary = r.structure?['primary'];
+  if (questions is List && primary is int && primary >= 0 && primary < questions.length) {
+    final q = questions[primary];
+    if (q is Map) {
+      final prompt = (q['prompt'] as String?)?.trim() ?? '';
+      final statements = q['statements'];
+      if (prompt.isNotEmpty) return (prompt: prompt, hasStatements: statements is List && statements.isNotEmpty);
+    }
+  }
+  final lines = (r.parsed?.stem ?? '').split('\n').where((l) => l.contains('?')).toList();
+  return lines.isEmpty ? null : (prompt: lines.last.trim(), hasStatements: false);
+}
+
+/// Soru kökü analizi: okunmuş soru cümleleri + kartın durumu ve hata nedeni.
+final stemReportProvider = Provider<StemReport?>((ref) {
+  final cards = ref.watch(allQuestionsProvider).value;
+  final records = ref.watch(ocrRecordsProvider).value;
+  if (cards == null || records == null) return null;
+  final samples = <StemSample>[];
+  for (final c in cards) {
+    final r = records[OcrJob.questionId(c.id)];
+    if (r == null || !r.ok || r.imagePath != c.questionImage) continue;
+    final p = questionPromptOf(r);
+    if (p == null) continue;
+    samples.add(StemSample(
+      prompt: p.prompt,
+      hasStatements: p.hasStatements,
+      status: c.status,
+      reason: c.reason,
+      subject: c.subject,
+    ));
+  }
+  return analyzeStems(samples);
 });
