@@ -8,6 +8,7 @@ import '../notes/domain/notes.dart';
 import '../question_bank/data/search_store.dart';
 import '../question_bank/domain/question_card.dart';
 import 'data/mlkit_ocr_engine.dart';
+import 'data/genai_describer.dart';
 import 'data/ocr_queue.dart';
 import 'data/page_image_tools.dart';
 import 'data/ocr_repository_impl.dart';
@@ -21,6 +22,11 @@ final ocrRecordsProvider = StreamProvider<Map<String, OcrRecord>>((ref) => ref.w
 
 /// Okuma sonuçları veri seti (JSONL).
 final ocrLogProvider = Provider<SearchLog>((ref) => SearchLog(name: 'ocr_kayitlari.jsonl'));
+
+final genAiDescriberProvider = Provider((ref) => GenAiDescriber());
+
+/// Resim açıklamasının bu cihazdaki durumu (yenilemek için invalidate).
+final genAiStatusProvider = FutureProvider<String>((ref) => ref.watch(genAiDescriberProvider).status());
 
 final ocrEngineProvider = Provider<OcrEngine>((ref) => MlKitOcrEngine());
 
@@ -62,4 +68,15 @@ List<OcrJob> ocrJobsFor(List<QuestionCard> cards, List<StudyNote> notes) => [
 Map<String, String> ocrQuestionTexts(Map<String, OcrRecord> records) => {
       for (final r in records.values)
         if (r.ownerType == 'question' && r.ok && r.searchable.isNotEmpty) r.ownerId: r.searchable,
+    };
+
+/// Kart → okunan soru metni ve (varsa) grafik/şekil açıklamaları: rapor için.
+Map<String, String> ocrQuestionTextsWithFigures(Map<String, OcrRecord> records) => {
+      for (final r in records.values)
+        if (r.ownerType == 'question' && r.ok && r.searchable.isNotEmpty)
+          r.ownerId: [
+            r.searchable,
+            for (final f in r.figures)
+              if (f['description'] is String) '[${f['kind']}: ${f['description']}]',
+          ].join(' '),
     };

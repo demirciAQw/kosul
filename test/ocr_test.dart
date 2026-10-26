@@ -1,14 +1,35 @@
+import 'dart:typed_data';
+
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kocum/core/database/app_database.dart';
 import 'package:kocum/features/ocr/data/ocr_queue.dart';
 import 'package:kocum/features/ocr/data/ocr_repository_impl.dart';
 import 'package:kocum/features/ocr/domain/ocr.dart';
+import 'package:kocum/features/ocr/data/page_image_tools.dart';
 import 'package:kocum/features/ocr/domain/question_text.dart';
+import 'package:kocum/features/ocr/domain/reader/figure_detector.dart';
 
 /// Satırları sırayla, alt alta yerleştirir (ML Kit çıktısı gibi).
 List<OcrLine> _stack(List<String> texts) =>
     [for (final (i, t) in texts.indexed) OcrLine(t, left: 10, top: 20.0 * i, height: 16)];
+
+class _FakeTools implements PageImageTools {
+  final crops = <List<double>>[];
+
+  @override
+  Future<SampledImage?> sample(String path, {int maxSide = 640}) async =>
+      SampledImage(Uint8List(4 * 4 * 4), 4, 4, 400, 400);
+
+  @override
+  Future<String?> rotate(String path, int degrees) async => null;
+
+  @override
+  Future<String?> crop(String path, List<double> box) async {
+    crops.add(box);
+    return '/yok/kirpma_${crops.length}.png';
+  }
+}
 
 class _FakeEngine implements OcrEngine {
   _FakeEngine(this.byPath);
@@ -123,5 +144,34 @@ void main() {
     await queue.retry(ok);
     await queue.drain();
     expect(engine.calls, hasLength(3));
+  });
+
+  test('resim açıklaması: grafik ve şekiller açıklanır, işaretler açıklanmaz; sürüm +genai', () async {
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    final repo = DriftOcrRepository(db);
+    final tools = _FakeTools();
+    final queue = OcrQueue(
+      engine: _FakeEngine({'/m/q/a.webp': _stack(['1. Grafiğe göre hangisi doğrudur?', 'A) bir', 'B) iki', 'C) üç'])}),
+      repository: repo,
+      resolve: (rel) => '/m/$rel',
+      gap: Duration.zero,
+      images: tools,
+      figures: (_) async => const [
+        FigureRegion(kind: 'chart', box: [0.1, 0.1, 0.9, 0.6], labels: 4),
+        FigureRegion(kind: 'annotation', box: [0.0, 0.7, 0.2, 0.8], labels: 0),
+      ],
+    )..describe = (path) async => 'A line graph rising over time';
+    const job = OcrJob(id: 'question:a', ownerType: 'question', ownerId: 'a', imagePath: 'q/a.webp');
+    await queue.sync([job], const {});
+    await queue.drain();
+
+    final rec = (await repo.watchAll().first)['question:a']!;
+    expect(rec.engine, 'kocum-okuyucu-2+genai');
+    expect(tools.crops, [
+      [0.1, 0.1, 0.9, 0.6],
+    ]); // yalnızca grafik kırpıldı
+    expect(rec.figures.first['description'], 'A line graph rising over time');
+    expect(rec.figures.last.containsKey('description'), isFalse);
   });
 }

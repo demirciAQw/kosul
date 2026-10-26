@@ -77,6 +77,24 @@ class _KocumAppState extends ConsumerState<KocumApp> {
       if (settings != null) ref.read(ocrQueueProvider).enabled = settings.ocrEnabled;
     }, fireImmediately: true);
 
+    // Resim açıklaması (Gemini Nano): ayar açık ve cihaz hazırsa kuyruğa bağlanır;
+    // sürüm değiştiği için eski sorular da bir kez yeniden işlenir.
+    Future<void> syncGenAi() async {
+      final settings = ref.read(settingsProvider).value;
+      if (settings == null) return;
+      final queue = ref.read(ocrQueueProvider);
+      final status = settings.genAiDescriptions ? await ref.read(genAiStatusProvider.future) : 'off';
+      final wanted = status == 'available' ? ref.read(genAiDescriberProvider).describe : null;
+      if ((wanted == null) != (queue.describe == null)) {
+        queue.describe = wanted;
+        syncOcr();
+      }
+    }
+
+    ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) => unawaited(syncGenAi()),
+        fireImmediately: true);
+    ref.listenManual<AsyncValue<String>>(genAiStatusProvider, (previous, next) => unawaited(syncGenAi()));
+
     // Hızlı fotoğraf modu: fotoğraf servisi ayarı izler.
     ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
       final settings = next.value;

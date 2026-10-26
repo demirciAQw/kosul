@@ -20,6 +20,9 @@ abstract interface class PageImageTools {
 
   /// [degrees] kadar döndürülmüş geçici JPEG; olmazsa null. Çağıran siler.
   Future<String?> rotate(String path, int degrees);
+
+  /// Normalize [box] (sol, üst, sağ, alt) bölgesinin geçici PNG'si; olmazsa null. Çağıran siler.
+  Future<String?> crop(String path, List<double> box);
 }
 
 /// Telefonda: çözme JPEG/WebP çözücüsünün kendi küçültmesiyle (hızlı, az bellek),
@@ -46,6 +49,36 @@ class FlutterPageImageTools implements PageImageTools {
       descriptor.dispose();
       buffer.dispose();
       return out;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> crop(String path, List<double> box) async {
+    try {
+      final codec = await ui.instantiateImageCodec(await File(path).readAsBytes());
+      final frame = await codec.getNextFrame();
+      final img = frame.image;
+      final src = ui.Rect.fromLTRB(box[0] * img.width, box[1] * img.height, box[2] * img.width, box[3] * img.height)
+          .inflate(8)
+          .intersect(ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()));
+      final scale = math.min(1.0, 1024 / math.max(src.width, src.height));
+      final w = math.max(1, (src.width * scale).round()), h = math.max(1, (src.height * scale).round());
+      final recorder = ui.PictureRecorder();
+      ui.Canvas(recorder).drawImageRect(img, src, ui.Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble()), ui.Paint());
+      final picture = recorder.endRecording();
+      final out = await picture.toImage(w, h);
+      final png = await out.toByteData(format: ui.ImageByteFormat.png);
+      picture.dispose();
+      out.dispose();
+      img.dispose();
+      codec.dispose();
+      if (png == null) return null;
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/ocr_sekil_${DateTime.now().microsecondsSinceEpoch}.png');
+      await file.writeAsBytes(png.buffer.asUint8List(), flush: true);
+      return file.path;
     } catch (_) {
       return null;
     }

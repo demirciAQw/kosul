@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/palette.dart';
 import '../../../app/widgets/tone_icon.dart';
+import '../../ocr/data/genai_describer.dart';
 import '../../ocr/ocr_providers.dart';
 import '../domain/settings.dart';
 import '../settings_providers.dart';
@@ -150,6 +151,7 @@ class _SettingsBody extends ConsumerWidget {
         ),
         _Section('Fotoğraftaki metin'),
         const _OcrCard(),
+        const _GenAiCard(),
         _Section('Haftalık sabit programım'),
         _FixedScheduleCard(settings: s),
         _Section('Görünüm'),
@@ -293,6 +295,75 @@ class _OcrCard extends ConsumerWidget {
                 '$done fotoğraf okundu${failed > 0 ? ', $failed okunamadı' : ''}.',
                 style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Resim açıklaması (Gemini Nano): cihaz durumu, indirme ve aç/kapa.
+class _GenAiCard extends ConsumerStatefulWidget {
+  const _GenAiCard();
+
+  @override
+  ConsumerState<_GenAiCard> createState() => _GenAiCardState();
+}
+
+class _GenAiCardState extends ConsumerState<_GenAiCard> {
+  bool _downloading = false;
+
+  Future<void> _download() async {
+    setState(() => _downloading = true);
+    await ref.read(genAiDescriberProvider).download();
+    ref.invalidate(genAiStatusProvider);
+    if (mounted) setState(() => _downloading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final settings = ref.watch(settingsProvider).value;
+    final status = ref.watch(genAiStatusProvider);
+    final value = status.value;
+    final unavailable = value == 'unavailable';
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: const ToneIcon(Icons.auto_awesome_outlined, color: KocumColors.blue),
+            title: const Text('Resim açıklaması (Gemini Nano)'),
+            subtitle: const Text(
+              'Sorulardaki grafik, şekil ve fotoğraflar telefonda kısa bir açıklamayla etiketlenir; '
+              'açıklamalar aramaya ve Claude raporuna girer. Yalnızca destekleyen cihazlarda, İngilizce.',
+            ),
+            value: (settings?.genAiDescriptions ?? true) && !unavailable,
+            onChanged: settings == null || unavailable
+                ? null
+                : (on) => ref.read(settingsProvider.notifier).change(settings.copyWith(genAiDescriptions: on)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    status.isLoading ? 'Durum denetleniyor…' : genAiStatusLabel(value ?? 'unknown'),
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ),
+                if (value == 'downloadable')
+                  TextButton(
+                    onPressed: _downloading ? null : _download,
+                    child: Text(_downloading ? 'İniyor…' : 'İndir'),
+                  ),
+                IconButton(
+                  tooltip: 'Yeniden denetle',
+                  onPressed: () => ref.invalidate(genAiStatusProvider),
+                  icon: const Icon(Icons.refresh_rounded, size: 20),
+                ),
+              ],
             ),
           ),
         ],

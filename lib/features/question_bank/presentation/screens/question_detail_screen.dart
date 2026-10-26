@@ -276,6 +276,12 @@ class _OcrSection extends ConsumerWidget {
               ],
             ),
           ],
+          for (final f in current.figures)
+            if (f['description'] is String)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text('${_kindLabel(f['kind'])}: ${f['description']}  (Gemini Nano, İngilizce)', style: muted),
+              ),
           if (questionCount > 1)
             Padding(
               padding: const EdgeInsets.only(top: 6),
@@ -319,4 +325,11 @@ IconData _figureIcon(String label) => switch (label) {
       'Tablo' => Icons.table_chart_outlined,
       'Grafik' => Icons.show_chart_rounded,
       _ => Icons.category_outlined,
+    };
+
+String _kindLabel(Object? kind) => switch (kind) {
+      'photo' => 'Fotoğraf',
+      'table' => 'Tablo',
+      'chart' => 'Grafik',
+      _ => 'Şekil',
     };

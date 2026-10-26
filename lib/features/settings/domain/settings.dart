@@ -13,6 +13,7 @@ class AppSettings {
     this.fastPhotos = false,
     this.smartSearch = true,
     this.ocrEnabled = true,
+    this.genAiDescriptions = true,
   });
 
   /// Her gün tekrar zamanı gelen soruları hatırlat.
@@ -41,6 +42,9 @@ class AppSettings {
   /// Fotoğraflardaki metni arka planda oku (ML Kit, telefonda).
   final bool ocrEnabled;
 
+  /// Grafik ve şekilleri Gemini Nano ile açıkla (destekleyen cihazda).
+  final bool genAiDescriptions;
+
   AppSettings copyWith({
     bool? reviewReminder,
     TimeOfDay? reviewTime,
@@ -52,6 +56,7 @@ class AppSettings {
     bool? fastPhotos,
     bool? smartSearch,
     bool? ocrEnabled,
+    bool? genAiDescriptions,
   }) =>
       AppSettings(
         reviewReminder: reviewReminder ?? this.reviewReminder,
@@ -64,6 +69,7 @@ class AppSettings {
         fastPhotos: fastPhotos ?? this.fastPhotos,
         smartSearch: smartSearch ?? this.smartSearch,
         ocrEnabled: ocrEnabled ?? this.ocrEnabled,
+        genAiDescriptions: genAiDescriptions ?? this.genAiDescriptions,
       );
 
   Map<String, dynamic> toJson() => {
@@ -77,6 +83,7 @@ class AppSettings {
         'fastPhotos': fastPhotos,
         'smartSearch': smartSearch,
         'ocrEnabled': ocrEnabled,
+        'genAiDescriptions': genAiDescriptions,
       };
 
   /// Bozuk ya da eksik alanlar varsayılana döner; ayar dosyası uygulamayı düşürmez.
@@ -93,6 +100,7 @@ class AppSettings {
       fastPhotos: j['fastPhotos'] == true,
       smartSearch: j['smartSearch'] != false,
       ocrEnabled: j['ocrEnabled'] != false,
+      genAiDescriptions: j['genAiDescriptions'] != false,
     );
   }
 

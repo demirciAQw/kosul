@@ -11,6 +11,8 @@
 // v0.2: harici kırpıcı (uCrop / image_cropper) kaldırıldı; kırpma uygulama içinde.
 import 'dart:io';
 
+import 'genai_patch.dart';
+
 const _desugarVersion = '2.1.4';
 
 void main() {
@@ -35,7 +37,27 @@ void main() {
   }
   _patchRootGradle();
   _copyLauncherIcons();
+  _patchGenAi(kts, groovy);
   stdout.writeln('Android ayarları tamam.');
+}
+
+/// ML Kit GenAI resim açıklaması: minSdk, bağımlılık ve MainActivity köprüsü.
+void _patchGenAi(File kts, File groovy) {
+  if (kts.existsSync()) {
+    kts.writeAsStringSync(patchGenAiKts(kts.readAsStringSync()));
+  } else if (groovy.existsSync()) {
+    groovy.writeAsStringSync(patchGenAiGroovy(groovy.readAsStringSync()));
+  }
+  final root = Directory('android/app/src/main/kotlin');
+  final activity = root.existsSync()
+      ? root.listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('MainActivity.kt')).firstOrNull
+      : null;
+  final pkg = activity == null ? null : packageOf(activity.readAsStringSync());
+  if (activity == null || pkg == null) {
+    stderr.writeln('Uyarı: MainActivity.kt bulunamadı; resim açıklaması köprüsü eklenmedi.');
+    return;
+  }
+  activity.writeAsStringSync(genAiMainActivity(pkg));
 }
 
 /// Koçum simgesi: tool/android_icon/res altındakiler (tool/make_icon.py ile

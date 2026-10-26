@@ -37,6 +37,12 @@ class OcrQueue {
   /// Okuyucu sürümü: değişince eski kayıtlar arka planda yeniden okunur.
   static const engineVersion = 'kocum-okuyucu-2';
 
+  /// Grafik ve şekilleri açıklayan model (Gemini Nano; destekleyen cihazda).
+  /// Etkinleşince sürüm değişir; eski sorular bir kez yeniden işlenir.
+  Future<String?> Function(String path)? describe;
+
+  String get engine => describe == null ? engineVersion : '$engineVersion+genai';
+
   /// Döndürme ve görüntü örnekleme (telefonda); testlerde verilmez.
   final PageImageTools? _images;
 
@@ -65,7 +71,7 @@ class OcrQueue {
   Future<void> sync(List<OcrJob> wanted, Map<String, OcrRecord> existing) async {
     final orphans = orphanIds(wanted: wanted, existing: existing);
     if (orphans.isNotEmpty) await _repository.deleteIds(orphans);
-    for (final job in pendingJobs(wanted: wanted, existing: existing, engine: engineVersion)) {
+    for (final job in pendingJobs(wanted: wanted, existing: existing, engine: engine)) {
       if (_queued.add(job.id)) _queue.add(job);
     }
     unawaited(_pump());
@@ -152,6 +158,23 @@ class OcrQueue {
         ]));
       }
 
+      // Grafik, şekil ve fotoğraflar için kısa açıklama (en büyük ikisi; İngilizce).
+      final figureJson = [for (final f in figures) <String, Object?>{...f.toJson()}];
+      final describer = describe;
+      if (describer != null && tools != null && job.ownerType == 'question') {
+        final targets = [
+          for (final (i, f) in figures.indexed)
+            if (f.kind != 'annotation') (i, (f.box[2] - f.box[0]) * (f.box[3] - f.box[1])),
+        ]..sort((a, b) => b.$2.compareTo(a.$2));
+        for (final (i, _) in targets.take(2)) {
+          final crop = await tools.crop(source, figures[i].box);
+          if (crop == null) continue;
+          final text = await describer(crop);
+          await _deleteQuietly(crop);
+          if (text != null) figureJson[i]['description'] = text;
+        }
+      }
+
       final ordered = readingOrder(lines);
       final main = reading.main;
       final record = OcrRecord(
@@ -169,13 +192,13 @@ class OcrQueue {
         lines: ordered,
         durationMs: watch.elapsedMilliseconds,
         processedAt: _clock(),
-        engine: engineVersion,
+        engine: engine,
         structure: {
           'rotation': rotation,
           'width': width.round(),
           'height': height.round(),
           ...reading.toJson(),
-          'figures': [for (final f in figures) f.toJson()],
+          'figures': figureJson,
         },
       );
       await _repository.save(record);
@@ -192,7 +215,7 @@ class OcrQueue {
         error: '$e',
         durationMs: watch.elapsedMilliseconds,
         processedAt: _clock(),
-        engine: engineVersion,
+        engine: engine,
       );
       await _repository.save(record);
       onRecord?.call(record);
