@@ -12,6 +12,7 @@
 import 'dart:io';
 
 import 'genai_patch.dart';
+import 'r8_patch.dart';
 
 const _desugarVersion = '2.1.4';
 
@@ -38,7 +39,19 @@ void main() {
   _patchRootGradle();
   _copyLauncherIcons();
   _patchGenAi(kts, groovy);
+  _patchR8(kts, groovy);
   stdout.writeln('Android ayarları tamam.');
+}
+
+/// R8: ML Kit'in kullanılmayan dil okuyucuları için uyarılar kapatılır.
+void _patchR8(File kts, File groovy) {
+  final rules = File('android/app/proguard-rules.pro');
+  rules.writeAsStringSync(patchProguardRules(rules.existsSync() ? rules.readAsStringSync() : null));
+  if (kts.existsSync()) {
+    kts.writeAsStringSync(patchR8Kts(kts.readAsStringSync()));
+  } else if (groovy.existsSync()) {
+    groovy.writeAsStringSync(patchR8Groovy(groovy.readAsStringSync()));
+  }
 }
 
 /// ML Kit GenAI resim açıklaması: minSdk, bağımlılık ve MainActivity köprüsü.
