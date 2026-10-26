@@ -78,9 +78,9 @@ Float64List _boxMean(Float64List a, int w, int h, int r) {
   }
   final out = Float64List(w * h);
   for (var y = 0; y < h; y++) {
-    final y0 = math.max(0, y - r), y1 = math.min(h, y + r + 1);
+    final y0 = math.max<int>(0, y - r), y1 = math.min<int>(h, y + r + 1);
     for (var x = 0; x < w; x++) {
-      final x0 = math.max(0, x - r), x1 = math.min(w, x + r + 1);
+      final x0 = math.max<int>(0, x - r), x1 = math.min<int>(w, x + r + 1);
       final s = integ[y1 * (w + 1) + x1] - integ[y0 * (w + 1) + x1] - integ[y1 * (w + 1) + x0] + integ[y0 * (w + 1) + x0];
       out[y * w + x] = s / ((y1 - y0) * (x1 - x0));
     }
@@ -104,7 +104,7 @@ List<FigureRegion> detectFigures(Uint8List rgba, int w, int h, List<TextBox> box
   for (var i = 0; i < n; i++) {
     final r = rgba[i * 4], g = rgba[i * 4 + 1], b = rgba[i * 4 + 2];
     lum[i] = 0.299 * r + 0.587 * g + 0.114 * b;
-    sat[i] = (math.max(r, math.max(g, b)) - math.min(r, math.min(g, b))).toDouble();
+    sat[i] = (math.max<int>(r, math.max<int>(g, b)) - math.min<int>(r, math.min<int>(g, b))).toDouble();
   }
   final bg = _boxMean(lum, w, h, 15);
   final paper = List<bool>.generate(n, (i) => lum[i] > bg[i] - 12 && sat[i] < 60);
@@ -114,8 +114,8 @@ List<FigureRegion> detectFigures(Uint8List rgba, int w, int h, List<TextBox> box
   // Metin satırları maskelenir (şekil etiketleri hariç).
   for (final t in boxes) {
     if (t.isLabel) continue;
-    final x0 = math.max(0, t.left.floor() - 3), y0 = math.max(0, t.top.floor() - 3);
-    final x1 = math.min(w, (t.left + t.width).floor() + 3), y1 = math.min(h, (t.top + t.height).floor() + 3);
+    final x0 = math.max<int>(0, t.left.floor() - 3), y0 = math.max<int>(0, t.top.floor() - 3);
+    final x1 = math.min<int>(w, (t.left + t.width).floor() + 3), y1 = math.min<int>(h, (t.top + t.height).floor() + 3);
     for (var y = y0; y < y1; y++) {
       for (var x = x0; x < x1; x++) {
         ink[y * w + x] = false;
@@ -179,7 +179,7 @@ List<FigureRegion> detectFigures(Uint8List rgba, int w, int h, List<TextBox> box
     final inkFrac = inkCount / area;
     if (inkFrac < 0.01) continue;
     final touches = x0 <= 2 || y0 <= 2 || x1 >= w - 2 || y1 >= h - 2;
-    final rx0 = math.max(0, x0 - 8), ry0 = math.max(0, y0 - 8), rx1 = math.min(w, x1 + 8), ry1 = math.min(h, y1 + 8);
+    final rx0 = math.max<int>(0, x0 - 8), ry0 = math.max<int>(0, y0 - 8), rx1 = math.min<int>(w, x1 + 8), ry1 = math.min<int>(h, y1 + 8);
     var ringPaper = 0;
     for (var y = ry0; y < ry1; y++) {
       for (var x = rx0; x < rx1; x++) {
@@ -187,7 +187,7 @@ List<FigureRegion> detectFigures(Uint8List rgba, int w, int h, List<TextBox> box
         if (paper[y * w + x]) ringPaper++;
       }
     }
-    final ringFrac = ringPaper / math.max(1, (ry1 - ry0) * (rx1 - rx0) - area);
+    final ringFrac = ringPaper / math.max<int>(1, (ry1 - ry0) * (rx1 - rx0) - area);
     final paperIn = paperCount / area;
     final edges = (x0 <= 2 ? 1 : 0) + (y0 <= 2 ? 1 : 0) + (x1 >= w - 2 ? 1 : 0) + (y1 >= h - 2 ? 1 : 0);
     if (edges >= 2 || (touches && (rw > 0.85 * w || rh > 0.85 * h))) continue; // şerit, kenar, masa
@@ -226,10 +226,12 @@ List<FigureRegion> detectFigures(Uint8List rgba, int w, int h, List<TextBox> box
     }
     bool axes() {
       var left = false, bottom = false;
-      for (var x = 0; x < math.min(rw, math.max(3, rw ~/ 5)) && !left; x++) {
+      final leftBand = math.min<int>(rw, math.max<int>(3, rw ~/ 5));
+      for (int x = 0; x < leftBand && !left; x++) {
         left = _longestRun((y) => darkAt(x, y), rh) >= 0.6 * rh;
       }
-      for (var y = math.max(0, rh - math.max(3, rh ~/ 4)); y < rh && !bottom; y++) {
+      final bottomStart = math.max<int>(0, rh - math.max<int>(3, rh ~/ 4));
+      for (int y = bottomStart; y < rh && !bottom; y++) {
         bottom = _longestRun((x) => darkAt(x, y), rw) >= 0.6 * rw;
       }
       return left && bottom;

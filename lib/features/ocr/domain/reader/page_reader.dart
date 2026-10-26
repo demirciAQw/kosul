@@ -203,8 +203,8 @@ List<List<OcrLine>> splitColumns(List<OcrLine> lines, double width) {
   final bins = List<int>.filled(50, 0);
   for (final l in lines) {
     if (l.width > 0.6 * width) continue;
-    final a = math.max(0, (l.left / width * 50).floor());
-    final b = math.min(50, ((l.left + l.width) / width * 50).floor() + 1);
+    final a = math.max<int>(0, (l.left / width * 50).floor());
+    final b = math.min<int>(50, ((l.left + l.width) / width * 50).floor() + 1);
     for (var i = a; i < b; i++) {
       bins[i]++;
     }
@@ -349,7 +349,7 @@ QuestionPart _parseBlock(_Block b, double width, double height) {
       // İşaretin sol hizasından başlayan üst satır kesrin payı değil, metindir.
       final cy = l.top + l.height / 2;
       if (top0 < cy && cy < first.top && l.left <= first.left + 0.5 * first.word.width) {
-        top0 = math.max(top0, l.top + l.height);
+        top0 = math.max<double>(top0, l.top + l.height);
       }
     }
     for (var ri = 0; ri < rows.length; ri++) {
@@ -499,7 +499,7 @@ List<OcrLine> withWords(List<OcrLine> lines) => [
         else
           () {
             final width = l.width > 0 ? l.width : l.text.length * l.height * 0.5;
-            final total = math.max(1, l.text.length);
+            final total = math.max<int>(1, l.text.length);
             var cx = l.left;
             final words = <OcrWord>[];
             for (final p in l.text.split(' ').where((p) => p.isNotEmpty)) {
@@ -534,7 +534,7 @@ PageReading readPage(List<OcrLine> rawLines, double width, double height, {int? 
     if (q.partial) s -= 3;
     final cx = (q.box[0] + q.box[2]) / 2 / width, cy = (q.box[1] + q.box[3]) / 2 / height;
     final dist = math.sqrt(math.pow(cx - 0.5, 2) + math.pow(cy - 0.5, 2));
-    s += 2 * (1 - math.min(1, dist / 0.71)) + 2 * (q.box[2] - q.box[0]) * (q.box[3] - q.box[1]) / (width * height);
+    s += 2 * (1 - math.min<double>(1.0, dist / 0.71)) + 2 * (q.box[2] - q.box[0]) * (q.box[3] - q.box[1]) / (width * height);
     if (preferredNumber != null && q.number == preferredNumber) s += 6;
     return s;
   }

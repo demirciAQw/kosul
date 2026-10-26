@@ -34,7 +34,7 @@ class FlutterPageImageTools implements PageImageTools {
       final buffer = await ui.ImmutableBuffer.fromUint8List(await File(path).readAsBytes());
       final descriptor = await ui.ImageDescriptor.encoded(buffer);
       final fw = descriptor.width, fh = descriptor.height;
-      final scale = maxSide / math.max(fw, fh);
+      final scale = maxSide / math.max<int>(fw, fh);
       final codec = await descriptor.instantiateCodec(
         targetWidth: scale < 1 ? (fw * scale).round() : fw,
         targetHeight: scale < 1 ? (fh * scale).round() : fh,
@@ -63,8 +63,8 @@ class FlutterPageImageTools implements PageImageTools {
       final src = ui.Rect.fromLTRB(box[0] * img.width, box[1] * img.height, box[2] * img.width, box[3] * img.height)
           .inflate(8)
           .intersect(ui.Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()));
-      final scale = math.min(1.0, 1024 / math.max(src.width, src.height));
-      final w = math.max(1, (src.width * scale).round()), h = math.max(1, (src.height * scale).round());
+      final scale = math.min<double>(1.0, 1024 / math.max<double>(src.width, src.height));
+      final w = math.max<int>(1, (src.width * scale).round()), h = math.max<int>(1, (src.height * scale).round());
       final recorder = ui.PictureRecorder();
       ui.Canvas(recorder).drawImageRect(img, src, ui.Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble()), ui.Paint());
       final picture = recorder.endRecording();
