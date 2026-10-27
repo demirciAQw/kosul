@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'crop_screen.dart';
 import 'photo_capture_service.dart';
+import 'camera_screen.dart';
 
 /// "Kamerayla çek / Galeriden seç" sayfası. Vazgeçilirse null.
 Future<PhotoSource?> askPhotoSource(BuildContext context) => showModalBottomSheet<PhotoSource>(
@@ -36,7 +37,21 @@ Future<CapturedPhoto?> capturePhoto(
   PhotoSource source, {
   required String title,
 }) async {
-  final original = await service.pickToTemp(source);
+  final String? original;
+  final camera = service.camera;
+  if (source == PhotoSource.camera && service.fast && camera != null) {
+    // Performans modu: uygulama içi kamera (hazır tutuluyorsa anında açılır).
+    final shot = await CameraScreen.open(context, camera);
+    if (shot == null) return null;
+    if (shot.wantsGallery) {
+      if (!context.mounted) return null;
+      original = await service.pickToTemp(PhotoSource.gallery);
+    } else {
+      original = shot.path;
+    }
+  } else {
+    original = await service.pickToTemp(source);
+  }
   if (original == null) return null;
   if (!context.mounted) {
     await PhotoCaptureService.deleteQuietly(original);

@@ -14,7 +14,11 @@ class OpticSection {
     this.start = 1,
     this.initialMarks = const {},
     this.initiallyIncluded = true,
+    this.withPhoto,
   });
+
+  /// Soru fotoğrafı olan numaralar (bilinmiyorsa null: göstergesi çizilmez).
+  final Set<int>? withPhoto;
 
   final String key; // test düğümü kimliği ya da "single"
   final String title;
@@ -82,7 +86,11 @@ class _SectionState {
         marks = {
           for (final e in s.initialMarks.entries)
             if (e.value != QuestionStatus.correct && e.key >= s.start) e.key: e.value,
-        };
+        },
+        photos = s.withPhoto == null ? null : {...s.withPhoto!};
+
+  /// Fotoğraflı numaralar (bilinmiyorsa null).
+  final Set<int>? photos;
 
   final String key;
   final String title;
@@ -128,7 +136,7 @@ class OpticFormScreen extends StatefulWidget {
   /// Verilirse form önce GÖRÜNTÜLEME modunda açılır: numaraya dokunmak o
   /// sorunun ekranını açar (dönüşte sorunun güncel durumu döner; doğruysa
   /// null). İşaretlemek için sağ üstteki "Düzenle".
-  final Future<QuestionStatus?> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion;
+  final Future<({QuestionStatus? status, bool hasPhoto})> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion;
 
   static const maxTotal = 200;
 
@@ -140,7 +148,7 @@ class OpticFormScreen extends StatefulWidget {
     String? subtitle,
     bool totalEditable = true,
     bool showNet = false,
-    Future<QuestionStatus?> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion,
+    Future<({QuestionStatus? status, bool hasPhoto})> Function(OpticSection section, int number, QuestionStatus? mark)? onOpenQuestion,
   }) =>
       Navigator.of(context, rootNavigator: true).push<OpticFormResult>(MaterialPageRoute(
         fullscreenDialog: true,
@@ -176,14 +184,17 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
     _opening = true;
     try {
       final original = widget.sections.firstWhere((x) => x.key == section.key);
-      final status = await open(original, number, section.marks[number]);
+      final after = await open(original, number, section.marks[number]);
       if (!mounted) return;
       setState(() {
+        final status = after.status;
         if (status == null || status == QuestionStatus.correct) {
           section.marks.remove(number);
         } else {
           section.marks[number] = status;
         }
+        final photos = section.photos;
+        if (photos != null) after.hasPhoto ? photos.add(number) : photos.remove(number);
       });
     } finally {
       _opening = false;
@@ -387,9 +398,14 @@ class _OpticFormScreenState extends State<OpticFormScreen> {
                           itemCount: section.total,
                           itemBuilder: (context, i) {
                             final number = section.start + i;
+                            final photos = section.photos;
                             return _Bubble(
                               number: number,
                               status: section.marks[number],
+                              // İşaretli ama fotoğrafı yok: alt yarı boş daire.
+                              missingPhoto: photos != null &&
+                                  section.marks[number] != null &&
+                                  !photos.contains(number),
                               onTap: () => _viewing ? _open(section, number) : _tap(section, number),
                               onLongPress: _viewing ? null : () => _tap(section, number, alternate: true),
                             );
@@ -513,12 +529,21 @@ class _TotalDialogState extends State<_TotalDialog> {
 }
 
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.number, required this.status, required this.onTap, this.onLongPress});
+  const _Bubble({
+    required this.number,
+    required this.status,
+    required this.onTap,
+    this.onLongPress,
+    this.missingPhoto = false,
+  });
 
   final int number;
   final QuestionStatus? status;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
+
+  /// İşaretli sorunun fotoğrafı yok: üst yarı dolu (numara), alt yarı boş (işaret).
+  final bool missingPhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -526,30 +551,44 @@ class _Bubble extends StatelessWidget {
     final marked = status;
     final fill = marked == null ? Colors.transparent : statusColor(marked);
     final ink = marked == null ? scheme.onSurface : Colors.white;
+    final icon = marked == null
+        ? null
+        : Icon(marked == QuestionStatus.wrong ? Icons.close_rounded : Icons.remove_rounded,
+            size: 12, color: missingPhoto ? fill : ink);
     return Semantics(
       button: true,
-      label: '$number. soru, ${marked?.label ?? 'doğru'}',
+      label: '$number. soru, ${marked?.label ?? 'doğru'}${missingPhoto ? ', fotoğrafı yok' : ''}',
       child: Material(
-        color: fill,
+        color: missingPhoto ? Colors.transparent : fill,
         shape: CircleBorder(
           side: BorderSide(color: marked == null ? scheme.outline : fill, width: 1.5),
         ),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onTap,
           onLongPress: onLongPress,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('$number', style: TextStyle(color: ink, fontWeight: FontWeight.w600, fontSize: 15)),
-              if (marked != null)
-                Icon(
-                  marked == QuestionStatus.wrong ? Icons.close_rounded : Icons.remove_rounded,
-                  size: 12,
-                  color: ink,
+          child: missingPhoto
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: fill,
+                        alignment: Alignment.bottomCenter,
+                        child: Text('$number',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                      ),
+                    ),
+                    Expanded(child: Center(child: icon)),
+                  ],
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('$number', style: TextStyle(color: ink, fontWeight: FontWeight.w600, fontSize: 15)),
+                    if (icon != null) icon,
+                  ],
                 ),
-            ],
-          ),
         ),
       ),
     );

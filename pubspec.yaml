@@ -1,7 +1,7 @@
 name: kocum
 description: "Koçum: YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi."
 publish_to: 'none'
-version: 8.0.3+32
+version: 8.1.0+33
 
 environment:
   sdk: ^3.8.0
@@ -28,6 +28,8 @@ dependencies:
   # Fotoğraf: çekim/seçim + otomatik sıkıştırma (WebP).
   # Kırpma/döndürme uygulamanın kendi ekranında (lib/core/media/crop_screen.dart).
   image_picker: ^1.1.2
+  # Uygulama içi hızlı kamera (performans modu)
+  camera: '>=0.11.0 <0.13.0'
   flutter_image_compress: ^2.3.0
 
   # JSON şablon içe aktarma (dosya seç) / dışa aktarma (paylaş: Telegram, WhatsApp, Drive)

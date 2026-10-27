@@ -11,6 +11,7 @@ class AppSettings {
     this.fixedSchedule = '',
     this.booksDeadline,
     this.fastPhotos = false,
+    this.warmCamera = true,
     this.smartSearch = true,
     this.ocrEnabled = true,
     this.genAiDescriptions = true,
@@ -36,6 +37,9 @@ class AppSettings {
   /// Hızlı fotoğraf modu: daha küçük çözünürlük; kırpma ve kayıt daha hızlı.
   final bool fastPhotos;
 
+  /// Performans modunda kamerayı uygulama öndeyken hazır tut (anında çekim).
+  final bool warmCamera;
+
   /// Akıllı arama: yazım hatalarını düzeltir, benzerliğe göre sıralar.
   final bool smartSearch;
 
@@ -54,6 +58,7 @@ class AppSettings {
     String? fixedSchedule,
     DateTime? Function()? booksDeadline,
     bool? fastPhotos,
+    bool? warmCamera,
     bool? smartSearch,
     bool? ocrEnabled,
     bool? genAiDescriptions,
@@ -67,6 +72,7 @@ class AppSettings {
         fixedSchedule: fixedSchedule ?? this.fixedSchedule,
         booksDeadline: booksDeadline != null ? booksDeadline() : this.booksDeadline,
         fastPhotos: fastPhotos ?? this.fastPhotos,
+        warmCamera: warmCamera ?? this.warmCamera,
         smartSearch: smartSearch ?? this.smartSearch,
         ocrEnabled: ocrEnabled ?? this.ocrEnabled,
         genAiDescriptions: genAiDescriptions ?? this.genAiDescriptions,
@@ -81,6 +87,7 @@ class AppSettings {
         'fixedSchedule': fixedSchedule,
         if (booksDeadline != null) 'booksDeadline': booksDeadline!.toIso8601String(),
         'fastPhotos': fastPhotos,
+        'warmCamera': warmCamera,
         'smartSearch': smartSearch,
         'ocrEnabled': ocrEnabled,
         'genAiDescriptions': genAiDescriptions,
@@ -98,6 +105,7 @@ class AppSettings {
       fixedSchedule: j['fixedSchedule'] is String ? j['fixedSchedule'] as String : d.fixedSchedule,
       booksDeadline: j['booksDeadline'] is String ? DateTime.tryParse(j['booksDeadline'] as String) : null,
       fastPhotos: j['fastPhotos'] == true,
+      warmCamera: j['warmCamera'] != false,
       smartSearch: j['smartSearch'] != false,
       ocrEnabled: j['ocrEnabled'] != false,
       genAiDescriptions: j['genAiDescriptions'] != false,

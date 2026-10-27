@@ -105,6 +105,12 @@ class QuickMarkQuestions {
 
   /// Bu bağlamda [no] numaralı soru kartı (varsa). Optiğin görüntüleme
   /// modunda numaraya dokununca kartı açmak için.
+  /// Soru fotoğrafı olan numaralar (optikte "fotoğrafı yok" göstergesi için).
+  Future<Set<int>> numbersWithPhoto(QuickMarkContext ctx) async => {
+        for (final c in await _linked(ctx))
+          if (c.questionNo != null && c.questionImage != null) c.questionNo!,
+      };
+
   Future<QuestionCard?> cardAt(QuickMarkContext ctx, int no) async =>
       (await _linked(ctx)).where((c) => c.questionNo == no).firstOrNull;
 

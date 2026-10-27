@@ -23,9 +23,23 @@ class KocumApp extends ConsumerStatefulWidget {
 }
 
 class _KocumAppState extends ConsumerState<KocumApp> {
+  /// Kamera uygulama öndeyken hazır, arka planda ya da kapanırken kapalı.
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+    _lifecycle = AppLifecycleListener(
+      onResume: () => unawaited(ref.read(fastCameraProvider).warmUp()),
+      onHide: () => unawaited(ref.read(fastCameraProvider).close()),
+      onDetach: () => unawaited(ref.read(fastCameraProvider).close()),
+    );
     // Bildirim, veritabanındaki gerçeğin yansımasıdır (tek doğruluk kaynağı).
     // Telefon yeniden başlayıp bildirim kaybolsa bile uygulama açılınca geri gelir.
     ref.listenManual<AsyncValue<StudySession?>>(
@@ -98,7 +112,12 @@ class _KocumAppState extends ConsumerState<KocumApp> {
     // Hızlı fotoğraf modu: fotoğraf servisi ayarı izler.
     ref.listenManual<AsyncValue<AppSettings>>(settingsProvider, (previous, next) {
       final settings = next.value;
-      if (settings != null) ref.read(photoCaptureProvider).fast = settings.fastPhotos;
+      if (settings == null) return;
+      final capture = ref.read(photoCaptureProvider)..fast = settings.fastPhotos;
+      // Performans modu: uygulama içi kamera; ayar açıksa öndeyken hazır bekler.
+      final camera = ref.read(fastCameraProvider)..keepWarm = settings.fastPhotos && settings.warmCamera;
+      capture.camera = settings.fastPhotos ? camera : null;
+      unawaited(camera.keepWarm ? camera.warmUp() : camera.close());
     }, fireImmediately: true);
     ref.listenManual<AsyncValue<int>>(dueCountProvider, (previous, next) {
       if (next.hasValue && previous?.value != next.value) refreshReminders();

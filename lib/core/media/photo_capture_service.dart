@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'bmp_encoder.dart';
+import 'fast_camera.dart';
 
 enum PhotoSource { camera, gallery }
 
@@ -68,6 +69,9 @@ class PhotoCaptureService {
   /// Ayarlar › Hızlı fotoğraf modu: daha küçük kaynak ve çıktı, biraz düşük
   /// kalite. Kırpma ekranı daha çabuk açılır, kayıt daha çabuk biter.
   bool fast = false;
+
+  /// Performans modunda uygulama içi kamera (yoksa telefonun kamera uygulaması).
+  FastCamera? camera;
 
   double get sourceSide => fast ? 2560 : maxSourceSide;
   double get outputSide => fast ? 1920 : 2880;

@@ -136,6 +136,19 @@ class _SettingsBody extends ConsumerWidget {
             onChanged: (on) => _change(context, ref, s.copyWith(fastPhotos: on)),
           ),
         ),
+        Card(
+          child: SwitchListTile(
+            secondary: const ToneIcon(Icons.camera_alt_outlined, color: KocumColors.amber),
+            title: const Text('Kamerayı hazır tut'),
+            subtitle: const Text(
+              'Hızlı fotoğraf modunda uygulama kendi kamerasını kullanır. Bu açıksa kamera, uygulama '
+              'öndeyken hazır bekler ve anında açılır; uygulama arka plana geçince kapanır. Kamera açık '
+              'olduğu için ekranda yeşil nokta görünür ve pil biraz daha fazla harcanır.',
+            ),
+            value: s.fastPhotos && s.warmCamera,
+            onChanged: s.fastPhotos ? (on) => _change(context, ref, s.copyWith(warmCamera: on)) : null,
+          ),
+        ),
         _Section('Arama'),
         Card(
           child: SwitchListTile(

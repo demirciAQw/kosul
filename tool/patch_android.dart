@@ -11,6 +11,7 @@
 // v0.2: harici kırpıcı (uCrop / image_cropper) kaldırıldı; kırpma uygulama içinde.
 import 'dart:io';
 
+import 'camera_patch.dart';
 import 'genai_patch.dart';
 import 'r8_patch.dart';
 
@@ -130,6 +131,8 @@ void _patchManifest(File file) {
     '',
   );
   s = s.replaceFirst(RegExp(r'android:label="[^"]*"'), 'android:label="Koçum"');
+  // Kamera eklentisinin eklediği mikrofon izni (ses kaydı yok).
+  s = removeAudioPermission(s);
   file.writeAsStringSync(s);
 }
 

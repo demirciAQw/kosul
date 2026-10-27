@@ -52,8 +52,10 @@ Future<OpticFormResult?> openQuickMark(
   final sections = <OpticSection>[];
   for (final part in parts) {
     final existing = await quick.existingMarks(part.markContext);
+    final withPhoto = viewFirst ? await quick.numbersWithPhoto(part.markContext) : null;
     final highest = existing.keys.fold<int>(0, math.max);
     sections.add(OpticSection(
+      withPhoto: withPhoto,
       key: part.key,
       title: part.title,
       start: part.start,
@@ -69,7 +71,8 @@ Future<OpticFormResult?> openQuickMark(
 
   /// Görüntüleme modunda numaraya dokunulunca: kart varsa düzenleme, yoksa
   /// kaynak, ders, soru no ve durumla dolu ekleme ekranı. Dönüşte güncel durum.
-  Future<QuestionStatus?> openQuestion(OpticSection section, int number, QuestionStatus? mark) async {
+  Future<({QuestionStatus? status, bool hasPhoto})> openQuestion(
+      OpticSection section, int number, QuestionStatus? mark) async {
     final part = parts.firstWhere((p) => p.key == section.key);
     final ctx = part.markContext;
     final existing = await quick.cardAt(ctx, number);
@@ -96,8 +99,11 @@ Future<OpticFormResult?> openQuickMark(
             ),
     ));
     final after = await quick.cardAt(ctx, number);
-    if (after == null) return existing == null ? mark : null;
-    return after.status == QuestionStatus.correct ? null : after.status;
+    if (after == null) return (status: existing == null ? mark : null, hasPhoto: false);
+    return (
+      status: after.status == QuestionStatus.correct ? null : after.status,
+      hasPhoto: after.questionImage != null,
+    );
   }
 
   final result = await OpticFormScreen.open(

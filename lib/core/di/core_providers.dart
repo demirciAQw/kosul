@@ -5,6 +5,7 @@ import '../media/media_storage.dart';
 import '../media/photo_capture_service.dart';
 import '../notifications/session_chronometer.dart';
 import '../utils/id_generator.dart';
+import '../media/fast_camera.dart';
 
 // Asenkron başlatılan altyapı main() içinde override edilir.
 final appDatabaseProvider = Provider<AppDatabase>(
@@ -17,3 +18,10 @@ final sessionChronometerProvider = Provider<SessionChronometer>(
 final idGeneratorProvider = Provider<IdGenerator>((ref) => const UuidV7Generator());
 final clockProvider = Provider<Clock>((ref) => DateTime.now);
 final photoCaptureProvider = Provider<PhotoCaptureService>((ref) => PhotoCaptureService());
+
+/// Uygulama içi kamera (performans modunda hazır tutulur).
+final fastCameraProvider = Provider<FastCamera>((ref) {
+  final camera = FastCamera();
+  ref.onDispose(camera.close);
+  return camera;
+});
