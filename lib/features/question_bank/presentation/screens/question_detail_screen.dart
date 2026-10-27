@@ -212,7 +212,12 @@ class _OcrSection extends ConsumerWidget {
         style: muted,
       );
     } else if (!current.ok) {
-      body = Text('Okunamadı${current.error == null ? '' : ': ${current.error}'}', style: muted);
+      // Ekranda kısa neden; ayrıntının tamamı veri setinde.
+      final reason = current.error?.split('\n').first.trim();
+      body = Text(
+        'Okunamadı${reason == null || reason.isEmpty ? '' : ': ${reason.length > 140 ? '${reason.substring(0, 140)}…' : reason}'}',
+        style: muted,
+      );
     } else if (current.fullText.trim().isEmpty) {
       body = Text('Fotoğrafta okunabilir metin bulunamadı.', style: muted);
     } else {

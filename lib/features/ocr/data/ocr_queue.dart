@@ -35,7 +35,8 @@ class OcrQueue {
   final Duration gap;
 
   /// Okuyucu sürümü: değişince eski kayıtlar arka planda yeniden okunur.
-  static const engineVersion = 'kocum-okuyucu-2';
+  /// 2.1: sürüm derlemesindeki R8 hatasıyla "okunamadı" düşenler yeniden okunur.
+  static const engineVersion = 'kocum-okuyucu-2.1';
 
   /// Grafik ve şekilleri açıklayan model (Gemini Nano; destekleyen cihazda).
   /// Etkinleşince sürüm değişir; eski sorular bir kez yeniden işlenir.

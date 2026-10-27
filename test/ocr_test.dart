@@ -167,7 +167,7 @@ void main() {
     await queue.drain();
 
     final rec = (await repo.watchAll().first)['question:a']!;
-    expect(rec.engine, 'kocum-okuyucu-2+genai');
+    expect(rec.engine, '${OcrQueue.engineVersion}+genai');
     expect(tools.crops, [
       [0.1, 0.1, 0.9, 0.6],
     ]); // yalnızca grafik kırpıldı

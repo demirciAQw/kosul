@@ -8,6 +8,8 @@ void main() {
     for (final lang in ['chinese', 'devanagari', 'japanese', 'korean']) {
       expect(fresh, contains('-dontwarn com.google.mlkit.vision.text.$lang.**'));
     }
+    expect(fresh, contains('-keep class com.google.mlkit.** { *; }'));
+    expect(fresh, contains('-keep class com.google_mlkit_text_recognition.** { *; }'));
     expect(patchProguardRules(fresh), fresh);
     final kept = patchProguardRules('-keep class foo.Bar');
     expect(kept, startsWith('-keep class foo.Bar'));
