@@ -5,6 +5,7 @@ import '../domain/ocr.dart';
 import '../domain/question_text.dart';
 import '../domain/reader/figure_detector.dart';
 import '../domain/reader/page_reader.dart';
+import '../domain/reader/pencil_cleaner.dart';
 import 'page_image_tools.dart';
 
 /// Arka plan okuma kuyruğu: fotoğraflar tek tek, aralarında kısa bir mola
@@ -36,7 +37,8 @@ class OcrQueue {
 
   /// Okuyucu sürümü: değişince eski kayıtlar arka planda yeniden okunur.
   /// 2.1: sürüm derlemesindeki R8 hatasıyla "okunamadı" düşenler yeniden okunur.
-  static const engineVersion = 'kocum-okuyucu-2.1';
+  /// 2.2: kalem izi temizliği; eski okumalar bir kez yeniden okunur.
+  static const engineVersion = 'kocum-okuyucu-2.2';
 
   /// Grafik ve şekilleri açıklayan model (Gemini Nano; destekleyen cihazda).
   /// Etkinleşince sürüm değişir; eski sorular bir kez yeniden işlenir.
@@ -140,6 +142,20 @@ class OcrQueue {
             break;
           }
           await _deleteQuietly(rotated);
+        }
+      }
+      // Kurşun kalem ve renkli kalem izleri: temizlenmiş kopya da okunur; asıl okuma
+      // korunur, yalnızca asılda okunamayan yerler eklenir.
+      if (tools != null) {
+        final cleaned = await tools.cleanForOcr(source);
+        if (cleaned != null) {
+          try {
+            lines = mergeOcrLines(lines, await _engine.recognize(cleaned));
+          } catch (_) {
+            // Temizlenmiş okuma başarısızsa asıl okuma yeter.
+          } finally {
+            await _deleteQuietly(cleaned);
+          }
         }
       }
       final image = tools == null ? null : await tools.sample(source);

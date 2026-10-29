@@ -25,6 +25,9 @@ class _FakeTools implements PageImageTools {
   Future<String?> rotate(String path, int degrees) async => null;
 
   @override
+  Future<String?> cleanForOcr(String path) async => null;
+
+  @override
   Future<String?> crop(String path, List<double> box) async {
     crops.add(box);
     return '/yok/kirpma_${crops.length}.png';

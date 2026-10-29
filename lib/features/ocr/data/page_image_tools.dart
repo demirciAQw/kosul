@@ -3,8 +3,12 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../../core/media/bmp_encoder.dart';
+import '../domain/reader/pencil_cleaner.dart';
 
 /// Şekil bulucu için küçültülmüş görüntü (RGBA) ve asıl boyutlar.
 class SampledImage {
@@ -23,6 +27,9 @@ abstract interface class PageImageTools {
 
   /// Normalize [box] (sol, üst, sağ, alt) bölgesinin geçici PNG'si; olmazsa null. Çağıran siler.
   Future<String?> crop(String path, List<double> box);
+
+  /// Kurşun kalem ve renkli kalem izleri silinmiş geçici kopya (BMP); olmazsa null. Çağıran siler.
+  Future<String?> cleanForOcr(String path);
 }
 
 /// Telefonda: çözme JPEG/WebP çözücüsünün kendi küçültmesiyle (hızlı, az bellek),
@@ -78,6 +85,28 @@ class FlutterPageImageTools implements PageImageTools {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/ocr_sekil_${DateTime.now().microsecondsSinceEpoch}.png');
       await file.writeAsBytes(png.buffer.asUint8List(), flush: true);
+      return file.path;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> cleanForOcr(String path) async {
+    try {
+      final codec = await ui.instantiateImageCodec(await File(path).readAsBytes());
+      final frame = await codec.getNextFrame();
+      final img = frame.image;
+      final data = await img.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final w = img.width, h = img.height;
+      img.dispose();
+      codec.dispose();
+      if (data == null) return null;
+      final cleaned = await compute(cleanPencilTask, PencilJob(data.buffer.asUint8List(), w, h));
+      final bmp = await compute(rgbaToBmpTask, (cleaned, w, h));
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/ocr_temiz_${DateTime.now().microsecondsSinceEpoch}.bmp');
+      await file.writeAsBytes(bmp, flush: true);
       return file.path;
     } catch (_) {
       return null;
