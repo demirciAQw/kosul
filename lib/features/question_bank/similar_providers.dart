@@ -14,9 +14,42 @@ import 'question_bank_providers.dart';
 
 final _numericOption = RegExp(r'^[\d\s.,/√°²³+\-−·]+$');
 
-/// Fotoğrafı okunmuş her sorunun benzerlik özellikleri ve metin vektörleri.
-final similarIndexProvider =
-    Provider<({Map<String, SimilarProfile> profiles, Map<String, Map<String, double>> vectors})>((ref) {
+/// Okuma kaydından asıl sorunun parçaları: paragraf/verilen metin (şekil
+/// açıklamalarıyla), soru cümlesi, şıklar, öncüller ve maddeler.
+({String passage, String prompt, String options, String given}) questionPartsOf(OcrRecord r) {
+  final figures = [
+    for (final f in r.figures)
+      if (f['description'] is String) '${f['description']}',
+  ].join(' ');
+  final questions = r.structure?['questions'];
+  final primary = r.structure?['primary'];
+  if (questions is List && primary is int && primary >= 0 && primary < questions.length && questions[primary] is Map) {
+    final q = questions[primary] as Map;
+    String joined(Object? v) => v is List ? v.map((e) => '$e').join(' ') : '';
+    final statements = q['statements'] is List
+        ? [
+            for (final st in q['statements'] as List)
+              if (st is Map) '${st['text']}',
+          ]
+        : const <String>[];
+    final options = q['options'] is Map ? (q['options'] as Map).values.map((v) => '$v').join(' ') : '';
+    return (
+      passage: '${joined(q['stem'])} $figures'.trim(),
+      prompt: '${q['prompt'] ?? ''}',
+      options: options,
+      given: [...statements, joined(q['bullets'])].join(' ').trim(),
+    );
+  }
+  return (
+    passage: '${r.parsed?.stem ?? r.fullText} $figures'.trim(),
+    prompt: '',
+    options: r.parsed?.options.values.join(' ') ?? '',
+    given: '',
+  );
+}
+
+/// Fotoğrafı okunmuş her sorunun benzerlik özellikleri ve dizini.
+final similarIndexProvider = Provider<({Map<String, SimilarProfile> profiles, SimilarIndex index})>((ref) {
   final cards = ref.watch(allQuestionsProvider).value ?? const <QuestionCard>[];
   final records = ref.watch(ocrRecordsProvider).value ?? const <String, OcrRecord>{};
   final tags = ref.watch(autoTagsProvider);
@@ -26,6 +59,7 @@ final similarIndexProvider =
     final r = records[OcrJob.questionId(c.id)];
     if (r == null || !r.ok || r.imagePath != c.questionImage || r.searchable.trim().isEmpty) continue;
     final main = mainQuestionOf(r);
+    final parts = questionPartsOf(r);
     final t = tags[c.id];
     // Konu adı üzerinden: MEB düğümü, elle yazılan ve otomatik konu aynı ölçüde kıyaslanır.
     final topicTitle = (c.mebNodeId == null ? null : curriculum[c.mebNodeId]?.title) ??
@@ -34,7 +68,11 @@ final similarIndexProvider =
     final options = r.parsed?.options ?? const <String, String>{};
     final numeric = options.values.where((v) => _numericOption.hasMatch(v.trim())).length;
     profiles[c.id] = SimilarProfile(
-      text: '${r.searchable} ${main.prompt}',
+      text: r.searchable,
+      passage: parts.passage,
+      prompt: parts.prompt.isEmpty ? main.prompt : parts.prompt,
+      options: parts.options,
+      given: parts.given,
       topicKey: topicTitle == null ? null : normalizeTr(topicTitle),
       types: (t?.types ?? const <String>[]).toSet(),
       stemKind: main.prompt.trim().isEmpty ? null : classifyStem(main.prompt, hasStatements: main.hasStatements).name,
@@ -45,7 +83,7 @@ final similarIndexProvider =
       numericOptions: options.isEmpty ? null : numeric * 2 >= options.length,
     );
   }
-  return (profiles: profiles, vectors: tfidfVectors({for (final e in profiles.entries) e.key: e.value.text}));
+  return (profiles: profiles, index: SimilarIndex.build(profiles));
 });
 
 /// Bir sorunun benzerleri: yanlış/boş ve doğru yapılanlar ayrı.
@@ -53,6 +91,13 @@ final similarQuestionsProvider = Provider.family<SimilarResult, String>((ref, id
   final cards = ref.watch(allQuestionsProvider).value ?? const <QuestionCard>[];
   final target = cards.where((c) => c.id == id).firstOrNull;
   if (target == null) return const SimilarResult(mistakes: [], correct: []);
-  final index = ref.watch(similarIndexProvider);
-  return findSimilar(target, cards, index.profiles, index.vectors);
+  final data = ref.watch(similarIndexProvider);
+  return findSimilar(target, cards, data.profiles, data.index);
+});
+
+/// Eşleme: benzerliği yüksek sorular aynı grupta (kart → grup no).
+final similarGroupsProvider = Provider<Map<String, int>>((ref) {
+  final cards = ref.watch(allQuestionsProvider).value ?? const <QuestionCard>[];
+  final data = ref.watch(similarIndexProvider);
+  return similarGroups(cards, data.profiles, data.index);
 });

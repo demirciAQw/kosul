@@ -18,6 +18,7 @@ import '../../core/text/turkish_text.dart';
 import '../ocr/ocr_providers.dart';
 import '../ocr/domain/ocr.dart';
 import '../ocr/auto_tag_providers.dart';
+import 'similar_providers.dart';
 
 final questionCardRepositoryProvider = Provider<QuestionCardRepository>(
     (ref) => DriftQuestionCardRepository(ref.watch(appDatabaseProvider)));
@@ -113,7 +114,18 @@ final smartSearchResultProvider = Provider<AsyncValue<SmartSearchResult?>>((ref)
           if (c.reasonText != null) SearchField(c.reasonText!, fieldWeights.reason),
           if (c.note != null) SearchField(c.note!, fieldWeights.note),
           SearchField(c.status.label, fieldWeights.status),
-          if (read != null && read.ok && read.searchable.isNotEmpty) SearchField(read.searchable, fieldWeights.ocr),
+          // Okunan metin parçalarıyla: soru cümlesi (biraz daha ağır), paragraf /
+          // verilen bilgi (grafik açıklamaları dahil), şıklar, öncüller.
+          if (read != null && read.ok)
+            ...() {
+              final parts = questionPartsOf(read);
+              return [
+                if (parts.prompt.isNotEmpty) SearchField(parts.prompt, fieldWeights.ocr + 0.1),
+                if (parts.passage.isNotEmpty) SearchField(parts.passage, fieldWeights.ocr),
+                if (parts.options.isNotEmpty) SearchField(parts.options, fieldWeights.ocr),
+                if (parts.given.isNotEmpty) SearchField(parts.given, fieldWeights.ocr),
+              ];
+            }(),
           // Otomatik konu ve soru türü ("grafik yorumlama", "paragraf" …).
           if (tags[c.id] != null) SearchField(tags[c.id]!.summary, fieldWeights.reason),
         ];
@@ -161,12 +173,15 @@ final questionGroupsProvider = Provider<AsyncValue<List<QuestionGroup>>>((ref) {
   final curriculum = ref.watch(curriculumProvider).value ?? const <CurriculumNode>[];
   final books = ref.watch(libraryProvider).value ?? const <Book>[];
   final tags = ref.watch(autoTagsProvider);
+  final similar = by == GroupBy.similar ? ref.watch(similarGroupsProvider) : const <String, int>{};
   return cards.whenData((list) => groupQuestions(
         list,
         by,
         curriculum: {for (final n in curriculum) n.id: n},
         bookTitles: {for (final b in books) b.id: b.title},
         fallbackTopics: fallbackTopicsFor(list, tags),
+        similarGroups: by == GroupBy.similar ? similar : const {},
+        similarTitles: by == GroupBy.similar ? similarTitlesFor(similar, list, fallbackTopicsFor(list, tags)) : const {},
       ));
 });
 
@@ -236,3 +251,22 @@ class NotebookGalleryMode extends Notifier<bool> {
 }
 
 final notebookGalleryProvider = NotifierProvider<NotebookGalleryMode, bool>(NotebookGalleryMode.new);
+
+/// Benzer grupların başlığı: gruptaki soruların en sık konusu, yoksa "Benzer sorular N".
+Map<int, String> similarTitlesFor(Map<String, int> groups, List<QuestionCard> cards, Map<String, String> topics) {
+  final counts = <int, Map<String, int>>{};
+  for (final c in cards) {
+    final g = groups[c.id];
+    final t = topics[c.id];
+    if (g == null || t == null) continue;
+    final m = counts[g] ??= {};
+    m[t] = (m[t] ?? 0) + 1;
+  }
+  final out = <int, String>{};
+  for (final g in groups.values.toSet()) {
+    final m = counts[g];
+    final top = m == null ? null : (m.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
+    out[g] = top == null ? 'Benzer sorular $g' : '$top · benzer $g';
+  }
+  return out;
+}

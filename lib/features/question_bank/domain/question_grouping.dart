@@ -5,7 +5,8 @@ import 'question_card.dart';
 enum GroupBy {
   subject('Ders'),
   book('Kitap'),
-  topic('Konu');
+  topic('Konu'),
+  similar('Benzer');
 
   const GroupBy(this.label);
   final String label;
@@ -25,6 +26,9 @@ class QuestionGroup {
 
 const noTopicTitle = 'Konu belirtilmemiş';
 
+/// Benzer gruplamasında eşi bulunamayan sorular.
+const noMatchTitle = 'Eşi bulunamayanlar';
+
 /// Kartları ağaç yapısında gruplar:
 ///  - Ders:  Ders › Konu › kartlar
 ///  - Kitap: Kitap (ya da bağımsız kaynak) › Konu › kartlar
@@ -37,6 +41,9 @@ List<QuestionGroup> groupQuestions(
   /// MEB konusu olmayan kartlar için konu: elle yazılan ya da otomatik
   /// ("Türev (otomatik)"). Yoksa "Konu belirtilmemiş".
   Map<String, String> fallbackTopics = const {},
+  /// Benzer gruplaması: kart → grup no ve grup no → başlık.
+  Map<String, int> similarGroups = const {},
+  Map<int, String> similarTitles = const {},
 }) {
   final top = <String, QuestionGroup>{};
   final sub = <String, QuestionGroup>{};
@@ -65,6 +72,13 @@ List<QuestionGroup> groupQuestions(
         final key = card.bookId ?? 'src:${normalizeTr(card.sourceName)}';
         final parent = topGroup(key, bookTitle ?? card.sourceName);
         subGroup(key, parent, topicKey, topicTitle).cards.add(card);
+      case GroupBy.similar:
+        final g = similarGroups[card.id];
+        if (g == null) {
+          topGroup('-', noMatchTitle).cards.add(card);
+        } else {
+          topGroup('sim:$g', similarTitles[g] ?? 'Benzer sorular $g').cards.add(card);
+        }
       case GroupBy.topic:
         if (node == null) {
           topGroup(topicKey, topicTitle).cards.add(card);
@@ -98,8 +112,9 @@ CurriculumNode _rootOf(CurriculumNode node, Map<String, CurriculumNode> curricul
 void _sortGroups(List<QuestionGroup> groups) {
   groups.sort((a, b) {
     // "Konu belirtilmemiş" her zaman en altta, diğerleri Türkçe alfabetik.
-    if (a.title == noTopicTitle) return 1;
-    if (b.title == noTopicTitle) return -1;
+    final aLast = a.title == noTopicTitle || a.title == noMatchTitle;
+    final bLast = b.title == noTopicTitle || b.title == noMatchTitle;
+    if (aLast != bLast) return aLast ? 1 : -1;
     return normalizeTr(a.title).compareTo(normalizeTr(b.title));
   });
   for (final g in groups) {
