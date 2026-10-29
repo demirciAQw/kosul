@@ -6,6 +6,8 @@ Veriler yalnızca telefonda (sunucu yok). Arayüz, yorumlar ve commit mesajları
 
 **Sıradaki büyük iş:** tablet + PDF modu. Ayrıntılı tarif:
 [`docs/TABLET_PDF.md`](docs/TABLET_PDF.md). Telefon akışı bozulmadan eklenir.
+Aynı belgede **I. Benzer sorularda gelişim** ("bu hatayı öğrendim mi?") hem
+telefon (konu düzeyi) hem tablet (soru düzeyi) için tarif edilmiştir.
 
 ## Mimari
 

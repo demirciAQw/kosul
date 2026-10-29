@@ -119,6 +119,45 @@ Her aşama ayrı sürüm, ayrı testler; telefon akışı her aşamada çalış�
   mevcut oturum ve derin analiz bu veriyi kullanır.
 - Kabul: süre hesaplama saf fonksiyon ve testli.
 
+### I. Benzer sorularda gelişim ("bu hatayı öğrendim mi?")
+
+Amaç: Öğrencinin yanlış yaptığı sorudan **sonra** benzer soruları doğru
+yapıp yapmadığını göstermek. Öğrenme kanıtı budur.
+
+**Benzerlik anahtarı** (öncelik sırasıyla):
+1. Aynı konu (MEB düğümü ya da otomatik konu) **ve** aynı soru türü
+   (paragraf, grafik yorumlama, öncüllü, olumsuz kök, hesap…).
+2. Tablette ayrıca metin benzerliği (kelime kümesi, Jaccard ≥ 0,5): aynı
+   kalıptaki sorular ("…hangisine değinilmemiştir?").
+
+**Hesap** (saf fonksiyon, testli): Her yanlış/boş soru W için, W'den
+**sonraki** benzer sorular → doğru / yanlış / boş sayısı.
+- "Öğrenilmiş": en az 3 benzer soru ve en az %80 doğru.
+- "Hâlâ sorunlu": en az 3 benzer soru ve %50 altı doğru.
+- "Gelişiyor": arada kalanlar.
+- "Henüz veri yok": 3'ten az benzer soru.
+
+**Veri kaynağı:**
+- **Tablet:** Çözülen her soru (doğrular dahil) metin, konu, tür ve süreyle
+  kaydedilir; analiz **soru düzeyinde** yapılır. Bunun için doğru soruların
+  da hafif bir kaydı gerekir (`solved_questions`: documentId, page, number,
+  sonuç, süre, konu, türler; görsel ve kart yok).
+- **Telefon:** Doğru soruların metni yok; analiz **konu düzeyinde** yapılır:
+  W'den sonraki aynı konulu testlerin doğru/yanlış/boş sayıları
+  (`TestResult` + kitap şablonundaki test → konu eşlemesi). Ekranda bunun konu
+  düzeyi bir tahmin olduğu yazılır.
+
+**Nerede görünür:**
+- Soru ekranı: "Sonraki benzer sorular: 4/5 doğru · Öğrenilmiş".
+- Tekrar: "Öğrenilmiş" sorular tekrarda geri plana düşer; "Hâlâ sorunlu"
+  olanlar öne gelir (mevcut "benzer hatalar öne" mantığıyla birleşir).
+- Analiz: konu × soru türü tablosu; her hücrede doğruluk ve zaman içindeki
+  yön (ilk yarı → son yarı).
+- Claude raporu: "Öğrenilmiş / hâlâ sorunlu" özetleri.
+
+**Kabul:** Hesap, zaman sırası ve eşikler için fikstürlü testler; telefon ve
+tablet verisi aynı fonksiyondan geçer (yalnızca benzerlik anahtarı değişir).
+
 ### Sonraki aşamalar
 - El yazısında arama (Digital Ink, `tr`; sonuçlar sayfaya gider ve vurgular).
 - Video çözüm bağlantısı: soru başına bağlantı + saniye ("Çözümü izle").
