@@ -16,6 +16,8 @@ import '../../../ocr/ocr_providers.dart';
 import '../../../ocr/domain/ocr.dart';
 import '../../../../app/widgets/tone_icon.dart';
 import '../../../ocr/auto_tag_providers.dart';
+import '../../similar_providers.dart';
+import '../../domain/similar_questions.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.cardId});
@@ -146,6 +148,8 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
           if (card.questionImage != null) ...[
             const SizedBox(height: 24),
             _OcrSection(card: card),
+            const SizedBox(height: 16),
+            _SimilarSection(card: card),
           ],
           if (card.note != null) ...[
             const SizedBox(height: 20),
@@ -379,3 +383,72 @@ String _kindLabel(Object? kind) => switch (kind) {
       'chart' => 'Grafik',
       _ => 'Şekil',
     };
+
+/// Benzer sorular: bu hatanın benzerlerini yanlış mı, doğru mu yapmışım?
+class _SimilarSection extends ConsumerWidget {
+  const _SimilarSection({required this.card});
+  final QuestionCard card;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final result = ref.watch(similarQuestionsProvider(card.id));
+    final empty = result.mistakes.isEmpty && result.correct.isEmpty;
+
+    Widget group(String title, List<SimilarMatch> items, Color color) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            Text('$title (${items.length})', style: theme.textTheme.labelLarge?.copyWith(color: color)),
+            for (final m in items)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                leading: SizedBox.square(
+                  dimension: 44,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: m.card.questionImage == null
+                        ? const Icon(Icons.image_not_supported_outlined)
+                        : MediaImage(m.card.questionImage!, cacheWidth: 120),
+                  ),
+                ),
+                title: Text(m.card.locationText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                subtitle: Text(m.reasons.isEmpty ? 'genel benzerlik' : m.reasons.join(' · '),
+                    maxLines: 2, overflow: TextOverflow.ellipsis),
+                onTap: () => context.push(AppRoutes.question(m.card.id)),
+              ),
+          ],
+        );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const ToneIcon(Icons.compare_arrows_rounded, color: KocumColors.blue, size: 32),
+                const SizedBox(width: 10),
+                Expanded(child: Text('Benzer sorular', style: theme.textTheme.titleSmall)),
+              ],
+            ),
+            if (empty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  'Henüz benzer soru bulunamadı. Benzerlik, fotoğrafı okunmuş sorular arasında aranır; '
+                  'doğru yaptığın sorular ancak fotoğrafıyla eklediysen görünür.',
+                  style: muted,
+                ),
+              ),
+            if (result.mistakes.isNotEmpty) group('Yanlış/boş yaptıkların', result.mistakes, theme.colorScheme.error),
+            if (result.correct.isNotEmpty) group('Doğru yaptıkların', result.correct, KocumColors.correct),
+          ],
+        ),
+      ),
+    );
+  }
+}
