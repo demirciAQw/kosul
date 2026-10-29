@@ -349,3 +349,49 @@ class AppMeta extends Table {
   @override
   Set<Column> get primaryKey => {metaKey};
 }
+
+/// PDF kitapları (v12): dosya medya klasöründe; isteğe bağlı ders.
+@DataClassName('PdfDocumentRow')
+class PdfDocuments extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get filePath => text()(); // medya köküne göre göreli
+  IntColumn get pageCount => integer()();
+  TextColumn get subject => text().nullable()();
+  IntColumn get lastPage => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// PDF'ten seçilen soru (v12): kartın PDF'teki yeri, sayfaya oranla (0–1).
+/// Görsel dosyası tutulmaz; gerektiğinde PDF'ten çizilir.
+@DataClassName('PdfQuestionRefRow')
+class PdfQuestionRefs extends Table {
+  TextColumn get cardId => text()();
+  TextColumn get documentId => text()();
+  IntColumn get page => integer()(); // 0'dan başlar
+  RealColumn get x0 => real()();
+  RealColumn get y0 => real()();
+  RealColumn get x1 => real()();
+  RealColumn get y1 => real()();
+
+  @override
+  Set<Column> get primaryKey => {cardId};
+}
+
+/// Kalem katmanı (v12): PDF sayfası ya da soru üstündeki çizgiler, oranla.
+@DataClassName('InkLayerRow')
+class InkLayers extends Table {
+  TextColumn get id => text()();
+  TextColumn get ownerType => text()(); // page | card
+  TextColumn get ownerId => text()(); // "belge:sayfa" ya da kart kimliği
+  TextColumn get name => text()();
+  TextColumn get strokesJson => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

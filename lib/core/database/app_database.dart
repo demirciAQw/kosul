@@ -22,6 +22,9 @@ part 'app_database.g.dart';
   StudyNotes,
   NotePhotos,
   OcrResults,
+  PdfDocuments,
+  PdfQuestionRefs,
+  InkLayers,
   AppMeta,
 
 ])
@@ -36,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
   /// v7: ders notları (study_notes).
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -115,6 +118,12 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from == 10) {
             await m.addColumn(ocrResults, ocrResults.structureJson);
+          }
+          if (from < 12) {
+            // PDF kitapları, PDF'ten seçilen soruların yeri, kalem katmanları.
+            await m.createTable(pdfDocuments);
+            await m.createTable(pdfQuestionRefs);
+            await m.createTable(inkLayers);
           }
         },
         beforeOpen: (details) async {
