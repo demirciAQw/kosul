@@ -3,7 +3,9 @@
 //
 // Otomatik denemeler (uygulama açılınca, oturum bitince) en fazla 2 dakikada
 // bir yapılır ve koç bulunamazsa sessizce vazgeçer. Bilgisayarın IP'si
-// değiştiyse mDNS ile yeni adresi bulup bir kez daha dener.
+// değiştiyse mDNS ile yeni adresi bulup bir kez daha dener. Cevap gelmezse aynı
+// isteği (aynı tek kullanımlık istekId ile) bir kez yeniden gönderir; sunucu
+// kayıtları iki kez uygulamaz.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -23,13 +25,17 @@ class KocEsitleyici {
     required this.yedekTopla,
     required this.saat,
     this.degisti,
-  });
+    IdGenerator? idUret,
+  }) : idUret = idUret ?? const UuidV7Generator();
 
   final EslemeDeposu depo;
   final KocIstemcisi istemci;
   final KocBulucu bulucu;
   final Future<Map<String, dynamic>> Function() yedekTopla;
   final Clock saat;
+
+  /// Her eşitleme isteğine tek kullanımlık kimlik verir.
+  final IdGenerator idUret;
 
   /// Durum değişince (arayüz yenilensin diye) çağrılır.
   final void Function()? degisti;
@@ -81,15 +87,27 @@ class KocEsitleyici {
   Future<EsitlemeDurumu> _gonder(KocEslemesi esleme, EsitlemeDurumu durum) async {
     final yedek = await yedekTopla();
     final son = durum.sonEsitleme, oncekiOzet = durum.sonOzet;
-    var paket = await Isolate.run(() => esitlemePaketi(yedek, son, oncekiOzet));
-    var cevap = EsitlemeCevabi.fromJson(await istemci.esitle(esleme.adres, esleme.port, esleme.anahtar, paket.gzip));
+    final id1 = idUret.next();
+    var paket = await Isolate.run(() => esitlemePaketi(yedek, son, oncekiOzet, istekId: id1));
+    var cevap = EsitlemeCevabi.fromJson(await _yolla(esleme, paket.gzip));
     if (cevap.yedekGerekli) {
-      paket = await Isolate.run(() => esitlemePaketi(yedek, son, null));
-      cevap = EsitlemeCevabi.fromJson(await istemci.esitle(esleme.adres, esleme.port, esleme.anahtar, paket.gzip));
+      final id2 = idUret.next();
+      paket = await Isolate.run(() => esitlemePaketi(yedek, son, null, istekId: id2));
+      cevap = EsitlemeCevabi.fromJson(await _yolla(esleme, paket.gzip));
     }
     final zaman = cevap.sunucuZamani;
     if (zaman == null) throw const KocHatasi('Bilgisayarın cevabı anlaşılamadı.');
     return durum.basarili(sunucuZamani: zaman, an: saat(), ozet: paket.ozet);
+  }
+
+  /// Cevap gelmezse aynı gövde (aynı istekId) bir kez daha gönderilir.
+  Future<Map<String, dynamic>> _yolla(KocEslemesi esleme, List<int> govde) async {
+    try {
+      return await istemci.esitle(esleme.adres, esleme.port, esleme.anahtar, govde);
+    } on KocHatasi catch (e) {
+      if (!e.cevapGelmedi) rethrow;
+      return istemci.esitle(esleme.adres, esleme.port, esleme.anahtar, govde);
+    }
   }
 }
 
@@ -98,10 +116,11 @@ class KocEsitleyici {
 ({String ozet, List<int> gzip, bool tam}) esitlemePaketi(
   Map<String, dynamic> yedek,
   String? sonEsitleme,
-  String? oncekiOzet,
-) {
+  String? oncekiOzet, {
+  String? istekId,
+}) {
   final ozet = yedekOzeti(yedek);
   final tam = ozet != oncekiOzet;
-  final govde = esitlemeIstegi(sonEsitleme: sonEsitleme, ozet: ozet, yedek: tam ? yedek : null);
+  final govde = esitlemeIstegi(sonEsitleme: sonEsitleme, ozet: ozet, istekId: istekId, yedek: tam ? yedek : null);
   return (ozet: ozet, gzip: gzip.encode(utf8.encode(jsonEncode(govde))), tam: tam);
 }

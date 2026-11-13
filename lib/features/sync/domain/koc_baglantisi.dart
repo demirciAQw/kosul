@@ -143,15 +143,19 @@ String yedekOzeti(Map<String, dynamic> yedek) {
 }
 
 /// `POST /esitle` gövdesi. Yedek değişmediyse [yedek] null olur, sadece özet gider.
+/// [istekId] tek kullanımlıktır: cevap yolda kaybolup aynı gövde yeniden
+/// gönderilirse sunucu kayıtları ikinci kez uygulamaz, önceki cevabı verir.
 Map<String, Object?> esitlemeIstegi({
   required String? sonEsitleme,
   required String ozet,
+  String? istekId,
   Map<String, dynamic>? yedek,
   Map<String, List<Map<String, Object?>>> tablolar = const {},
 }) => {
   'surum': 1,
   'sonEsitleme': sonEsitleme,
   'yedekOzeti': ozet,
+  if (istekId != null) 'istekId': istekId,
   if (yedek != null) 'yedek': yedek,
   if (tablolar.isNotEmpty) 'tablolar': tablolar,
 };

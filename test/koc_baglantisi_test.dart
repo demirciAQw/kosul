@@ -172,6 +172,7 @@ void main() {
     late List<Map<String, dynamic>> gelenler;
     String? sunucudakiOzet;
     var cevapKodu = 200;
+    var cevapsizKalan = 0; // bu kadar istek cevapsız kalır (cevap yolda kayboldu)
     var saat = DateTime(2026, 11, 14, 10);
     var yedek = <String, dynamic>{'format': 'kocum.backup', 'exportedAt': 'x', 'questions': <Object>[]};
 
@@ -179,6 +180,7 @@ void main() {
       gelenler = [];
       sunucudakiOzet = null;
       cevapKodu = 200;
+      cevapsizKalan = 0;
       sunucu = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       sunucu.listen((req) async {
         expect(req.headers.value(HttpHeaders.authorizationHeader), 'Bearer gizli');
@@ -186,6 +188,12 @@ void main() {
         final ham = await req.fold<List<int>>([], (a, b) => a..addAll(b));
         final govde = jsonDecode(utf8.decode(gzip.decode(ham))) as Map<String, dynamic>;
         gelenler.add(govde);
+        if (cevapsizKalan > 0) {
+          cevapsizKalan--;
+          await Future<void>.delayed(const Duration(milliseconds: 400));
+          await req.response.close();
+          return;
+        }
         Map<String, Object?> cevap;
         if (cevapKodu != 200) {
           cevap = {'hata': 'Bu cihaz eşli değil.'};
@@ -214,9 +222,9 @@ void main() {
       await db.close();
     });
 
-    KocEsitleyici esitleyici({KocBulucu? bulucu}) => KocEsitleyici(
+    KocEsitleyici esitleyici({KocBulucu? bulucu, KocIstemcisi? istemci}) => KocEsitleyici(
       depo: depo,
-      istemci: KocIstemcisi(),
+      istemci: istemci ?? KocIstemcisi(),
       bulucu: bulucu ?? _SahteBulucu(null),
       yedekTopla: () async => yedek,
       saat: () => saat,
@@ -241,6 +249,21 @@ void main() {
       expect(gelenler.last.containsKey('yedek'), isFalse);
       expect(gelenler.last['sonEsitleme'], 'z1');
       expect((await depo.durum()).sonEsitleme, 'z2');
+    });
+
+    test('her istek tek kullanımlık kimlik taşır; cevap gelmezse aynı kimlikle bir kez yeniden', () async {
+      final e = esitleyici(istemci: KocIstemcisi(esitlemeSuresi: const Duration(milliseconds: 200)));
+      await e.dene(zorla: true);
+      await e.dene(zorla: true);
+      expect(gelenler[0]['istekId'], isA<String>());
+      expect(gelenler[0]['istekId'], isNot(gelenler[1]['istekId']));
+
+      gelenler.clear();
+      cevapsizKalan = 1;
+      final d = await e.dene(zorla: true);
+      expect(d!.sonHata, isNull);
+      expect(gelenler.length, 2);
+      expect(gelenler[0]['istekId'], gelenler[1]['istekId']);
     });
 
     test('sunucu yedeği kaybettiyse tam yedek yeniden gider', () async {

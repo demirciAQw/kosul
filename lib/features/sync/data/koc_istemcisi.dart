@@ -17,8 +17,11 @@ class KocSunucuBilgisi {
 }
 
 class KocHatasi implements Exception {
-  const KocHatasi(this.mesaj, {this.durum});
+  const KocHatasi(this.mesaj, {this.durum, this.cevapGelmedi = false});
   final String mesaj;
+
+  /// İstek gitti ama cevap gelmedi (zaman aşımı). Aynı istek yeniden denenebilir.
+  final bool cevapGelmedi;
 
   /// HTTP durum kodu (bağlantı kurulamadıysa null).
   final int? durum;
@@ -31,8 +34,11 @@ class KocHatasi implements Exception {
 }
 
 class KocIstemcisi {
-  KocIstemcisi({this.zamanAsimi = const Duration(seconds: 20)});
+  KocIstemcisi({this.zamanAsimi = const Duration(seconds: 20), this.esitlemeSuresi = const Duration(minutes: 2)});
   final Duration zamanAsimi;
+
+  /// Eşitleme isteğinin cevabı için beklenecek en uzun süre (yedek büyük olabilir).
+  final Duration esitlemeSuresi;
 
   Uri _uri(String adres, int port, String yol) => Uri(scheme: 'http', host: adres, port: port, path: yol);
 
@@ -75,7 +81,7 @@ class KocIstemcisi {
     } on KocHatasi {
       rethrow;
     } on TimeoutException {
-      throw const KocHatasi('Bilgisayar cevap vermedi.');
+      throw const KocHatasi('Bilgisayar cevap vermedi.', cevapGelmedi: true);
     } on SocketException {
       throw const KocHatasi('Bilgisayara ulaşılamadı. Aynı Wi-Fi\'de mi, koc sunucu açık mı?');
     } on HttpException catch (e) {
@@ -121,7 +127,7 @@ class KocIstemcisi {
 
   /// [gzipliGovde]: gzip ile sıkıştırılmış JSON (büyük olabilir; ana iş parçacığı dışında hazırlanır).
   Future<Map<String, dynamic>> esitle(String adres, int port, String anahtar, List<int> gzipliGovde) =>
-      _istek(adres, port, '/esitle', gzipliGovde: gzipliGovde, anahtar: anahtar, sure: const Duration(minutes: 2));
+      _istek(adres, port, '/esitle', gzipliGovde: gzipliGovde, anahtar: anahtar, sure: esitlemeSuresi);
 
   Future<void> eslemeyiKaldir(String adres, int port, String anahtar) =>
       _istek(adres, port, '/eslemeyi-kaldir', govde: const {}, anahtar: anahtar, sure: const Duration(seconds: 5));
