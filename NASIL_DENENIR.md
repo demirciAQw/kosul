@@ -69,6 +69,22 @@ Telefon aynı Wi-Fi'deyken yedeğini (fotoğrafsız) bilgisayara kendiliğinden 
    Aynı dakikada iki kez açarsan ikincisi beklenir (en fazla 2 dakikada bir).
 7. **Eşlemeyi kaldır** de: terminalde "Eşleme kaldırıldı" yazar.
 
+## Anlık (v8.6)
+
+1. **Bugün** ekranında üstteki kalem simgesi: Anlık açılır (alt sekme yok).
+2. Aşağıya `bugün ((garson)) çağıramadım` yaz. `((` yazınca öneri listesi açılır; sonda **Yeni etiket: garson** çıkar.
+   Dokun: pencerede ad, tür (Kişi/Duygu/...), üst etiket ve renk; **Oluştur**. Metindeki `((garson))` renklenir.
+3. **His**'e dokun, -2 seç, gönder. Anlık listede "Bugün" başlığı altında, üstünde çerçeveli **garson** çipiyle görünür.
+4. Yazma alanındaki **+ Etiket**: arama kutulu ağaç listesi açılır; birkaç etiket işaretle, **Ekle**. Gönder.
+   Bu çiplerin × düğmesi çalışır; metinden gelen çipin ×'i "metinden sil" der.
+5. Bir çipe dokun: etiket sayfası (o etiketli anlıklar). Sağ üst menü **Etiketi sil**: sayılar ve seçenekler görünür.
+   Silince metindeki `((garson))` düz yazıya döner; Anlık menüsü **Son silinen etiketler**'den **Geri al**.
+6. Bir anlığa dokun: düzenle ya da sil.
+7. Sol üstteki ızgara simgesi ana uygulamaya döner. Uygulamayı Anlık'ta kapatırsan bir dahaki açılışta Anlık açılır.
+8. Uygulama simgesine uzun bas: **Anlık yaz** kısayolu yazma alanı açık gelir.
+9. **Ayarlar > Obsidian anlarını içe aktar**: `Anlar/*.md` dosyalarını seç. İkinci kez seçersen "atlandı" der.
+10. Eşliyse: anlık yazınca bilgisayara gider (`koc sunucu` terminalinde "eşitlendi").
+
 ## Hata alırsan
 
 Bu kodu yazarken Flutter'ı çalıştıramadım, yani ilk derlemede küçük bir hata çıkabilir.

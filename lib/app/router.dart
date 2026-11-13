@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/anlik/anlik_providers.dart';
+import '../features/anlik/presentation/anlik_ekrani.dart';
+import '../features/anlik/presentation/etiket_sayfasi.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/library/presentation/book_detail_screen.dart';
@@ -33,6 +36,8 @@ import '../features/tools/presentation/practice_test_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
+    // Son açılan mod hatırlanır: Anlık'ta kapatıldıysa Anlık açılır.
+    initialLocation: ref.read(baslangictaAnlikProvider) ? AppRoutes.anlik : AppRoutes.home,
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
@@ -85,6 +90,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AppRoutes.newPlan, builder: (context, state) => const CreatePlanScreen()),
       GoRoute(path: AppRoutes.sessions, builder: (context, state) => const SessionHistoryScreen()),
       GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
+      GoRoute(
+        path: AppRoutes.anlik,
+        builder: (context, state) => AnlikEkrani(yaz: state.uri.queryParameters['yaz'] == '1'),
+      ),
+      GoRoute(
+        path: '/anlik/etiket/:id',
+        builder: (context, state) => EtiketSayfasi(etiketId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/anlik/a/:id',
+        builder: (context, state) => AnlikDuzenleEkrani(anlikId: state.pathParameters['id']!),
+      ),
       GoRoute(path: AppRoutes.kocEsleme, builder: (context, state) => const EslemeEkrani()),
       GoRoute(path: AppRoutes.practiceTest, builder: (context, state) => const PracticeTestScreen()),
       GoRoute(

@@ -25,6 +25,7 @@ class KocEsitleyici {
     required this.yedekTopla,
     required this.saat,
     this.degisti,
+    this.kaynaklar = const [],
     IdGenerator? idUret,
   }) : idUret = idUret ?? const UuidV7Generator();
 
@@ -33,6 +34,9 @@ class KocEsitleyici {
   final KocBulucu bulucu;
   final Future<Map<String, dynamic>> Function() yedekTopla;
   final Clock saat;
+
+  /// Yedeğin yanında giden kayıtlar (v8.6: anlıklar, etiketler, bağlar).
+  final List<EsitKayitKaynagi> kaynaklar;
 
   /// Her eşitleme isteğine tek kullanımlık kimlik verir.
   final IdGenerator idUret;
@@ -87,16 +91,26 @@ class KocEsitleyici {
   Future<EsitlemeDurumu> _gonder(KocEslemesi esleme, EsitlemeDurumu durum) async {
     final yedek = await yedekTopla();
     final son = durum.sonEsitleme, oncekiOzet = durum.sonOzet;
+    final tablolar = <String, List<Map<String, Object?>>>{};
+    for (final k in kaynaklar) {
+      tablolar.addAll(await k.esitlenecekler());
+    }
     final id1 = idUret.next();
-    var paket = await Isolate.run(() => esitlemePaketi(yedek, son, oncekiOzet, istekId: id1));
+    var paket = await Isolate.run(() => esitlemePaketi(yedek, son, oncekiOzet, istekId: id1, tablolar: tablolar));
     var cevap = EsitlemeCevabi.fromJson(await _yolla(esleme, paket.gzip));
     if (cevap.yedekGerekli) {
       final id2 = idUret.next();
-      paket = await Isolate.run(() => esitlemePaketi(yedek, son, null, istekId: id2));
+      paket = await Isolate.run(() => esitlemePaketi(yedek, son, null, istekId: id2, tablolar: tablolar));
       cevap = EsitlemeCevabi.fromJson(await _yolla(esleme, paket.gzip));
     }
     final zaman = cevap.sunucuZamani;
     if (zaman == null) throw const KocHatasi('Bilgisayarın cevabı anlaşılamadı.');
+    // Önce gidenlerin işareti kalkar, sonra gelenler yazılır (çakışma kuralı
+    // "telefonda hâlâ eşitlenmemiş" olanlara bakar).
+    for (final k in kaynaklar) {
+      await k.esitlendi(tablolar);
+      await k.gelenleriUygula(cevap.tablolar);
+    }
     return durum.basarili(sunucuZamani: zaman, an: saat(), ozet: paket.ozet);
   }
 
@@ -118,9 +132,16 @@ class KocEsitleyici {
   String? sonEsitleme,
   String? oncekiOzet, {
   String? istekId,
+  Map<String, List<Map<String, Object?>>> tablolar = const {},
 }) {
   final ozet = yedekOzeti(yedek);
   final tam = ozet != oncekiOzet;
-  final govde = esitlemeIstegi(sonEsitleme: sonEsitleme, ozet: ozet, istekId: istekId, yedek: tam ? yedek : null);
+  final govde = esitlemeIstegi(
+    sonEsitleme: sonEsitleme,
+    ozet: ozet,
+    istekId: istekId,
+    yedek: tam ? yedek : null,
+    tablolar: tablolar,
+  );
   return (ozet: ozet, gzip: gzip.encode(utf8.encode(jsonEncode(govde))), tam: tam);
 }

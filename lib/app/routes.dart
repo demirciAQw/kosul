@@ -22,6 +22,12 @@ abstract final class AppRoutes {
   static const newNote = '/notes/new';
   static const settings = '/settings';
   static const kocEsleme = '/settings/koc';
+
+  // Anlık (kendi kabuğu, alt sekme yok)
+  static const anlik = '/anlik';
+  static const anlikYaz = '/anlik?yaz=1';
+  static String anlikEtiket(String id) => '/anlik/etiket/$id';
+  static String anlikDuzenle(String id) => '/anlik/a/$id';
   static String note(String id) => '/notes/$id';
   static String book(String id) => '/books/$id';
   static String bookTest(String bookId, String nodeId) => '/books/$bookId/tests/$nodeId';

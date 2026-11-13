@@ -3,6 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/core_providers.dart';
+import '../anlik/anlik_providers.dart';
 import '../tools/tools_providers.dart';
 import 'data/esleme_deposu.dart';
 import 'data/koc_bulucu.dart';
@@ -31,6 +32,7 @@ final kocEsitleyiciProvider = Provider(
     bulucu: ref.watch(kocBulucuProvider),
     yedekTopla: ref.watch(fullDataCollectorProvider),
     saat: ref.watch(clockProvider),
+    kaynaklar: [ref.watch(anlikDeposuProvider)],
     degisti: () {
       ref.invalidate(kocEslemesiProvider);
       ref.invalidate(esitlemeDurumuProvider);

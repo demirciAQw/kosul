@@ -8,6 +8,7 @@ import 'core/di/core_providers.dart';
 import 'core/media/local_media_storage.dart';
 import 'core/notifications/reminder_service.dart';
 import 'core/notifications/session_chronometer.dart';
+import 'features/anlik/anlik_providers.dart';
 import 'features/curriculum/data/curriculum_data.dart';
 import 'features/settings/settings_providers.dart';
 
@@ -28,6 +29,7 @@ Future<void> main() async {
   final media = await LocalMediaStorage.open();
   final chronometer = SessionChronometer();
   final reminders = ReminderService();
+  final anlikModu = await anlikModundaMi(database).catchError((_) => false);
   await Future.wait<void>([
     CurriculumSeeder(database).run(),
     chronometer.init(),
@@ -40,6 +42,7 @@ Future<void> main() async {
       mediaStorageProvider.overrideWithValue(media),
       sessionChronometerProvider.overrideWithValue(chronometer),
       reminderServiceProvider.overrideWithValue(reminders),
+      baslangictaAnlikProvider.overrideWithValue(anlikModu),
     ],
     child: const KocumApp(),
   ));

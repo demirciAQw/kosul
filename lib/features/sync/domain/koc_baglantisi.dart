@@ -195,6 +195,19 @@ class EsitlemeCevabi {
   }
 }
 
+/// Eşitlenen kayıtların kaynağı (v8.6: anlık/etiket/bağ; v8.8: ayar, düzen, plan).
+/// Her kaynak kendi tablolarını verir ve gelenleri kendi yazar.
+abstract interface class EsitKayitKaynagi {
+  /// Son eşitlemeden beri değişenler: tablo adı → kayıtlar (JSON).
+  Future<Map<String, List<Map<String, Object?>>>> esitlenecekler();
+
+  /// Gönderilenler sunucuya ulaştı (yolda yeniden değişenler işaretli kalır).
+  Future<void> esitlendi(Map<String, List<Map<String, Object?>>> gonderilen);
+
+  /// Sunucudan gelenleri yazar (kendi tablolarını alır, diğerlerini yok sayar).
+  Future<int> gelenleriUygula(Map<String, List<Map<String, Object?>>> tablolar);
+}
+
 /// Eşitlenen bir kayıt (v8.6'dan itibaren anlık, etiket, bağ). [esitlenmedi]:
 /// son eşitlemeden beri telefonda değişti.
 class EsitKayit {

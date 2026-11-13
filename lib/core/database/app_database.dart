@@ -23,7 +23,9 @@ part 'app_database.g.dart';
   NotePhotos,
   OcrResults,
   AppMeta,
-
+  Anliklar,
+  Etiketler,
+  Baglar,
 ])
 class AppDatabase extends _$AppDatabase {
   /// Testlerde: `AppDatabase(NativeDatabase.memory())`
@@ -35,8 +37,9 @@ class AppDatabase extends _$AppDatabase {
   /// v5: kartlarda serbest konu/kazanım adı (karneden içe aktarma).
   /// v6: eski sürümlerden kalan yetim tekrar kayıtlarını temizler.
   /// v7: ders notları (study_notes).
+  /// v12: Anlık (anliklar, etiketler, baglar).
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -48,6 +51,7 @@ class AppDatabase extends _$AppDatabase {
             "ON study_sessions(status) WHERE status = 'running'",
           );
           await _createV2Indexes();
+          await _createAnlikIndexes();
         },
         onUpgrade: (m, from, to) async {
           if (from < 2) {
@@ -116,11 +120,23 @@ class AppDatabase extends _$AppDatabase {
           if (from == 10) {
             await m.addColumn(ocrResults, ocrResults.structureJson);
           }
+          if (from < 12) {
+            await m.createTable(anliklar);
+            await m.createTable(etiketler);
+            await m.createTable(baglar);
+            await _createAnlikIndexes();
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+
+  Future<void> _createAnlikIndexes() async {
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_baglar_kaynak ON baglar(kaynak_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_baglar_hedef ON baglar(hedef_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS ix_anliklar_olusturma ON anliklar(olusturma)');
+  }
 
   Future<void> _createV2Indexes() async {
     await customStatement(

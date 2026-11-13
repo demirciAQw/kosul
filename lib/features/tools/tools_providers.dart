@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/di/core_providers.dart';
+import '../anlik/anlik_providers.dart';
+import '../anlik/domain/anlik_esitleme.dart';
 import '../library/library_providers.dart';
 import '../mock_exam/mock_exam_providers.dart';
 import '../notes/notes_providers.dart';
@@ -31,6 +33,7 @@ final notebookPdfRequestProvider = NotifierProvider<NotebookPdfRequest, bool>(No
 /// dışa aktarması ve bilgisayarla eşitleme aynı veriyi kullanır.
 final fullDataCollectorProvider = Provider<Future<Map<String, dynamic>> Function()>((ref) => () async {
       final ocr = await ref.read(ocrRecordsProvider.future);
+      final anlik = ref.read(anlikDeposuProvider);
       return fullDataJson(
         now: ref.read(clockProvider)(),
         cards: await ref.read(allQuestionsProvider.future),
@@ -41,5 +44,10 @@ final fullDataCollectorProvider = Provider<Future<Map<String, dynamic>> Function
         plans: await ref.read(plansProvider.future),
         notes: await ref.read(notesProvider.future),
         ocr: [for (final r in ocr.values) r.toDatasetJson()],
+        anlik: {
+          'anliklar': [for (final a in await anlik.anliklar()) anlikJson(a)],
+          'etiketler': [for (final e in await anlik.etiketler()) etiketJson(e)],
+          'baglar': [for (final b in await anlik.baglar()) bagJson(b)],
+        },
       );
     });

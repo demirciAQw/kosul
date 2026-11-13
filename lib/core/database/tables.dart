@@ -349,3 +349,60 @@ class AppMeta extends Table {
   @override
   Set<Column> get primaryKey => {metaKey};
 }
+
+// ───────────────────────── Anlık (v12) ─────────────────────────
+// Eşitlenen tablolar: her satır guncelleme, silindi (yumuşak silme) ve
+// esitlenmedi (son eşitlemeden beri değişti) taşır. Ayrıntı: docs/ANLIK.md.
+
+@DataClassName('AnlikRow')
+class Anliklar extends Table {
+  TextColumn get id => text()();
+  TextColumn get metin => text()();
+  DateTimeColumn get olusturma => dateTime()();
+  DateTimeColumn get guncelleme => dateTime()();
+  IntColumn get duygu => integer().nullable()(); // -3..+3
+  TextColumn get cihaz => text().withDefault(const Constant(''))();
+  BoolColumn get silindi => boolean().withDefault(const Constant(false))();
+  BoolColumn get esitlenmedi => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('EtiketRow')
+class Etiketler extends Table {
+  TextColumn get id => text()();
+  TextColumn get ad => text()();
+  // Benzersizlik kodda sağlanır: silinmiş bir etiketle aynı ad yeniden kullanılabilir.
+  TextColumn get normAd => text()();
+  TextColumn get tur => text().withDefault(const Constant('diger'))(); // kisi|duygu|konu|yer|diger
+  IntColumn get renk => integer().nullable()();
+  TextColumn get olusturan => text().withDefault(const Constant('ben'))(); // ben|ai
+  DateTimeColumn get olusturma => dateTime()();
+  DateTimeColumn get guncelleme => dateTime()();
+  BoolColumn get silindi => boolean().withDefault(const Constant(false))();
+  BoolColumn get esitlenmedi => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('BagRow')
+class Baglar extends Table {
+  TextColumn get id => text()();
+  TextColumn get tip => text()(); // etiketli|ust|ilgili
+  TextColumn get kaynakTur => text()(); // anlik|etiket
+  TextColumn get kaynakId => text()();
+  TextColumn get hedefTur => text()();
+  TextColumn get hedefId => text()();
+  TextColumn get neden => text().withDefault(const Constant('elle'))(); // metin|serit|elle|ai
+  TextColumn get durum => text().withDefault(const Constant('onayli'))(); // onerildi|onayli|reddedildi
+  RealColumn get puan => real().nullable()();
+  DateTimeColumn get olusturma => dateTime()();
+  DateTimeColumn get guncelleme => dateTime()();
+  BoolColumn get silindi => boolean().withDefault(const Constant(false))();
+  BoolColumn get esitlenmedi => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

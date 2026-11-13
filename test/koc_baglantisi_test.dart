@@ -173,6 +173,7 @@ void main() {
     String? sunucudakiOzet;
     var cevapKodu = 200;
     var cevapsizKalan = 0; // bu kadar istek cevapsız kalır (cevap yolda kayboldu)
+    var sunucuTablolari = <String, Object?>{};
     var saat = DateTime(2026, 11, 14, 10);
     var yedek = <String, dynamic>{'format': 'kocum.backup', 'exportedAt': 'x', 'questions': <Object>[]};
 
@@ -181,6 +182,7 @@ void main() {
       sunucudakiOzet = null;
       cevapKodu = 200;
       cevapsizKalan = 0;
+      sunucuTablolari = {};
       sunucu = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       sunucu.listen((req) async {
         expect(req.headers.value(HttpHeaders.authorizationHeader), 'Bearer gizli');
@@ -201,7 +203,11 @@ void main() {
           cevap = {'yedekGerekli': true};
         } else {
           if (govde['yedek'] != null) sunucudakiOzet = govde['yedekOzeti'] as String;
-          cevap = {'sunucuZamani': 'z${gelenler.length}', 'yedekKaydedildi': govde['yedek'] != null, 'tablolar': {}};
+          cevap = {
+            'sunucuZamani': 'z${gelenler.length}',
+            'yedekKaydedildi': govde['yedek'] != null,
+            'tablolar': sunucuTablolari,
+          };
         }
         req.response
           ..statusCode = cevapKodu
@@ -222,13 +228,15 @@ void main() {
       await db.close();
     });
 
-    KocEsitleyici esitleyici({KocBulucu? bulucu, KocIstemcisi? istemci}) => KocEsitleyici(
-      depo: depo,
-      istemci: istemci ?? KocIstemcisi(),
-      bulucu: bulucu ?? _SahteBulucu(null),
-      yedekTopla: () async => yedek,
-      saat: () => saat,
-    );
+    KocEsitleyici esitleyici({KocBulucu? bulucu, KocIstemcisi? istemci, List<EsitKayitKaynagi> kaynaklar = const []}) =>
+        KocEsitleyici(
+          kaynaklar: kaynaklar,
+          depo: depo,
+          istemci: istemci ?? KocIstemcisi(),
+          bulucu: bulucu ?? _SahteBulucu(null),
+          yedekTopla: () async => yedek,
+          saat: () => saat,
+        );
 
     test('ilk eşitlemede tam yedek, sonra sadece özet; aralık beklenir', () async {
       final e = esitleyici();
@@ -264,6 +272,21 @@ void main() {
       expect(d!.sonHata, isNull);
       expect(gelenler.length, 2);
       expect(gelenler[0]['istekId'], gelenler[1]['istekId']);
+    });
+
+    test('kayıtlar yedekle birlikte gider; önce işaret kalkar, sonra gelenler yazılır', () async {
+      final k = _SahteKaynak();
+      sunucuTablolari = {
+        'anliklar': [
+          {'id': 'masa1', 'metin': 'masadan'},
+        ],
+      };
+      final d = await esitleyici(kaynaklar: [k]).dene(zorla: true);
+      expect(d!.sonHata, isNull);
+      expect((gelenler.single['tablolar'] as Map)['anliklar'], [
+        {'id': 'a1', 'metin': 'bir'},
+      ]);
+      expect(k.olaylar, ['topla', 'esitlendi:anliklar', 'gelen:masa1']);
     });
 
     test('sunucu yedeği kaybettiyse tam yedek yeniden gider', () async {
@@ -325,6 +348,30 @@ void main() {
       expect(await depo.cihazId(), id);
     });
   });
+}
+
+class _SahteKaynak implements EsitKayitKaynagi {
+  final olaylar = <String>[];
+
+  @override
+  Future<Map<String, List<Map<String, Object?>>>> esitlenecekler() async {
+    olaylar.add('topla');
+    return {
+      'anliklar': [
+        {'id': 'a1', 'metin': 'bir'},
+      ],
+    };
+  }
+
+  @override
+  Future<void> esitlendi(Map<String, List<Map<String, Object?>>> gonderilen) async =>
+      olaylar.add('esitlendi:${gonderilen.keys.join(',')}');
+
+  @override
+  Future<int> gelenleriUygula(Map<String, List<Map<String, Object?>>> tablolar) async {
+    olaylar.add('gelen:${[for (final k in tablolar['anliklar'] ?? const []) k['id']].join(',')}');
+    return 1;
+  }
 }
 
 class _SahteBulucu extends KocBulucu {

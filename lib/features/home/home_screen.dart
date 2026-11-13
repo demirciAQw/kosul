@@ -44,6 +44,11 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Anlık',
+            onPressed: () => context.go(AppRoutes.anlik),
+            icon: const Icon(Icons.edit_note_rounded),
+          ),
+          IconButton(
             tooltip: 'Ayarlar ve hatırlatıcılar',
             onPressed: () => context.push(AppRoutes.settings),
             icon: const Icon(Icons.settings_outlined),

@@ -27,6 +27,7 @@ Map<String, dynamic> fullDataJson({
   required List<StudyPlan> plans,
   required List<StudyNote> notes,
   List<Map<String, Object?>> ocr = const [],
+  Map<String, List<Map<String, Object?>>> anlik = const {},
 }) =>
     {
       'format': 'kocum.backup',
@@ -130,6 +131,8 @@ Map<String, dynamic> fullDataJson({
       ],
       // Fotoğraflardan okunan metinler (soru, çözüm, not sayfası), sahibine bağlı.
       'ocr': ocr,
+      // Anlık (v8.6): anlıklar, etiketler, bağlar; silinenler dahil (silindi: true).
+      if (anlik.isNotEmpty) 'anlik': anlik,
       'notes': [
         for (final n in notes)
           {

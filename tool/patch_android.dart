@@ -8,6 +8,7 @@
 //    (yoksa eskisi gibi hata ayıklama anahtarı kullanılır)
 //  - Eski eklentileri yeni Android SDK ile derleme
 //  - Bilgisayarla eşitleme: internet izni, mDNS, yerel ağda düz HTTP (v8.5)
+//  - Uygulama kısayolu "Anlık yaz" (v8.6)
 //
 // v0.2: harici kırpıcı (uCrop / image_cropper) kaldırıldı; kırpma uygulama içinde.
 import 'dart:io';
@@ -16,6 +17,7 @@ import 'camera_patch.dart';
 import 'genai_patch.dart';
 import 'network_patch.dart';
 import 'r8_patch.dart';
+import 'shortcut_patch.dart';
 
 const _desugarVersion = '2.1.4';
 
@@ -43,7 +45,28 @@ void main() {
   _copyLauncherIcons();
   _patchGenAi(kts, groovy);
   _patchR8(kts, groovy);
+  _patchShortcut(manifest);
   stdout.writeln('Android ayarları tamam.');
+}
+
+/// "Anlık yaz" kısayolu: kaynak dosyaları ve manifest.
+void _patchShortcut(File manifest) {
+  final root = Directory('android/app/src/main/kotlin');
+  final activity = root.existsSync()
+      ? root.listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('MainActivity.kt')).firstOrNull
+      : null;
+  final pkg = activity == null ? null : packageOf(activity.readAsStringSync());
+  if (pkg == null) {
+    stderr.writeln('Uyarı: MainActivity.kt bulunamadı; "Anlık yaz" kısayolu eklenmedi.');
+    return;
+  }
+  File('android/app/src/main/res/xml/kocum_kisayollar.xml')
+    ..parent.createSync(recursive: true)
+    ..writeAsStringSync(kisayolXml(pkg));
+  File('android/app/src/main/res/values/kocum_kisayol_metinleri.xml')
+    ..parent.createSync(recursive: true)
+    ..writeAsStringSync(kisayolMetinleri);
+  manifest.writeAsStringSync(patchShortcutManifest(manifest.readAsStringSync()));
 }
 
 /// R8: ML Kit'in kullanılmayan dil okuyucuları için uyarılar kapatılır.

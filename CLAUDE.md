@@ -21,7 +21,7 @@ telefon (konu düzeyi) hem tablet (soru düzeyi) için tarif edilmiştir.
   Domain saf Dart: test edilebilir, Flutter'a bağlı değil.
 - Ortak: `lib/core/` (database, media, export, text, notifications, di).
 - Önemli yerler:
-  - `core/database/` tablolar ve göçler (`schemaVersion` şu an 11)
+  - `core/database/` tablolar ve göçler (`schemaVersion` şu an 12)
   - `features/question_bank/` soru kartları, defter, optik, akıllı arama
   - `features/ocr/` fotoğraftan okuma (ML Kit), sayfa okuyucu
     (`domain/reader/page_reader.dart`: soru, kök, öncül, şık; konuma göre),
@@ -33,6 +33,9 @@ telefon (konu düzeyi) hem tablet (soru düzeyi) için tarif edilmiştir.
   - `features/sync/` bilgisayarla eşleme ve eşitleme (v8.5): kurallar
     `domain/koc_baglantisi.dart`, istemci/bulucu/eşitleyici `data/`. Karşı
     taraf `~/koc-arac/koc/sunucu.py`; istek alan adları iki tarafta aynı.
+  - `features/anlik/` Anlık (v8.6): kısa notlar, `((etiket))`, etiket şeridi,
+    alt-üst etiketler. Kurallar `domain/etiket_metni.dart` ve
+    `domain/etiket_kurallari.dart`; veritabanı `data/anlik_deposu.dart` (eşitleme kaynağı).
   - `core/media/` fotoğraf akışı: çekim, kırpma, arka planda sıkıştırma,
     uygulama içi hızlı kamera (performans modu)
 - Android projesi depoda **yok**; derlemede `flutter create` ile üretilir ve
@@ -96,4 +99,4 @@ defteri (galeri/gruplu, akıllı arama, geçmiş); tekrar (aralıklı, benzer ha
 fotoğraf bölgeleri); otomatik konu ve soru türü etiketi; soru kökü analizi;
 derin analiz; Claude raporu ve paketleri; dışa aktarma (PDF, xlsx, ZIP, yedek);
 notlar; hatırlatıcılar; hızlı kamera; Gemini Nano köprüsü (cihaz desteklerse);
-bilgisayarla eşleme ve otomatik yedek (v8.5).
+bilgisayarla eşleme ve otomatik yedek (v8.5); Anlık ve etiketler (v8.6).

@@ -7,6 +7,7 @@ import '../../../app/routes.dart';
 import '../../../app/widgets/tone_icon.dart';
 import '../../ocr/data/genai_describer.dart';
 import '../../ocr/ocr_providers.dart';
+import '../../anlik/presentation/md_ice_aktar_karti.dart';
 import '../../sync/presentation/koc_ayar_karti.dart';
 import '../domain/settings.dart';
 import '../settings_providers.dart';
@@ -197,6 +198,8 @@ class _SettingsBody extends ConsumerWidget {
         ),
         _Section('Bilgisayar'),
         KocAyarKarti(onTap: () => context.push(AppRoutes.kocEsleme)),
+        _Section('Anlık'),
+        const MdIceAktarKarti(),
         _Section('Hakkında'),
         Card(
           child: ListTile(
@@ -205,7 +208,7 @@ class _SettingsBody extends ConsumerWidget {
               child: Image.asset('assets/icon/logo.png', width: 36, height: 36),
             ),
             title: const Text('Koçum'),
-            subtitle: const Text('Sürüm 8.5. Veriler bu telefonda; eşlersen yedeği bilgisayarına da gider.'),
+            subtitle: const Text('Sürüm 8.6. Veriler bu telefonda; eşlersen yedeği bilgisayarına da gider.'),
           ),
         ),
       ],
