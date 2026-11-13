@@ -121,18 +121,8 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
     try {
       final now = ref.read(clockProvider)();
       final cards = await ref.read(allQuestionsProvider.future);
-      final notes = ref.read(notesProvider).value ?? const <StudyNote>[];
-      final data = fullDataJson(
-        now: now,
-        cards: cards,
-        books: ref.read(libraryProvider).value ?? const <Book>[],
-        results: ref.read(testResultsProvider).value ?? const {},
-        sessions: await ref.read(studySessionRepositoryProvider).watchHistory(limit: 100000).first,
-        exams: ref.read(mockExamsProvider).value ?? const <MockExam>[],
-        plans: ref.read(plansProvider).value ?? const <StudyPlan>[],
-        notes: notes,
-        ocr: [for (final r in (ref.read(ocrRecordsProvider).value ?? const {}).values) r.toDatasetJson()],
-      );
+      final notes = await ref.read(notesProvider.future);
+      final data = await ref.read(fullDataCollectorProvider)();
       // Arama veri seti (varsa) de pakete girer.
       final extra = <String, List<int>>{};
       final log = await ref.read(searchLogProvider).file();

@@ -55,6 +55,20 @@ Actions kaydında "Sabit imza kullaniliyor." satırını görürsen imza çalı�
 
 Not: Yeni eklenen yanlışlar **ertesi gün** tekrar listesine (Yanlışlarımı göster) düşer. İlk gün "bugün tekrar yok" görmen normaldir.
 
+## Bilgisayarla eşleme (v8.5)
+
+Telefon aynı Wi-Fi'deyken yedeğini (fotoğrafsız) bilgisayara kendiliğinden gönderir. İnternet kullanılmaz.
+
+1. Bilgisayarda (bir kez, ufw açıksa): `sudo ufw allow from 192.168.0.0/16 to any port 8765 proto tcp`
+   ve `sudo ufw allow from 192.168.0.0/16 to any port 5353 proto udp`
+2. Bilgisayarda: `cd ~/koc-arac && uv run koc sunucu`
+3. Telefonda: **Ayarlar > Bilgisayarla eşle**. Bilgisayar listede çıkar (çıkmazsa sunucunun yazdığı IP'yi elle yaz).
+4. Bilgisayara dokun; terminalde 6 haneli kod çıkar. Kodu telefona yaz, **Eşle** de.
+5. Birkaç saniye sonra terminalde "eşitlendi, yedek alındı" yazar; yedek `~/koc-arac/veri/kocum_yedek.json`.
+6. Uygulamayı kapatıp aç ya da bir oturum bitir: terminalde yeni satır çıkar ("yedek aynı" ya da "yedek alındı").
+   Aynı dakikada iki kez açarsan ikincisi beklenir (en fazla 2 dakikada bir).
+7. **Eşlemeyi kaldır** de: terminalde "Eşleme kaldırıldı" yazar.
+
 ## Hata alırsan
 
 Bu kodu yazarken Flutter'ı çalıştıramadım, yani ilk derlemede küçük bir hata çıkabilir.

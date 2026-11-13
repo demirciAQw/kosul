@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/palette.dart';
+import '../../../app/routes.dart';
 import '../../../app/widgets/tone_icon.dart';
 import '../../ocr/data/genai_describer.dart';
 import '../../ocr/ocr_providers.dart';
+import '../../sync/presentation/koc_ayar_karti.dart';
 import '../domain/settings.dart';
 import '../settings_providers.dart';
 
@@ -192,6 +195,8 @@ class _SettingsBody extends ConsumerWidget {
             ),
           ),
         ),
+        _Section('Bilgisayar'),
+        KocAyarKarti(onTap: () => context.push(AppRoutes.kocEsleme)),
         _Section('Hakkında'),
         Card(
           child: ListTile(
@@ -200,7 +205,7 @@ class _SettingsBody extends ConsumerWidget {
               child: Image.asset('assets/icon/logo.png', width: 36, height: 36),
             ),
             title: const Text('Koçum'),
-            subtitle: const Text('Sürüm 6.5. Tüm veriler bu telefonda saklanır.'),
+            subtitle: const Text('Sürüm 8.5. Veriler bu telefonda; eşlersen yedeği bilgisayarına da gider.'),
           ),
         ),
       ],

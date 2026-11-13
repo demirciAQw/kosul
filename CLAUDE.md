@@ -1,10 +1,15 @@
 # Koçum: proje notları (Claude Code için)
 
 YKS'ye hazırlanan bir öğrencinin kişisel çalışma uygulaması. Flutter, Android.
-Veriler yalnızca telefonda (sunucu yok). Arayüz, yorumlar ve commit mesajları
+Veriler telefonda; internete çıkmaz. Eşlenirse yedek yerel ağda bilgisayardaki
+`koc sunucu`ya (`~/koc-arac`, Python) gider. Arayüz, yorumlar ve commit mesajları
 **Türkçe**. Kullanıcı (geliştirici aynı zamanda öğrenci) kısa, sade Türkçe ister.
 
-**Sıradaki büyük iş:** tablet + PDF modu. Ayrıntılı tarif:
+**Sıradaki iş (sırayla):** v8.5 koç klasörü, sonra v8.6–v9.0 Anlık, grafik, eşitleme, öneriler,
+dinamik program. Hepsi tek belgede: [`docs/ANLIK.md`](docs/ANLIK.md).
+Bir sürüm bitmeden diğerine geçme.
+
+**Daha sonraki büyük iş:** tablet + PDF modu. Ayrıntılı tarif:
 [`docs/TABLET_PDF.md`](docs/TABLET_PDF.md). Telefon akışı bozulmadan eklenir.
 Aynı belgede **I. Benzer sorularda gelişim** ("bu hatayı öğrendim mi?") hem
 telefon (konu düzeyi) hem tablet (soru düzeyi) için tarif edilmiştir.
@@ -25,6 +30,9 @@ telefon (konu düzeyi) hem tablet (soru düzeyi) için tarif edilmiştir.
   - `features/dashboard/` derin analiz, soru kökü analizi, Claude raporu
   - `features/library/` kitaplar ve kitap haritası (şablonlar `assets/templates/`)
   - `features/mock_exam/` denemeler, karne PDF içe aktarma
+  - `features/sync/` bilgisayarla eşleme ve eşitleme (v8.5): kurallar
+    `domain/koc_baglantisi.dart`, istemci/bulucu/eşitleyici `data/`. Karşı
+    taraf `~/koc-arac/koc/sunucu.py`; istek alan adları iki tarafta aynı.
   - `core/media/` fotoğraf akışı: çekim, kırpma, arka planda sıkıştırma,
     uygulama içi hızlı kamera (performans modu)
 - Android projesi depoda **yok**; derlemede `flutter create` ile üretilir ve
@@ -87,4 +95,5 @@ defteri (galeri/gruplu, akıllı arama, geçmiş); tekrar (aralıklı, benzer ha
 öne); fotoğraftan okuma (yön, sütun, soru blokları, şıklar, şekil/grafik/
 fotoğraf bölgeleri); otomatik konu ve soru türü etiketi; soru kökü analizi;
 derin analiz; Claude raporu ve paketleri; dışa aktarma (PDF, xlsx, ZIP, yedek);
-notlar; hatırlatıcılar; hızlı kamera; Gemini Nano köprüsü (cihaz desteklerse).
+notlar; hatırlatıcılar; hızlı kamera; Gemini Nano köprüsü (cihaz desteklerse);
+bilgisayarla eşleme ve otomatik yedek (v8.5).

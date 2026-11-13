@@ -1,7 +1,7 @@
 name: kocum
 description: "Koçum: YKS öğrencileri için tamamen çevrimdışı çalışma, süre ve hata analizi takipçisi."
 publish_to: 'none'
-version: 8.4.0+38
+version: 8.5.0+39
 
 environment:
   sdk: ^3.8.0
@@ -47,6 +47,9 @@ dependencies:
 
   uuid: ^4.5.1
   intl: any # sürümü flutter_localizations sabitler
+  # Bilgisayarla eşitleme (v8.5): yedek özeti ve yerel ağda koçu bulma (ikisi de BSD)
+  crypto: ^3.0.6
+  multicast_dns: ^0.3.3
 
 dev_dependencies:
   flutter_test:

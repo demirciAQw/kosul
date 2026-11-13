@@ -12,6 +12,7 @@ import '../features/settings/domain/settings.dart';
 import '../features/settings/settings_providers.dart';
 import '../features/study_session/domain/study_session.dart';
 import '../features/study_session/study_session_providers.dart';
+import '../features/sync/sync_providers.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -35,8 +36,14 @@ class _KocumAppState extends ConsumerState<KocumApp> {
   @override
   void initState() {
     super.initState();
+    // Bilgisayarla eşitleme: açılışta, öne gelince ve oturum bitince denenir
+    // (en fazla 2 dakikada bir; eşli değilse ya da koç yoksa sessizce geçer).
+    void esitle() => unawaited(ref.read(kocEsitleyiciProvider).dene().catchError((_) => null));
     _lifecycle = AppLifecycleListener(
-      onResume: () => unawaited(ref.read(fastCameraProvider).warmUp()),
+      onResume: () {
+        unawaited(ref.read(fastCameraProvider).warmUp());
+        esitle();
+      },
       onHide: () => unawaited(ref.read(fastCameraProvider).close()),
       onDetach: () => unawaited(ref.read(fastCameraProvider).close()),
     );
@@ -50,12 +57,16 @@ class _KocumAppState extends ConsumerState<KocumApp> {
         final session = next.value;
         if (session == null) {
           chronometer.hide();
+          if (previous?.value != null) esitle();
         } else if (previous?.value?.id != session.id) {
           chronometer.show(startedAt: session.startedAt, itemCount: session.items.length);
         }
       },
       fireImmediately: true,
     );
+
+    // Açılış işleri bitsin diye eşitleme biraz sonra.
+    Future<void>.delayed(const Duration(seconds: 5), esitle);
 
     // Hatırlatıcılar: uygulama açılınca ve bekleyen tekrar sayısı değişince
     // yeniden kurulur; bildirim metni güncel sayıyı söyler.

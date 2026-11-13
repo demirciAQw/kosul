@@ -7,12 +7,14 @@
 //  - Sabit imza: android/key.properties varsa release APK onunla imzalanır
 //    (yoksa eskisi gibi hata ayıklama anahtarı kullanılır)
 //  - Eski eklentileri yeni Android SDK ile derleme
+//  - Bilgisayarla eşitleme: internet izni, mDNS, yerel ağda düz HTTP (v8.5)
 //
 // v0.2: harici kırpıcı (uCrop / image_cropper) kaldırıldı; kırpma uygulama içinde.
 import 'dart:io';
 
 import 'camera_patch.dart';
 import 'genai_patch.dart';
+import 'network_patch.dart';
 import 'r8_patch.dart';
 
 const _desugarVersion = '2.1.4';
@@ -133,6 +135,8 @@ void _patchManifest(File file) {
   s = s.replaceFirst(RegExp(r'android:label="[^"]*"'), 'android:label="Koçum"');
   // Kamera eklentisinin eklediği mikrofon izni (ses kaydı yok).
   s = removeAudioPermission(s);
+  // Bilgisayarla eşitleme (yerel ağ).
+  s = patchNetworkManifest(s);
   file.writeAsStringSync(s);
 }
 
