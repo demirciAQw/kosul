@@ -309,3 +309,57 @@ List<Anlik> etiketinAnliklari({required String etiketId, required List<Anlik> an
       if (!a.silindi && ids.contains(a.id)) a,
   ]..sort((a, b) => b.olusturma.compareTo(a.olusturma));
 }
+
+// ───────────────────────── Yeniden adlandırma ve birleştirme (v8.6.1) ─────────────────────────
+
+/// Metninde `((ad))` geçen (silinmemiş) anlık kimlikleri: "N anlık etkilenecek".
+Set<String> metninde({required String normAd, required List<Anlik> anliklar}) => {
+  for (final a in anliklar)
+    if (!a.silindi && metinEtiketAdlari(a.metin).contains(normAd)) a.id,
+};
+
+/// Aynı iki ucu, aynı tipi ve aynı nedeni olan etkin bağlardan fazlalar
+/// (birleştirmeden sonra çift bağ kalmasın). Döner: silinecek bağ kimlikleri;
+/// her gruptan en eski kalır.
+Set<String> yinelenenBaglar(List<Bag> baglar) {
+  final gorulen = <String, Bag>{};
+  final sil = <String>{};
+  final sirali =
+      [
+        for (final b in baglar)
+          if (!b.silindi) b,
+      ]..sort((a, b) {
+        final c = a.olusturma.compareTo(b.olusturma);
+        return c != 0 ? c : a.id.compareTo(b.id);
+      });
+  for (final b in sirali) {
+    final anahtar = '${b.tip.name}|${b.kaynakId}|${b.hedefId}|${b.neden.name}';
+    if (b.kaynakId == b.hedefId || gorulen.containsKey(anahtar)) {
+      sil.add(b.id);
+    } else {
+      gorulen[anahtar] = b;
+    }
+  }
+  return sil;
+}
+
+/// [kaynakId] [hedefId]'de toplanırsa alt-üst ağacında döngü oluşur mu?
+/// (Kaynağın bir üstü hedefin altındaysa olur.) Kendine bağ sayılmaz, silinir.
+bool birlestirmeDonguOlurMu({required String kaynakId, required String hedefId, required List<Bag> baglar}) {
+  String cevir(String id) => id == kaynakId ? hedefId : id;
+  final ust = <String, Set<String>>{};
+  for (final b in baglar) {
+    if (b.tip != BagTip.ust || !b.etkin) continue;
+    final a = cevir(b.kaynakId), u = cevir(b.hedefId);
+    if (a != u) (ust[a] ??= {}).add(u);
+  }
+  // hedeften yukarı çıkarak hedefe geri dönülüyor mu?
+  final gorulen = <String>{};
+  final yigin = [...(ust[hedefId] ?? const <String>{})];
+  while (yigin.isNotEmpty) {
+    final x = yigin.removeLast();
+    if (x == hedefId) return true;
+    if (gorulen.add(x)) yigin.addAll(ust[x] ?? const {});
+  }
+  return false;
+}

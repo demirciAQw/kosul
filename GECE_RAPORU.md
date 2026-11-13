@@ -11,6 +11,7 @@ Her adım bitince güncellenir. `main`'e dokunulmadı, birleştirme yok.
 | 2. `koc esitle` + uçtan uca test (koc-arac) | koc-arac `main` (yerel) | `uv run pytest`: 30 geçti |
 | 3. Koçum v8.5.1: tek kullanımlık eşitleme | `v8.5` | yeşil |
 | 4. Koçum v8.6.0: Anlık | `v8.6.0` | (bekleniyor) |
+| 5. Koçum v8.6.1: etiket etiketi ve arama | `v8.6.1` | (bekleniyor) |
 
 ### Sistem kontrolü (hiçbir şey kurulmadı)
 - CachyOS, çekirdek 7.2.9; Python 3.14.10; uv 0.13.8; Flutter 3.50.0.
@@ -44,6 +45,9 @@ Her adım bitince güncellenir. `main`'e dokunulmadı, birleştirme yok.
 - Obsidian içe aktarmada bilinmeyen `((x))` için etiket kendiliğinden (tür: diğer) oluşur;
   pencere açmak yüzlerce dosyada olmaz.
 - Eşitlemede aynı adlı iki etiket birleşir: daha eski olan kalır (iki tarafta aynı sonuç).
+- Arama parçaları (`searchTokens`, `editDistance`, `tokenSimilarity`, `relevanceScore`) `core/text/fuzzy_search.dart`'a
+  taşındı; `smart_search.dart` onları yeniden dışa veriyor, eski testler değişmeden geçiyor.
+- Birleştirmede döngü kontrolü ayrı bir saf fonksiyon (`birlestirmeDonguOlurMu`); çift bağlar temizlenir.
 - Anlıklar tam yedeğe (`kocum.backup` içinde `anlik`) de girer.
 
 ## Sabah telefonda deneme listesi
@@ -56,6 +60,8 @@ v8.5.1:
 4. İkinci terminalde `uv run koc esitle --yedek veri/kocum_yedek.json`: kodu sorar, sonra "Eşitlendi".
 
 v8.6.0: `NASIL_DENENIR.md` > "Anlık (v8.6)" bölümündeki 10 adım.
+
+v8.6.1: aynı belgede "Etiket etiketi ve arama (v8.6.1)" (8 adım).
 
 ## Önce okunacak 3 dosya
 1. `lib/features/anlik/domain/etiket_metni.dart`: `((etiket))` nasıl bulunur (kısa, saf Dart).

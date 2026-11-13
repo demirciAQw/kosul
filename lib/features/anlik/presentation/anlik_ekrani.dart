@@ -10,13 +10,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
 import '../../../core/di/core_providers.dart';
-import '../../../core/text/turkish_text.dart';
 import '../../../core/utils/formatters.dart';
 import '../../sync/sync_providers.dart';
 import '../anlik_providers.dart';
 import '../data/anlik_deposu.dart';
 import '../domain/anlik.dart';
+import '../domain/anlik_arama.dart';
 import '../domain/etiket_kurallari.dart';
+import 'arama_filtreleri.dart';
+import 'etiket_menusu.dart';
 import 'etiket_seridi.dart';
 import 'etiketli_metin.dart';
 import 'yazma_alani.dart';
@@ -33,6 +35,8 @@ class AnlikEkrani extends ConsumerStatefulWidget {
 
 class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
   var _sorgu = '';
+  var _filtre = const AnlikFiltresi();
+  var _filtreAcik = false;
 
   @override
   void initState() {
@@ -56,18 +60,21 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
       for (final e in etiketler)
         if (!e.silindi) e.normAd: e,
     };
-    final q = normalizeTr(_sorgu);
-    final gorunen = [
-      for (final a in anliklar ?? const <Anlik>[])
-        if (!a.silindi && (q.isEmpty || normalizeTr(a.metin).contains(q))) a,
-    ];
+    final aramaVar = _sorgu.trim().isNotEmpty || !_filtre.bos;
+    final gorunen = anlikAra(
+      anliklar: anliklar ?? const <Anlik>[],
+      etiketler: etiketler,
+      baglar: baglar,
+      kutu: _sorgu,
+      filtre: _filtre,
+    );
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(tooltip: 'Ana uygulama', icon: const Icon(Icons.apps_rounded), onPressed: _anaUygulama),
         titleSpacing: 0,
         title: TextField(
           decoration: const InputDecoration(
-            hintText: 'Anlıklarda ara',
+            hintText: 'Ara  (#etiket, -#etiket)',
             prefixIcon: Icon(Icons.search_rounded),
             border: InputBorder.none,
             filled: false,
@@ -75,6 +82,12 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
           onChanged: (v) => setState(() => _sorgu = v),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Süz',
+            isSelected: _filtreAcik || !_filtre.bos,
+            icon: const Icon(Icons.filter_list_rounded),
+            onPressed: () => setState(() => _filtreAcik = !_filtreAcik),
+          ),
           PopupMenuButton<String>(
             onSelected: (v) {
               if (v == 'silinen') {
@@ -91,6 +104,19 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
       ),
       body: Column(
         children: [
+          if (_filtreAcik || !_filtre.bos)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: AramaFiltreleri(filtre: _filtre, degisti: (f) => setState(() => _filtre = f)),
+            ),
+          if (aramaVar && anliklar != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('${gorunen.length} anlık', style: Theme.of(context).textTheme.labelMedium),
+              ),
+            ),
           Expanded(
             child: anliklar == null
                 ? const Center(child: CircularProgressIndicator())
@@ -99,7 +125,7 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
                     child: Padding(
                       padding: const EdgeInsets.all(32),
                       child: Text(
-                        q.isEmpty ? 'Henüz anlık yok. Aşağıya kısaca ne olduğunu yaz.' : 'Sonuç yok.',
+                        aramaVar ? 'Sonuç yok.' : 'Henüz anlık yok. Aşağıya kısaca ne olduğunu yaz.',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
@@ -111,7 +137,8 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
                     itemCount: gorunen.length,
                     itemBuilder: (context, i) {
                       final a = gorunen[i];
-                      final gunBasi = i == 0 || !_ayniGun(gorunen[i - 1].olusturma, a.olusturma);
+                      // Aramada sıra alakaya göredir: gün başlığı sadece tarih sırasında.
+                      final gunBasi = !aramaVar && (i == 0 || !_ayniGun(gorunen[i - 1].olusturma, a.olusturma));
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -126,6 +153,7 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
                             baglar: baglar,
                             etiketBul: (n) => adla[n],
                             onEtiket: _etiketAc,
+                            onEtiketUzun: (e) => etiketMenusu(context, ref, e),
                           ),
                         ],
                       );
@@ -161,6 +189,7 @@ class AnlikKarti extends StatelessWidget {
     required this.baglar,
     required this.etiketBul,
     this.onEtiket,
+    this.onEtiketUzun,
   });
 
   final Anlik anlik;
@@ -168,6 +197,7 @@ class AnlikKarti extends StatelessWidget {
   final List<Bag> baglar;
   final Etiket? Function(String) etiketBul;
   final void Function(Etiket)? onEtiket;
+  final void Function(Etiket)? onEtiketUzun;
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +221,7 @@ class AnlikKarti extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (ciplar.isNotEmpty) ...[
-                EtiketSeridi(ciplar: ciplar, kucuk: true, onAc: onEtiket),
+                EtiketSeridi(ciplar: ciplar, kucuk: true, onAc: onEtiket, onUzunBas: onEtiketUzun),
                 const SizedBox(height: 6),
               ],
               EtiketliMetin(

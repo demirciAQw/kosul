@@ -85,6 +85,17 @@ Telefon aynı Wi-Fi'deyken yedeğini (fotoğrafsız) bilgisayara kendiliğinden 
 9. **Ayarlar > Obsidian anlarını içe aktar**: `Anlar/*.md` dosyalarını seç. İkinci kez seçersen "atlandı" der.
 10. Eşliyse: anlık yazınca bilgisayara gider (`koc sunucu` terminalinde "eşitlendi").
 
+### Etiket etiketi ve arama (v8.6.1)
+
+1. Bir etiket çipine **uzun bas**: menü açılır.
+2. **Etiket etiketi ekle**: listeden `tiksinti` seç (yoksa yaz, "tiksinti ekle"), **Ekle**. Artık `tiksinti`, `his`'in altında.
+3. `tiksinti`'ye uzun bas > **Etiket etiketi ekle** > `his`: "döngü olurdu" der, eklenmez.
+4. **Yeniden adlandır**: önce "N anlık etkilenecek" yazar; metinlerdeki `((eski))` yeni adla değişir.
+5. **Birleştir**: iki etiketten biri diğerine katılır; anlıklar ve alt etiketler geçer.
+6. Arama kutusuna `#his` yaz: `his` ve altındaki `tiksinti` etiketli anlıklar gelir. `-#ders` dışlar. `((his))` de olur.
+7. Süz simgesi: Etiket (Hepsi/Herhangi biri), Tarih, Duygu, Metin içi/Şerit/Yapay zekâ, Etiketsiz çipleri. **Temizle**.
+8. Yanlış defterindeki arama eskisi gibi çalışmalı (yazım hatası toleransı aynı).
+
 ## Hata alırsan
 
 Bu kodu yazarken Flutter'ı çalıştıramadım, yani ilk derlemede küçük bir hata çıkabilir.

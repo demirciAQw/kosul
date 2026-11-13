@@ -8,6 +8,7 @@ import '../anlik_providers.dart';
 import '../domain/anlik.dart';
 import '../domain/etiket_kurallari.dart';
 import '../domain/etiket_metni.dart';
+import 'etiket_menusu.dart';
 import 'etiket_secici.dart';
 import 'etiket_seridi.dart';
 import 'etiketli_metin.dart';
@@ -221,6 +222,7 @@ class _YazmaAlaniState extends ConsumerState<YazmaAlani> {
                 kucuk: true,
                 onEkle: _seritEkle,
                 onAc: widget.onEtiketAc,
+                onUzunBas: (e) => etiketMenusu(context, ref, e),
                 onKaldir: (c) {
                   if (c.bag != null) {
                     ref.read(anlikDeposuProvider).bagKaldir(c.bag!.id);

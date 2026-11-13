@@ -373,6 +373,76 @@ class AnlikDeposu implements EsitKayitKaynagi {
     });
   }
 
+  /// Yeniden adlandır: metindeki ((eski)) yazıları da güncellenir.
+  /// Döner: metni değişen anlık sayısı.
+  Future<int> etiketYenidenAdlandir(String etiketId, String yeniAd) async {
+    final temiz = etiketAdiDuzelt(yeniAd);
+    if (!gecerliEtiketAdi(temiz)) throw const EtiketHatasi('Etiket adı boş ya da çok uzun.');
+    final simdi = _saat();
+    var sayi = 0;
+    await _db.transaction(() async {
+      final hepsi = await etiketler();
+      final etiket = hepsi.where((e) => e.id == etiketId).firstOrNull;
+      if (etiket == null) return;
+      final ayni = adlaBul(hepsi, temiz);
+      if (ayni != null && ayni.id != etiketId) {
+        throw EtiketHatasi('"$temiz" adında bir etiket zaten var. İstersen "Birleştir" de.');
+      }
+      await (_db.update(_db.etiketler)..where((e) => e.id.equals(etiketId))).write(
+        EtiketlerCompanion(
+          ad: Value(temiz),
+          normAd: Value(normalizeTr(temiz)),
+          guncelleme: Value(simdi),
+          esitlenmedi: const Value(true),
+        ),
+      );
+      for (final a in await anliklar()) {
+        if (a.silindi) continue;
+        final yeni = etiketiYenidenAdlandir(a.metin, etiket.normAd, temiz);
+        if (yeni == a.metin) continue;
+        sayi++;
+        await (_db.update(_db.anliklar)..where((x) => x.id.equals(a.id))).write(
+          AnliklarCompanion(metin: Value(yeni), guncelleme: Value(simdi), esitlenmedi: const Value(true)),
+        );
+      }
+    });
+    return sayi;
+  }
+
+  /// [kaynakId] etiketi [hedefId]'de toplanır: bağlar taşınır, metindeki
+  /// ((kaynak)) yazıları ((hedef)) olur, kaynak yumuşak silinir.
+  Future<void> etiketBirlestir({required String kaynakId, required String hedefId}) async {
+    if (kaynakId == hedefId) return;
+    final simdi = _saat();
+    await _db.transaction(() async {
+      final hepsi = {for (final e in await etiketler()) e.id: e};
+      final kaynak = hepsi[kaynakId], hedef = hepsi[hedefId];
+      if (kaynak == null || hedef == null) return;
+      final baglar = await this.baglar();
+      if (birlestirmeDonguOlurMu(kaynakId: kaynakId, hedefId: hedefId, baglar: baglar)) {
+        throw const EtiketHatasi('Bu birleştirme döngü oluşturur.');
+      }
+      for (final a in await anliklar()) {
+        if (a.silindi) continue;
+        final yeni = etiketiYenidenAdlandir(a.metin, kaynak.normAd, hedef.ad);
+        if (yeni == a.metin) continue;
+        await (_db.update(_db.anliklar)..where((x) => x.id.equals(a.id))).write(
+          AnliklarCompanion(metin: Value(yeni), guncelleme: Value(simdi), esitlenmedi: const Value(true)),
+        );
+      }
+      await etiketleriBirlestir(kaybeden: kaynakId, kalan: hedefId, simdi: simdi);
+      await _yinelenenleriSil(simdi);
+    });
+  }
+
+  Future<void> _yinelenenleriSil(DateTime simdi) async {
+    final sil = yinelenenBaglar(await baglar());
+    if (sil.isEmpty) return;
+    await (_db.update(_db.baglar)..where((b) => b.id.isIn(sil))).write(
+      BaglarCompanion(silindi: const Value(true), guncelleme: Value(simdi), esitlenmedi: const Value(true)),
+    );
+  }
+
   // ───────────── içe aktarma ─────────────
 
   /// Obsidian `Anlar/*.md` dosyaları. Metindeki bilinmeyen ((…)) adlar için
@@ -526,6 +596,7 @@ class AnlikDeposu implements EsitKayitKaynagi {
     for (final e in harita.entries) {
       await etiketleriBirlestir(kaybeden: e.key, kalan: e.value, simdi: simdi);
     }
+    if (harita.isNotEmpty) await _yinelenenleriSil(simdi);
   }
 
   /// [kaybeden]'in bağları [kalan]'a taşınır, [kaybeden] yumuşak silinir.

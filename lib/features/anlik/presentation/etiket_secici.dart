@@ -11,6 +11,7 @@ import '../../../core/text/turkish_text.dart';
 import '../anlik_providers.dart';
 import '../domain/anlik.dart';
 import '../domain/etiket_kurallari.dart';
+import 'etiket_menusu.dart';
 import 'etiketli_metin.dart';
 import 'yeni_etiket_penceresi.dart';
 
@@ -105,22 +106,25 @@ class _EtiketSeciciState extends ConsumerState<_EtiketSecici> {
               child: ListView(
                 children: [
                   for (final s in gorunen)
-                    CheckboxListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.only(left: 16 + 24.0 * s.derinlik, right: 16),
-                      value: _secili.contains(s.etiket.id),
-                      secondary: Icon(Icons.label_rounded, color: etiketRengi(s.etiket, parlaklik: parlaklik)),
-                      title: Text(
-                        s.etiket.ad,
-                        style: s.derinlik == 0 && q.isEmpty ? const TextStyle(fontWeight: FontWeight.w600) : null,
+                    GestureDetector(
+                      onLongPress: () => etiketMenusu(context, ref, s.etiket),
+                      child: CheckboxListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.only(left: 16 + 24.0 * s.derinlik, right: 16),
+                        value: _secili.contains(s.etiket.id),
+                        secondary: Icon(Icons.label_rounded, color: etiketRengi(s.etiket, parlaklik: parlaklik)),
+                        title: Text(
+                          s.etiket.ad,
+                          style: s.derinlik == 0 && q.isEmpty ? const TextStyle(fontWeight: FontWeight.w600) : null,
+                        ),
+                        onChanged: (v) {
+                          if (widget.tekSecim) {
+                            Navigator.pop(context, {s.etiket.id});
+                            return;
+                          }
+                          setState(() => v == true ? _secili.add(s.etiket.id) : _secili.remove(s.etiket.id));
+                        },
                       ),
-                      onChanged: (v) {
-                        if (widget.tekSecim) {
-                          Navigator.pop(context, {s.etiket.id});
-                          return;
-                        }
-                        setState(() => v == true ? _secili.add(s.etiket.id) : _secili.remove(s.etiket.id));
-                      },
                     ),
                   if (yeniEtiketGosterilsinMi(etiketler, _sorgu))
                     ListTile(leading: const Icon(Icons.add_rounded), title: Text('${_sorgu.trim()} ekle'), onTap: _yeni)

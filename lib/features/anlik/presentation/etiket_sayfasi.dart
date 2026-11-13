@@ -10,6 +10,7 @@ import '../anlik_providers.dart';
 import '../domain/anlik.dart';
 import '../domain/etiket_kurallari.dart';
 import 'anlik_ekrani.dart';
+import 'etiket_menusu.dart';
 import 'etiketli_metin.dart';
 
 class EtiketSayfasi extends ConsumerWidget {
@@ -51,11 +52,10 @@ class EtiketSayfasi extends ConsumerWidget {
           ],
         ),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (v) async {
-              if (v == 'sil') await etiketSilDiyalogu(context, ref, etiket);
-            },
-            itemBuilder: (_) => const [PopupMenuItem(value: 'sil', child: Text('Etiketi sil'))],
+          IconButton(
+            tooltip: 'Etiket menüsü',
+            icon: const Icon(Icons.more_vert_rounded),
+            onPressed: () => etiketMenusu(context, ref, etiket),
           ),
         ],
       ),
@@ -94,6 +94,7 @@ class EtiketSayfasi extends ConsumerWidget {
               onEtiket: (e) {
                 if (e.id != etiketId) context.push(AppRoutes.anlikEtiket(e.id));
               },
+              onEtiketUzun: (e) => etiketMenusu(context, ref, e),
             ),
         ],
       ),
