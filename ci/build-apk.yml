@@ -3,7 +3,7 @@ name: APK derle
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches: [main, master, 'v8.*', 'v9.*']
 
 jobs:
   apk:
