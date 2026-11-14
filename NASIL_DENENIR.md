@@ -96,6 +96,17 @@ Telefon aynı Wi-Fi'deyken yedeğini (fotoğrafsız) bilgisayara kendiliğinden 
 7. Süz simgesi: Etiket (Hepsi/Herhangi biri), Tarih, Duygu, Metin içi/Şerit/Yapay zekâ, Etiketsiz çipleri. **Temizle**.
 8. Yanlış defterindeki arama eskisi gibi çalışmalı (yazım hatası toleransı aynı).
 
+## Noktasal grafik (v8.7)
+
+1. Anlık'ta sağ üstteki baloncuk simgesi: grafik bütün anlıklarla açılır. Eskiler dışta ve solda, yeniler içte ve sağda.
+2. İki parmakla yakınlaştır. Bir noktaya dokun: anlık açılır; etikete dokun: etiket sayfası.
+3. Etikete uzun bas: sadece komşuları parlak kalır. Boş yere dokun: hepsi geri gelir.
+4. Alttaki **Düzen ↔ Bağ** kaydırıcısı: solda tarih sarmalı korunur, sağda bağlar şekli toplar.
+5. Üstteki seçici: **Takvim** (her gün bir nokta, her tur bir hafta, hafta başları "9–15 Kas" gibi yazılı),
+   **Metin içi**, **Ana etiketler** (artılı etikete dokun: altları açılır), **Etiket ağacı**.
+6. Geri çık, grafiği yeniden aç: seçtiğin görünüm ve kaydırıcı yeri hatırlanır.
+7. Arama kutusuna `#his` yaz, **Grafikte göster**: grafik sadece bu sonuçlarla açılır; Takvim'de bu anlıklar mavi.
+
 ## Hata alırsan
 
 Bu kodu yazarken Flutter'ı çalıştıramadım, yani ilk derlemede küçük bir hata çıkabilir.

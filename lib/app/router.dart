@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/anlik/anlik_providers.dart';
 import '../features/anlik/presentation/anlik_ekrani.dart';
 import '../features/anlik/presentation/etiket_sayfasi.dart';
+import '../features/anlik/presentation/graf_ekrani.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/library/presentation/book_detail_screen.dart';
@@ -93,6 +94,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.anlik,
         builder: (context, state) => AnlikEkrani(yaz: state.uri.queryParameters['yaz'] == '1'),
+      ),
+      GoRoute(
+        path: AppRoutes.anlikGraf,
+        builder: (context, state) => GrafEkrani(girdi: state.extra as GrafGirdisi? ?? const GrafGirdisi()),
       ),
       GoRoute(
         path: '/anlik/etiket/:id',

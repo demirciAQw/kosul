@@ -10,8 +10,9 @@ Her adım bitince güncellenir. `main`'e dokunulmadı, birleştirme yok.
 | 1. Sistem kontrolü (koc-arac) | — | — |
 | 2. `koc esitle` + uçtan uca test (koc-arac) | koc-arac `main` (yerel) | `uv run pytest`: 30 geçti |
 | 3. Koçum v8.5.1: tek kullanımlık eşitleme | `v8.5` | yeşil |
-| 4. Koçum v8.6.0: Anlık | `v8.6.0` | (bekleniyor) |
-| 5. Koçum v8.6.1: etiket etiketi ve arama | `v8.6.1` | (bekleniyor) |
+| 4. Koçum v8.6.0: Anlık | `v8.6.0` | yeşil |
+| 5. Koçum v8.6.1: etiket etiketi ve arama | `v8.6.1` | yeşil |
+| 6. Koçum v8.7: noktasal grafik | `v8.7` | (bekleniyor) |
 
 ### Sistem kontrolü (hiçbir şey kurulmadı)
 - CachyOS, çekirdek 7.2.9; Python 3.14.10; uv 0.13.8; Flutter 3.50.0.
@@ -48,6 +49,12 @@ Her adım bitince güncellenir. `main`'e dokunulmadı, birleştirme yok.
 - Arama parçaları (`searchTokens`, `editDistance`, `tokenSimilarity`, `relevanceScore`) `core/text/fuzzy_search.dart`'a
   taşındı; `smart_search.dart` onları yeniden dışa veriyor, eski testler değişmeden geçiyor.
 - Birleştirmede döngü kontrolü ayrı bir saf fonksiyon (`birlestirmeDonguOlurMu`); çift bağlar temizlenir.
+- Kuvvet düzeninde itme sadece 60 birim yakındaki düğümler arasında (ızgara): 1550 düğüm testte birkaç saniye.
+  Rastgelelik yok; üst üste düğümler sıra numarasına göre sabit yöne ayrılır.
+- Takvim en fazla son ~1 yılı (370 gün) gösterir; daha eskisi sarmalı okunmaz yapardı.
+- Ana etiketler: birden çok üstü olan alt etiket, adı alfabede önce gelen üstüne katlanır.
+- Ekran duman testi (`test/anlik_ekran_test.dart`) gerçek bir hata yakaladı: isolate'e giden kapanış
+  ekran durumunu taşıyordu, grafik telefonda açılmazdı. Düzeltildi.
 - Anlıklar tam yedeğe (`kocum.backup` içinde `anlik`) de girer.
 
 ## Sabah telefonda deneme listesi
@@ -62,6 +69,8 @@ v8.5.1:
 v8.6.0: `NASIL_DENENIR.md` > "Anlık (v8.6)" bölümündeki 10 adım.
 
 v8.6.1: aynı belgede "Etiket etiketi ve arama (v8.6.1)" (8 adım).
+
+v8.7: aynı belgede "Noktasal grafik (v8.7)" (7 adım).
 
 ## Önce okunacak 3 dosya
 1. `lib/features/anlik/domain/etiket_metni.dart`: `((etiket))` nasıl bulunur (kısa, saf Dart).

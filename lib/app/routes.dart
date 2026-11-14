@@ -26,6 +26,7 @@ abstract final class AppRoutes {
   // Anlık (kendi kabuğu, alt sekme yok)
   static const anlik = '/anlik';
   static const anlikYaz = '/anlik?yaz=1';
+  static const anlikGraf = '/anlik/graf';
   static String anlikEtiket(String id) => '/anlik/etiket/$id';
   static String anlikDuzenle(String id) => '/anlik/a/$id';
   static String note(String id) => '/notes/$id';

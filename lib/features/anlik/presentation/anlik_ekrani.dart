@@ -21,6 +21,7 @@ import 'arama_filtreleri.dart';
 import 'etiket_menusu.dart';
 import 'etiket_seridi.dart';
 import 'etiketli_metin.dart';
+import 'graf_ekrani.dart';
 import 'yazma_alani.dart';
 
 class AnlikEkrani extends ConsumerStatefulWidget {
@@ -50,6 +51,21 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
   }
 
   void _etiketAc(Etiket e) => context.push(AppRoutes.anlikEtiket(e.id));
+
+  /// Grafik her zaman o anki arama sonucuyla açılır (arama yoksa hepsi).
+  void _grafik(List<Anlik>? sonuc) {
+    final kutu = sorguCoz(_sorgu);
+    final etiketler = ref.read(etiketlerProvider).value ?? const <Etiket>[];
+    final secili = {
+      ..._filtre.etiketler,
+      for (final e in etiketler)
+        if (!e.silindi && kutu.dahil.contains(e.normAd)) e.id,
+    };
+    context.push(
+      AppRoutes.anlikGraf,
+      extra: GrafGirdisi(anlikIds: sonuc == null ? null : {for (final a in sonuc) a.id}, etiketIds: secili),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +99,11 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Grafik',
+            icon: const Icon(Icons.bubble_chart_outlined),
+            onPressed: () => _grafik(aramaVar ? gorunen : null),
+          ),
+          IconButton(
             tooltip: 'Süz',
             isSelected: _filtreAcik || !_filtre.bos,
             icon: const Icon(Icons.filter_list_rounded),
@@ -112,9 +133,15 @@ class _AnlikEkraniState extends ConsumerState<AnlikEkrani> {
           if (aramaVar && anliklar != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('${gorunen.length} anlık', style: Theme.of(context).textTheme.labelMedium),
+              child: Row(
+                children: [
+                  Expanded(child: Text('${gorunen.length} anlık', style: Theme.of(context).textTheme.labelMedium)),
+                  TextButton.icon(
+                    onPressed: gorunen.isEmpty ? null : () => _grafik(gorunen),
+                    icon: const Icon(Icons.bubble_chart_outlined, size: 18),
+                    label: const Text('Grafikte göster'),
+                  ),
+                ],
               ),
             ),
           Expanded(
