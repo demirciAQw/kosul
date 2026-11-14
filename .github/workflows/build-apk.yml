@@ -61,7 +61,6 @@ jobs:
 
       - name: Testler
         run: flutter test
-        continue-on-error: true
 
       # Surum kodu her derlemede artar: Android guncellemeyi "eski surum" diye reddetmez.
       - name: APK derle
