@@ -12,7 +12,7 @@ Her adım bitince güncellenir. `main`'e dokunulmadı, birleştirme yok.
 | 3. Koçum v8.5.1: tek kullanımlık eşitleme | `v8.5` | yeşil |
 | 4. Koçum v8.6.0: Anlık | `v8.6.0` | yeşil |
 | 5. Koçum v8.6.1: etiket etiketi ve arama | `v8.6.1` | yeşil |
-| 6. Koçum v8.7: noktasal grafik | `v8.7` | (bekleniyor) |
+| 6. Koçum v8.7: noktasal grafik | `v8.7` | yeşil |
 | 7. koc-arac adım 3: `koc oku`, `koc ozet`, `koc pano` | koc-arac `main` (yerel) | `uv run pytest`: 39 geçti |
 
 ### Sistem kontrolü (hiçbir şey kurulmadı)
